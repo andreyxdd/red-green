@@ -31,10 +31,11 @@
     "react/prop-types": 0,
     "no-shadow": "off",
     "@typescript-eslint/no-shadow": ["error"],
+    "@typescript-eslint/no-unused-vars": ["error"],
     "react/react-in-jsx-scope": "off",
     "react/jsx-props-no-spreading": "off",
     "react/destructuring-assignment": "off",
     "react/no-unstable-nested-components": ["warn", { "allowAsProps": true }]
   },
-  "ignorePatterns": ["babel.config.js", "**/__tests__/*.js"]
+  "ignorePatterns": ["babel.config.js", "**/__tests__/*.js", "/web-build/*"]
 }

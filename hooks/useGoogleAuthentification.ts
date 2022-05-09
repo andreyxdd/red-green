@@ -16,7 +16,6 @@ export default function useGoogleAuthentication() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [request, _, promptAsync] = useIdTokenAuthRequest({
     ...Constants.manifest?.extra?.google,
-    expoClientId: '739474459497-53aaa2aap39phn0snvo005mric2njld7.apps.googleusercontent.com',
   });
 
   async function prompt() {

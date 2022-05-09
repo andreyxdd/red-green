@@ -1,12 +1,16 @@
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import {
+  Alert,
   KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
 import {
-  createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithCredential, updateEmail,
 } from 'firebase/auth';
+import { AppleAuthenticationButton, AppleAuthenticationButtonType, AppleAuthenticationButtonStyle } from 'expo-apple-authentication';
 import { auth } from '../firebase';
+import useAppleAuthentication from '../hooks/useAppleAuthentification';
+import useGoogleAuthentication from '../hooks/useGoogleAuthentification';
 
 const styles = StyleSheet.create({
   container: {
@@ -36,6 +40,12 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
+  },
+  appleButton: {
+    width: '100%',
+    padding: 15,
+    alignItems: 'center',
+    height: 48,
   },
   buttonOutline: {
     backgroundColor: 'white',
@@ -88,6 +98,31 @@ function LoginScreen() {
     }
   };
 
+  const [appleAuthAvailable, authWithApple] = useAppleAuthentication();
+  const handleAppleLogin = async () => {
+    try {
+      const [credential, data] = await authWithApple();
+      const { user } = await signInWithCredential(auth, credential);
+      if (data?.email && !user.email) {
+        await updateEmail(user, data.email);
+      }
+    } catch (error: any) {
+      console.error(error);
+      Alert.alert('Error', 'Something went wrong. Please try again later.');
+    }
+  };
+
+  const [googleAuthLoading, authWithGoogle] = useGoogleAuthentication();
+  const handleGoogleLogin = async () => {
+    try {
+      const [credential] = await authWithGoogle();
+      await signInWithCredential(auth, credential);
+    } catch (error: any) {
+      console.error(error);
+      Alert.alert('Error', 'Something went wrong. Please try again later.');
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -121,6 +156,22 @@ function LoginScreen() {
           style={[styles.button, styles.buttonOutline]}
         >
           <Text style={styles.buttonOutlineText}>Sign Up</Text>
+        </TouchableOpacity>
+        {appleAuthAvailable && (
+        <AppleAuthenticationButton
+          buttonType={AppleAuthenticationButtonType.SIGN_IN}
+          buttonStyle={AppleAuthenticationButtonStyle.WHITE_OUTLINE}
+          cornerRadius={8}
+          style={styles.appleButton}
+          onPress={handleAppleLogin}
+        />
+        )}
+        <TouchableOpacity
+          onPress={handleGoogleLogin}
+          style={styles.button}
+          disabled={!googleAuthLoading}
+        >
+          <Text style={styles.buttonText}>Google Sign-in</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

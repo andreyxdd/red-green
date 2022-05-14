@@ -24,6 +24,7 @@ export default {
       supportsTablet: true,
     },
     android: {
+      package: 'com.red-green.app',
       adaptiveIcon: {
         foregroundImage: './assets/images/adaptive-icon.png',
         backgroundColor: '#ffffff',
@@ -41,6 +42,7 @@ export default {
       firebaseAppId: process.env.FIREBASE_APP_ID,
       google: {
         expoClientId: process.env.GOOGLE_AUTH_EXPO_CLIENT_ID,
+        androidClientId: process.env.GOOGLE_AUTH_ANDROID_CLIENT_ID,
       },
     },
   },

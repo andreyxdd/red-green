@@ -40,7 +40,7 @@ export default function ModalScreen() {
     auth
       .signOut()
       .then(() => {
-        navigation.navigate('Login');
+        navigation.navigate('Intro');
       })
       .catch((e) => console.log(e));
   };

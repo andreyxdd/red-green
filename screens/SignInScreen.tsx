@@ -4,9 +4,7 @@ import {
   Alert,
   KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
-import {
-  createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithCredential, updateEmail,
-} from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithCredential, updateEmail } from 'firebase/auth';
 import { AppleAuthenticationButton, AppleAuthenticationButtonType, AppleAuthenticationButtonStyle } from 'expo-apple-authentication';
 import { auth } from '../firebase';
 import useAppleAuthentication from '../hooks/useAppleAuthentification';
@@ -37,6 +35,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#0782F9',
     width: '100%',
+    marginTop: 5,
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -65,7 +64,7 @@ const styles = StyleSheet.create({
   },
 });
 
-function LoginScreen() {
+function SignInScreen() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
@@ -81,20 +80,12 @@ function LoginScreen() {
     return unsubscribe;
   }, [navigation]);
 
-  const handleSignUp = async () => {
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      navigation.navigate('Root');
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
       console.log(error);
+      Alert.alert('Error', 'Something went wrong. Please try again later.');
     }
   };
 
@@ -143,19 +134,12 @@ function LoginScreen() {
           secureTextEntry
         />
       </View>
-
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           onPress={handleLogin}
           style={styles.button}
         >
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={handleSignUp}
-          style={[styles.button, styles.buttonOutline]}
-        >
-          <Text style={styles.buttonOutlineText}>Sign Up</Text>
+          <Text style={styles.buttonText}>Sign-in</Text>
         </TouchableOpacity>
         {appleAuthAvailable && (
         <AppleAuthenticationButton
@@ -178,4 +162,4 @@ function LoginScreen() {
   );
 }
 
-export default LoginScreen;
+export default SignInScreen;

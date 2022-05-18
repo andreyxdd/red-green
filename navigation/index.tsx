@@ -12,7 +12,9 @@ import { ColorSchemeName, Pressable } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import LoginScreen from '../screens/LoginScreen';
+import IntroScreen from '../screens/IntroScreen';
+import SignInScreen from '../screens/SignInScreen';
+import SignUpScreen from '../screens/SignUpScreen';
 import ModalScreen from '../screens/ModalScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import TabOneScreen from '../screens/TabOneScreen';
@@ -20,6 +22,8 @@ import TabTwoScreen from '../screens/TabTwoScreen';
 import TabThreeScreen from '../screens/TabThreeScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
+
+import BackArrow from '../components/svg/BackArrow';
 
 /**
  * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
@@ -99,11 +103,64 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 function RootNavigator() {
   return (
     <Stack.Navigator>
-      <Stack.Screen options={{ headerShown: false }} name="Login" component={LoginScreen} />
-      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
-      <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
-      <Stack.Group screenOptions={{ presentation: 'modal' }}>
-        <Stack.Screen name="Modal" component={ModalScreen} />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="Intro"
+        component={IntroScreen}
+      />
+      <Stack.Screen
+        options={({ navigation }) => ({
+          title: '',
+          headerTransparent: true,
+          headerLeft: () => (
+            <Pressable
+              onPress={() => navigation.navigate('Intro')}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.5 : 1,
+              })}
+            >
+              <BackArrow />
+            </Pressable>
+          ),
+        })}
+        name="SignIn"
+        component={SignInScreen}
+      />
+      <Stack.Screen
+        options={({ navigation }) => ({
+          title: '',
+          headerTransparent: true,
+          headerLeft: () => (
+            <Pressable
+              onPress={() => navigation.navigate('Intro')}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.5 : 1,
+              })}
+            >
+              <BackArrow />
+            </Pressable>
+          ),
+        })}
+        name="SignUp"
+        component={SignUpScreen}
+      />
+      <Stack.Screen
+        name="Root"
+        component={BottomTabNavigator}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="NotFound"
+        component={NotFoundScreen}
+        options={{ title: 'Oops!' }}
+      />
+      <Stack.Group
+        screenOptions={{ presentation: 'modal' }}
+      >
+        <Stack.Screen
+          name="Modal"
+          component={ModalScreen}
+        />
       </Stack.Group>
     </Stack.Navigator>
   );

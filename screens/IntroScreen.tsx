@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import {
   StyleSheet, Text, TouchableOpacity, View,
 } from 'react-native';
-import { auth } from '../firebase';
+import useAuthentification from '../hooks/useAuthentification';
 
 const styles = StyleSheet.create({
   container: {
@@ -39,16 +39,13 @@ const styles = StyleSheet.create({
 
 function LoginScreen() {
   const navigation = useNavigation();
+  const { user } = useAuthentification();
 
   React.useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        navigation.navigate('Root');
-      }
-    });
-
-    return unsubscribe;
-  }, [navigation]);
+    if (user) {
+      navigation.navigate('Root');
+    }
+  }, [user, navigation]);
 
   return (
     <View style={styles.container}>

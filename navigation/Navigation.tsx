@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { ColorSchemeName, Pressable, View } from 'react-native';
 
+import useAuthentication from '../hooks/useAuthentification';
+
 import IntroScreen from '../screens/IntroScreen';
 import SignInScreen from '../screens/SignInScreen';
 import SignUpScreen from '../screens/SignUpScreen';
@@ -21,96 +23,105 @@ import BottomTabNavigator from './BottomTabNavigator';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
+  const { user } = useAuthentication();
+
   return (
     <Stack.Navigator>
+      {!user ? (
+        <>
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Intro"
+            component={IntroScreen}
+          />
+          <Stack.Screen
+            options={({ navigation }) => ({
+              title: '',
+              headerTransparent: true,
+              headerLeft: () => (
+                <Pressable
+                  onPress={() => navigation.navigate('Intro')}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.5 : 1,
+                  })}
+                >
+                  <FontAwesome
+                    name="chevron-left"
+                    size={24}
+                    color="grey"
+                  />
+                </Pressable>
+              ),
+            })}
+            name="SignIn"
+            component={SignInScreen}
+          />
+          <Stack.Screen
+            options={({ navigation }) => ({
+              title: '',
+              headerTransparent: true,
+              headerLeft: () => (
+                <Pressable
+                  onPress={() => navigation.navigate('Intro')}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.5 : 1,
+                  })}
+                >
+                  <FontAwesome
+                    name="chevron-left"
+                    size={24}
+                    color="grey"
+                  />
+                </Pressable>
+              ),
+            })}
+            name="SignUp"
+            component={SignUpScreen}
+          />
+        </>
+      ) : (
+        <>
+          <Stack.Screen
+            name="Root"
+            component={BottomTabNavigator}
+            options={{ headerShown: false }}
+          />
+          <Stack.Group
+            screenOptions={{
+              presentation: 'modal',
+            }}
+          >
+            <Stack.Screen
+              name="UserMenu"
+              component={UserMenuScreen}
+              options={({ navigation }) => ({
+                title: '',
+                headerTransparent: true,
+                headerLeft: () => <View style={{ marginLeft: 50 }} />,
+                headerRight: () => (
+                  <Pressable
+                    onPress={() => navigation.navigate('TabTwo')}
+                    style={({ pressed }) => ({
+                      opacity: pressed ? 0.5 : 1,
+                    })}
+                  >
+                    <FontAwesome
+                      name="close"
+                      size={26}
+                      color="grey"
+                    />
+                  </Pressable>
+                ),
+              })}
+            />
+          </Stack.Group>
+        </>
+      ) }
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
         options={{ title: 'Oops!' }}
       />
-      <Stack.Screen
-        options={{ headerShown: false }}
-        name="Intro"
-        component={IntroScreen}
-      />
-      <Stack.Screen
-        options={({ navigation }) => ({
-          title: '',
-          headerTransparent: true,
-          headerLeft: () => (
-            <Pressable
-              onPress={() => navigation.navigate('Intro')}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}
-            >
-              <FontAwesome
-                name="chevron-left"
-                size={24}
-                color="grey"
-              />
-            </Pressable>
-          ),
-        })}
-        name="SignIn"
-        component={SignInScreen}
-      />
-      <Stack.Screen
-        options={({ navigation }) => ({
-          title: '',
-          headerTransparent: true,
-          headerLeft: () => (
-            <Pressable
-              onPress={() => navigation.navigate('Intro')}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}
-            >
-              <FontAwesome
-                name="chevron-left"
-                size={24}
-                color="grey"
-              />
-            </Pressable>
-          ),
-        })}
-        name="SignUp"
-        component={SignUpScreen}
-      />
-      <Stack.Screen
-        name="Root"
-        component={BottomTabNavigator}
-        options={{ headerShown: false }}
-      />
-      <Stack.Group
-        screenOptions={{
-          presentation: 'modal',
-        }}
-      >
-        <Stack.Screen
-          name="UserMenu"
-          component={UserMenuScreen}
-          options={({ navigation }) => ({
-            title: '',
-            headerTransparent: true,
-            headerLeft: () => <View style={{ marginLeft: 50 }} />,
-            headerRight: () => (
-              <Pressable
-                onPress={() => navigation.navigate('TabTwo')}
-                style={({ pressed }) => ({
-                  opacity: pressed ? 0.5 : 1,
-                })}
-              >
-                <FontAwesome
-                  name="close"
-                  size={26}
-                  color="grey"
-                />
-              </Pressable>
-            ),
-          })}
-        />
-      </Stack.Group>
     </Stack.Navigator>
   );
 }

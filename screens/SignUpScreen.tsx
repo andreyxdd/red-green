@@ -9,6 +9,7 @@ import {
 } from 'firebase/auth';
 import { AppleAuthenticationButton, AppleAuthenticationButtonType, AppleAuthenticationButtonStyle } from 'expo-apple-authentication';
 import { auth } from '../firebase';
+import useAuthentification from '../hooks/useAuthentification';
 import useAppleAuthentication from '../hooks/useAppleAuthentification';
 import useGoogleAuthentication from '../hooks/useGoogleAuthentification';
 
@@ -73,15 +74,12 @@ function SignUpScreen() {
 
   const navigation = useNavigation();
 
+  const { user } = useAuthentification();
   React.useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        navigation.navigate('Root');
-      }
-    });
-
-    return unsubscribe;
-  }, [navigation]);
+    if (user) {
+      navigation.navigate('Root');
+    }
+  }, [user, navigation]);
 
   const handleSignUp = async () => {
     try {
@@ -97,9 +95,9 @@ function SignUpScreen() {
   const handleAppleLogin = async () => {
     try {
       const [credential, data] = await authWithApple();
-      const { user } = await signInWithCredential(auth, credential);
-      if (data?.email && !user.email) {
-        await updateEmail(user, data.email);
+      const { user: appleUser } = await signInWithCredential(auth, credential);
+      if (data?.email && !appleUser.email) {
+        await updateEmail(appleUser, data.email);
       }
     } catch (error: any) {
       console.error(error);

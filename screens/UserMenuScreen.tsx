@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
 
 export default function UserMenuScreen() {
   const navigation = useNavigation();
-  const authData = useAuthentication();
+  const { user } = useAuthentication();
 
   const handleSignOut = () => {
     auth
@@ -81,7 +81,7 @@ export default function UserMenuScreen() {
         style={{ paddingTop: 20, paddingBottom: 20 }}
       />
       <Text style={styles.subTitle}>Username</Text>
-      <Text style={styles.text}>{authData.user?.email}</Text>
+      <Text style={styles.text}>{user?.email}</Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={[styles.button, styles.buttonItem]}>
           <Text style={styles.buttonText}>Profile</Text>

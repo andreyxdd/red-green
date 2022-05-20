@@ -4,8 +4,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { ColorSchemeName, Pressable, View } from 'react-native';
 
-import Colors from '../constants/Colors';
-import useColorScheme from '../hooks/useColorScheme';
 import IntroScreen from '../screens/IntroScreen';
 import SignInScreen from '../screens/SignInScreen';
 import SignUpScreen from '../screens/SignUpScreen';
@@ -23,10 +21,13 @@ import BottomTabNavigator from './BottomTabNavigator';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
-  const colorScheme = useColorScheme();
-
   return (
     <Stack.Navigator>
+      <Stack.Screen
+        name="NotFound"
+        component={NotFoundScreen}
+        options={{ title: 'Oops!' }}
+      />
       <Stack.Screen
         options={{ headerShown: false }}
         name="Intro"
@@ -46,7 +47,7 @@ function RootNavigator() {
               <FontAwesome
                 name="chevron-left"
                 size={24}
-                color={Colors[colorScheme].text}
+                color="grey"
               />
             </Pressable>
           ),
@@ -68,7 +69,7 @@ function RootNavigator() {
               <FontAwesome
                 name="chevron-left"
                 size={24}
-                color={Colors[colorScheme].text}
+                color="grey"
               />
             </Pressable>
           ),
@@ -80,11 +81,6 @@ function RootNavigator() {
         name="Root"
         component={BottomTabNavigator}
         options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="NotFound"
-        component={NotFoundScreen}
-        options={{ title: 'Oops!' }}
       />
       <Stack.Group
         screenOptions={{
@@ -107,8 +103,8 @@ function RootNavigator() {
               >
                 <FontAwesome
                   name="close"
-                  size={24}
-                  color={Colors[colorScheme].text}
+                  size={26}
+                  color="grey"
                 />
               </Pressable>
             ),

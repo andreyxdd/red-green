@@ -42,6 +42,7 @@ export default {
       firebaseAppId: process.env.FIREBASE_APP_ID,
       google: {
         expoClientId: process.env.GOOGLE_AUTH_EXPO_CLIENT_ID,
+        webClientId: process.env.GOOGLE_AUTH_WEB_CLIENT_ID,
         androidClientId: process.env.GOOGLE_AUTH_ANDROID_CLIENT_ID,
       },
     },

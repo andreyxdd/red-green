@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
-import Counter from '../components/Counter';
-import { Text, View } from '../components/Themed';
+import Counter from '../../components/Counter';
+import { Text, View } from '../../components/Themed';
 
 const styles = StyleSheet.create({
   container: {

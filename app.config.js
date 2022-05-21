@@ -24,7 +24,7 @@ export default {
       supportsTablet: true,
     },
     android: {
-      package: 'com.red-green.app',
+      package: 'com.redgreen.app',
       adaptiveIcon: {
         foregroundImage: './assets/images/adaptive-icon.png',
         backgroundColor: '#ffffff',

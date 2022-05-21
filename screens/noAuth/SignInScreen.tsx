@@ -4,14 +4,12 @@ import {
   Alert, Platform,
   KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
-import {
-  createUserWithEmailAndPassword, signInWithCredential, updateEmail,
-} from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithCredential, updateEmail } from 'firebase/auth';
 import { AppleAuthenticationButton, AppleAuthenticationButtonType, AppleAuthenticationButtonStyle } from 'expo-apple-authentication';
-import { auth } from '../firebase';
-import useAuthentification from '../hooks/useAuthentification';
-import useAppleAuthentication from '../hooks/useAppleAuthentification';
-import useGoogleAuthentication from '../hooks/useGoogleAuthentification';
+import { auth } from '../../firebase';
+import useAuthentification from '../../hooks/useAuthentification';
+import useAppleAuthentication from '../../hooks/useAppleAuthentification';
+import useGoogleAuthentication from '../../hooks/useGoogleAuthentification';
 
 const styles = StyleSheet.create({
   container: {
@@ -38,8 +36,8 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#0782F9',
     width: '100%',
-    padding: 15,
     marginTop: 5,
+    padding: 15,
     borderRadius: 10,
     alignItems: 'center',
   },
@@ -67,13 +65,11 @@ const styles = StyleSheet.create({
   },
 });
 
-function SignUpScreen() {
+function SignInScreen() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [, setPasswordRepeat] = React.useState('');
 
   const navigation = useNavigation();
-
   const { user } = useAuthentification();
   React.useEffect(() => {
     if (user) {
@@ -81,10 +77,9 @@ function SignUpScreen() {
     }
   }, [user, navigation]);
 
-  const handleSignUp = async () => {
+  const handleLogin = async () => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      navigation.navigate('Root');
+      await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
       console.log(error);
       Alert.alert('Error', 'Something went wrong. Please try again later.');
@@ -135,20 +130,13 @@ function SignUpScreen() {
           style={styles.input}
           secureTextEntry
         />
-        <TextInput
-          placeholder="Password"
-          value={password}
-          onChangeText={(text) => setPasswordRepeat(text)}
-          style={styles.input}
-          secureTextEntry
-        />
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          onPress={handleSignUp}
-          style={[styles.button, styles.buttonOutline]}
+          onPress={handleLogin}
+          style={styles.button}
         >
-          <Text style={styles.buttonOutlineText}>Sign Up</Text>
+          <Text style={styles.buttonText}>Sign-in</Text>
         </TouchableOpacity>
         {appleAuthAvailable && (
         <AppleAuthenticationButton
@@ -164,11 +152,11 @@ function SignUpScreen() {
           style={styles.button}
           disabled={!googleAuthLoading}
         >
-          <Text style={styles.buttonText}>Google Sign-Up</Text>
+          <Text style={styles.buttonText}>Google Sign-in</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
 }
 
-export default SignUpScreen;
+export default SignInScreen;

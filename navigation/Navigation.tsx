@@ -6,10 +6,10 @@ import { ColorSchemeName, Pressable, View } from 'react-native';
 
 import useAuthentication from '../hooks/useAuthentification';
 
-import IntroScreen from '../screens/IntroScreen';
-import SignInScreen from '../screens/SignInScreen';
-import SignUpScreen from '../screens/SignUpScreen';
-import UserMenuScreen from '../screens/UserMenuScreen';
+import IntroScreen from '../screens/noAuth/IntroScreen';
+import SignInScreen from '../screens/noAuth/SignInScreen';
+import SignUpScreen from '../screens/noAuth/SignUpScreen';
+import UserMenuScreen from '../screens/withAuth/UserMenuScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
@@ -35,28 +35,8 @@ function RootNavigator() {
             component={IntroScreen}
           />
           <Stack.Screen
-            options={({ navigation }) => ({
-              title: '',
-              headerTransparent: true,
-              headerLeft: () => (
-                <Pressable
-                  onPress={() => navigation.navigate('Intro')}
-                  style={({ pressed }) => ({
-                    opacity: pressed ? 0.5 : 1,
-                  })}
-                >
-                  <FontAwesome
-                    name="chevron-left"
-                    size={24}
-                    color="grey"
-                  />
-                </Pressable>
-              ),
-            })}
             name="SignIn"
             component={SignInScreen}
-          />
-          <Stack.Screen
             options={({ navigation }) => ({
               title: '',
               headerTransparent: true,
@@ -75,8 +55,28 @@ function RootNavigator() {
                 </Pressable>
               ),
             })}
+          />
+          <Stack.Screen
             name="SignUp"
             component={SignUpScreen}
+            options={({ navigation }) => ({
+              title: '',
+              headerTransparent: true,
+              headerLeft: () => (
+                <Pressable
+                  onPress={() => navigation.navigate('Intro')}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.5 : 1,
+                  })}
+                >
+                  <FontAwesome
+                    name="chevron-left"
+                    size={24}
+                    color="grey"
+                  />
+                </Pressable>
+              ),
+            })}
           />
         </>
       ) : (

@@ -3,7 +3,6 @@ import { useNavigation } from '@react-navigation/native';
 import {
   StyleSheet, Text, TouchableOpacity, View,
 } from 'react-native';
-import useAuthentification from '../hooks/useAuthentification';
 
 const styles = StyleSheet.create({
   container: {
@@ -37,15 +36,8 @@ const styles = StyleSheet.create({
   },
 });
 
-function LoginScreen() {
+function IntroScreen() {
   const navigation = useNavigation();
-  const { user } = useAuthentification();
-
-  React.useEffect(() => {
-    if (user) {
-      navigation.navigate('Root');
-    }
-  }, [user, navigation]);
 
   return (
     <View style={styles.container}>
@@ -68,4 +60,4 @@ function LoginScreen() {
   );
 }
 
-export default LoginScreen;
+export default IntroScreen;

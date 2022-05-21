@@ -4,12 +4,14 @@ import {
   Alert, Platform,
   KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
-import { signInWithEmailAndPassword, signInWithCredential, updateEmail } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword, signInWithCredential, updateEmail,
+} from 'firebase/auth';
 import { AppleAuthenticationButton, AppleAuthenticationButtonType, AppleAuthenticationButtonStyle } from 'expo-apple-authentication';
-import { auth } from '../firebase';
-import useAuthentification from '../hooks/useAuthentification';
-import useAppleAuthentication from '../hooks/useAppleAuthentification';
-import useGoogleAuthentication from '../hooks/useGoogleAuthentification';
+import { auth } from '../../firebase';
+import useAuthentification from '../../hooks/useAuthentification';
+import useAppleAuthentication from '../../hooks/useAppleAuthentification';
+import useGoogleAuthentication from '../../hooks/useGoogleAuthentification';
 
 const styles = StyleSheet.create({
   container: {
@@ -36,8 +38,8 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#0782F9',
     width: '100%',
-    marginTop: 5,
     padding: 15,
+    marginTop: 5,
     borderRadius: 10,
     alignItems: 'center',
   },
@@ -65,9 +67,10 @@ const styles = StyleSheet.create({
   },
 });
 
-function SignInScreen() {
+function SignUpScreen() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [, setPasswordRepeat] = React.useState('');
 
   const navigation = useNavigation();
 
@@ -78,9 +81,10 @@ function SignInScreen() {
     }
   }, [user, navigation]);
 
-  const handleLogin = async () => {
+  const handleSignUp = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await createUserWithEmailAndPassword(auth, email, password);
+      navigation.navigate('Intro');
     } catch (error) {
       console.log(error);
       Alert.alert('Error', 'Something went wrong. Please try again later.');
@@ -131,13 +135,20 @@ function SignInScreen() {
           style={styles.input}
           secureTextEntry
         />
+        <TextInput
+          placeholder="Password"
+          value={password}
+          onChangeText={(text) => setPasswordRepeat(text)}
+          style={styles.input}
+          secureTextEntry
+        />
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          onPress={handleLogin}
-          style={styles.button}
+          onPress={handleSignUp}
+          style={[styles.button, styles.buttonOutline]}
         >
-          <Text style={styles.buttonText}>Sign-in</Text>
+          <Text style={styles.buttonOutlineText}>Sign Up</Text>
         </TouchableOpacity>
         {appleAuthAvailable && (
         <AppleAuthenticationButton
@@ -153,11 +164,11 @@ function SignInScreen() {
           style={styles.button}
           disabled={!googleAuthLoading}
         >
-          <Text style={styles.buttonText}>Google Sign-in</Text>
+          <Text style={styles.buttonText}>Google Sign-Up</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
 }
 
-export default SignInScreen;
+export default SignUpScreen;

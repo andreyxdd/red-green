@@ -36,6 +36,7 @@ const linking: LinkingOptions<RootStackParamList> = {
         },
       },
       UserMenu: 'user-menu',
+      EditProfile: 'edit-profile',
       NotFound: '*',
     },
   },

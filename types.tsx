@@ -22,6 +22,7 @@ export type RootStackParamList = {
   SignUp: undefined;
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
   UserMenu: undefined;
+  EditProfile: undefined;
   NotFound: undefined;
 };
 

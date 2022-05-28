@@ -2,14 +2,17 @@ import { FontAwesome } from '@expo/vector-icons';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { ColorSchemeName, Pressable, View } from 'react-native';
+import {
+  ColorSchemeName, Pressable, View,
+} from 'react-native';
 
 import useAuthentication from '../hooks/useAuthentification';
 
 import IntroScreen from '../screens/noAuth/IntroScreen';
 import SignInScreen from '../screens/noAuth/SignInScreen';
 import SignUpScreen from '../screens/noAuth/SignUpScreen';
-import UserMenuScreen from '../screens/withAuth/UserMenuScreen';
+import UserMenuScreen from '../screens/withAuth/UserMenuScreen/UserMenuScreen';
+import EditProfile from '../screens/withAuth/UserMenuScreen/EditProfile';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
@@ -86,37 +89,53 @@ function RootNavigator() {
             component={BottomTabNavigator}
             options={{ headerShown: false }}
           />
-          <Stack.Group
-            screenOptions={{
-              presentation: 'modal',
-            }}
-          >
-            <Stack.Screen
-              name="UserMenu"
-              component={UserMenuScreen}
-              options={({ navigation }) => ({
-                title: '',
-                headerTransparent: true,
-                headerLeft: () => <View style={{ marginLeft: 50 }} />,
-                headerRight: () => (
-                  <Pressable
-                    onPress={() => navigation.navigate('TabTwo')}
-                    style={({ pressed }) => ({
-                      opacity: pressed ? 0.5 : 1,
-                    })}
-                  >
-                    <FontAwesome
-                      name="close"
-                      size={26}
-                      color="grey"
-                    />
-                  </Pressable>
-                ),
-              })}
-            />
-          </Stack.Group>
+          <Stack.Screen
+            name="UserMenu"
+            component={UserMenuScreen}
+            options={({ navigation }) => ({
+              title: '',
+              headerTransparent: true,
+              headerLeft: () => <View style={{ marginLeft: 50 }} />,
+              headerRight: () => (
+                <Pressable
+                  onPress={() => navigation.navigate('TabTwo')}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.5 : 1,
+                  })}
+                >
+                  <FontAwesome
+                    name="close"
+                    size={26}
+                    color="grey"
+                  />
+                </Pressable>
+              ),
+            })}
+          />
+          <Stack.Screen
+            name="EditProfile"
+            component={EditProfile}
+            options={({ navigation }) => ({
+              title: 'Profile',
+              headerTransparent: true,
+              headerLeft: () => (
+                <Pressable
+                  onPress={() => navigation.navigate('UserMenu')}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.5 : 1,
+                  })}
+                >
+                  <FontAwesome
+                    name="chevron-left"
+                    size={24}
+                    color="grey"
+                  />
+                </Pressable>
+              ),
+            })}
+          />
         </>
-      ) }
+      )}
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}

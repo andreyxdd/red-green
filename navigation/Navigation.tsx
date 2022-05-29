@@ -74,7 +74,7 @@ function RootNavigator() {
                 >
                   <FontAwesome
                     name="chevron-left"
-                    size={24}
+                    size={40}
                     color="grey"
                   />
                 </Pressable>
@@ -94,6 +94,7 @@ function RootNavigator() {
             component={UserMenuScreen}
             options={({ navigation }) => ({
               title: '',
+              animation: 'slide_from_bottom',
               headerTransparent: true,
               headerLeft: () => <View style={{ marginLeft: 50 }} />,
               headerRight: () => (
@@ -105,7 +106,7 @@ function RootNavigator() {
                 >
                   <FontAwesome
                     name="close"
-                    size={26}
+                    size={32}
                     color="grey"
                   />
                 </Pressable>
@@ -127,7 +128,7 @@ function RootNavigator() {
                 >
                   <FontAwesome
                     name="chevron-left"
-                    size={24}
+                    size={32}
                     color="grey"
                   />
                 </Pressable>

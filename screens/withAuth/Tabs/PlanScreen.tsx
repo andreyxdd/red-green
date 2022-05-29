@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
-import Counter from '../../components/Counter';
-import { Text, View } from '../../components/Themed';
+import Counter from '../../../components/Counter';
+import { Text, View } from '../../../components/Themed';
 
 const styles = StyleSheet.create({
   container: {
@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function TabThreeScreen() {
+export default function PlanScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tab Three - Counter</Text>

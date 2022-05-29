@@ -3,9 +3,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Pressable } from 'react-native';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import TabOneScreen from '../screens/withAuth/TabOneScreen';
-import TabTwoScreen from '../screens/withAuth/TabTwoScreen';
-import TabThreeScreen from '../screens/withAuth/TabThreeScreen';
+import TabOneScreen from '../screens/withAuth/Tabs/TodayScreen';
+import TabTwoScreen from '../screens/withAuth/Tabs/WeighInScreen';
+import TabThreeScreen from '../screens/withAuth/Tabs/PlanScreen';
 import { RootTabParamList, RootTabScreenProps } from '../types';
 
 /**
@@ -29,6 +29,7 @@ function BottomTabNavigator() {
         component={TabOneScreen}
         options={() => ({
           title: 'Today',
+          headerStyle: { backgroundColor: 'tomato', height: 80 },
           tabBarIcon: ({ color }) => (
             <AntDesign name="calendar" size={24} color={color} />
           ),
@@ -39,6 +40,7 @@ function BottomTabNavigator() {
         component={TabTwoScreen}
         options={({ navigation }: RootTabScreenProps<'TabTwo'>) => ({
           title: 'Weigh In',
+          headerStyle: { backgroundColor: 'tomato', height: 80 },
           tabBarIcon: ({ color }) => (
             <AntDesign name="pluscircleo" size={24} color={color} />
           ),
@@ -51,7 +53,7 @@ function BottomTabNavigator() {
             >
               <FontAwesome
                 name="user-circle-o"
-                size={40}
+                size={50}
                 color="grey"
                 style={{ marginRight: 15 }}
               />
@@ -64,6 +66,7 @@ function BottomTabNavigator() {
         component={TabThreeScreen}
         options={{
           title: 'Plan',
+          headerStyle: { backgroundColor: 'tomato', height: 80 },
           tabBarIcon: ({ color }) => <AntDesign name="barschart" size={24} color={color} />,
         }}
       />

@@ -3,9 +3,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Pressable } from 'react-native';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import TabOneScreen from '../screens/withAuth/Tabs/TodayScreen';
-import TabTwoScreen from '../screens/withAuth/Tabs/WeighInScreen';
-import TabThreeScreen from '../screens/withAuth/Tabs/PlanScreen';
+import TabOneScreen from '../screens/withAuth/Today/TodayScreen';
+import TabTwoScreen from '../screens/withAuth/Weighin/WeighInScreen';
+import TabThreeScreen from '../screens/withAuth/Plan/PlanScreen';
 import { RootTabParamList, RootTabScreenProps } from '../types';
 
 /**

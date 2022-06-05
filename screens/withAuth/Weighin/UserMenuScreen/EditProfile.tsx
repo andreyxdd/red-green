@@ -5,8 +5,8 @@ import {
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { useTailwind } from 'tailwind-rn';
-import { Text, View } from '../../../components/Themed';
-import useAuthentication from '../../../hooks/useAuthentification';
+import { Text, View } from '../../../../components/Themed';
+import useAuthentication from '../../../../hooks/useAuthentification';
 
 const styles = StyleSheet.create({
   container: {

@@ -2,9 +2,9 @@ import { StatusBar } from 'expo-status-bar';
 import { Platform, StyleSheet, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { auth } from '../../../firebase';
-import { Text, View } from '../../../components/Themed';
-import useAuthentication from '../../../hooks/useAuthentification';
+import { auth } from '../../../../firebase';
+import { Text, View } from '../../../../components/Themed';
+import useAuthentication from '../../../../hooks/useAuthentification';
 
 const styles = StyleSheet.create({
   container: {

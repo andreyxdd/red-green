@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { ref, set, onValue } from 'firebase/database';
+import { FirestoreError } from 'firebase/firestore';
 import { Text, View } from './Themed';
-import { db } from '../firebase';
+import { streamUserCounter, updateUserCounter } from '../firebase';
 import useAuthentication from '../hooks/useAuthentification';
 
 const styles = StyleSheet.create({
@@ -24,26 +24,27 @@ const styles = StyleSheet.create({
 
 export default function Counter() {
   const { user } = useAuthentication();
-  const userRef = ref(db, `users/${user?.uid}`);
   const [count, setCount] = React.useState(0);
 
   const onPress = () => {
-    if (user) set(userRef, { count: count + 1 });
+    if (user) updateUserCounter(user.uid, count + 1);
   };
 
   React.useEffect(() => {
-    const listener = onValue(userRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        setCount(data.count);
-      } else {
-        set(userRef, { count: 0 });
-      }
-    });
-
-    return () => listener();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count, userRef]);
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    let unsubscribe = () => { };
+    if (user && user.uid) {
+      unsubscribe = streamUserCounter(
+        user.uid,
+        (docSnapshot) => {
+          const updatedUserCounter = docSnapshot?.data()?.counter;
+          if (updatedUserCounter) setCount(updatedUserCounter);
+        },
+        (error: FirestoreError) => console.log(error),
+      );
+    }
+    return unsubscribe;
+  }, [user, setCount]);
 
   return (
     <View style={styles.container}>

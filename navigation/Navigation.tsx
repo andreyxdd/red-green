@@ -11,8 +11,9 @@ import useAuthentication from '../hooks/useAuthentification';
 import IntroScreen from '../screens/noAuth/IntroScreen';
 import SignInScreen from '../screens/noAuth/SignInScreen';
 import SignUpScreen from '../screens/noAuth/SignUpScreen';
-import UserMenuScreen from '../screens/withAuth/Weighin/UserMenuScreen/UserMenuScreen';
-import EditProfile from '../screens/withAuth/Weighin/UserMenuScreen/EditProfile';
+import UserMenuScreen from '../screens/withAuth/Weighin/UserMenu/UserMenuScreen';
+import EditProfileScreen from '../screens/withAuth/Weighin/UserMenu/EditProfileScreen';
+import EditPlanScreen from '../screens/withAuth/Plan/EditPlanScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
@@ -115,13 +116,35 @@ function RootNavigator() {
           />
           <Stack.Screen
             name="EditProfile"
-            component={EditProfile}
+            component={EditProfileScreen}
             options={({ navigation }) => ({
               title: 'Profile',
               headerTransparent: true,
               headerLeft: () => (
                 <Pressable
                   onPress={() => navigation.navigate('UserMenu')}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.5 : 1,
+                  })}
+                >
+                  <FontAwesome
+                    name="chevron-left"
+                    size={32}
+                    color="grey"
+                  />
+                </Pressable>
+              ),
+            })}
+          />
+          <Stack.Screen
+            name="EditPlan"
+            component={EditPlanScreen}
+            options={({ navigation }) => ({
+              title: 'Edit Plan',
+              headerTransparent: true,
+              headerLeft: () => (
+                <Pressable
+                  onPress={() => navigation.navigate('TabThree')}
                   style={({ pressed }) => ({
                     opacity: pressed ? 0.5 : 1,
                   })}

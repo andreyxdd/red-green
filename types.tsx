@@ -23,6 +23,7 @@ export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
   UserMenu: undefined;
   EditProfile: undefined;
+  EditPlan: undefined;
   NotFound: undefined;
 };
 

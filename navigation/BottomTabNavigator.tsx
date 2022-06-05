@@ -7,6 +7,7 @@ import TabOneScreen from '../screens/withAuth/Today/TodayScreen';
 import TabTwoScreen from '../screens/withAuth/Weighin/WeighInScreen';
 import TabThreeScreen from '../screens/withAuth/Plan/PlanScreen';
 import { RootTabParamList, RootTabScreenProps } from '../types';
+import { MenuContextOpenner } from '../components/PopupPlanMenu';
 
 /**
  * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
@@ -67,6 +68,7 @@ function BottomTabNavigator() {
         options={{
           title: 'Plan',
           headerStyle: { backgroundColor: 'tomato', height: 80 },
+          headerRight: () => <MenuContextOpenner />,
           tabBarIcon: ({ color }) => <AntDesign name="barschart" size={24} color={color} />,
         }}
       />

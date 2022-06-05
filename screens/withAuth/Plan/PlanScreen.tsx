@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import Counter from '../../../components/Counter';
+import PopupPlanMenu from '../../../components/PopupPlanMenu';
 import { Text, View } from '../../../components/Themed';
 
 const styles = StyleSheet.create({
@@ -26,6 +27,7 @@ export default function PlanScreen() {
       <Text style={styles.title}>Tab Three - Counter</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <Counter />
+      <PopupPlanMenu />
     </View>
   );
 }

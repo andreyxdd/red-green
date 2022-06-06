@@ -1,13 +1,13 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
-  Platform, StyleSheet, Button, Keyboard, Dimensions,
+  Platform, StyleSheet, Button, Keyboard,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 // import { useTailwind } from 'tailwind-rn';
 import { Text, View } from '../../../components/Themed';
+import DatePickerModal from '../../../components/DatePickerModal';
 
 const styles = StyleSheet.create({
   container: {
@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
 
 export default function EditPlanScreen() {
   // const tailwind = useTailwind();
-  const [date, setDate] = React.useState(new Date(1598051730000));
+  const [date, setDate] = React.useState<Date>();
 
   const datePickerRef = React.useRef<RBSheet>(null);
   const toggleDatePicker = () => {
@@ -33,45 +33,21 @@ export default function EditPlanScreen() {
     }
   };
 
-  const onChangeDate = (event: unknown, selectedDate?: Date) => {
-    if (selectedDate) {
-      setDate(selectedDate);
-    }
-  };
-
   return (
     <View style={styles.container}>
       <View>
         <Button onPress={toggleDatePicker} title="Show date picker!" />
       </View>
-      <Text>
-        selected:
-        {' '}
-        {date.toLocaleString()}
-      </Text>
-      <RBSheet
-        ref={datePickerRef}
-        closeOnDragDown
-        height={300}
-        openDuration={250}
-        customStyles={{
-          container: {
-            justifyContent: 'center',
-            alignItems: 'center',
-          },
-        }}
-      >
-        <DateTimePicker
-          testID="dateTimePickerGoal"
-          value={date || new Date()}
-          mode="date"
-          onChange={onChangeDate}
-          style={{ width: Dimensions.get('window').width * 0.9 }}
-          display="spinner"
-        />
-      </RBSheet>
-
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
+      {date && (
+      <>
+        <Text>
+          selected:
+          {' '}
+          {date.toLocaleString()}
+        </Text>
+        <DatePickerModal ref={datePickerRef} value={date} setValue={setDate} id="datePickerGoal" />
+      </>
+      )}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
     </View>
   );

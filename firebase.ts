@@ -59,6 +59,15 @@ export const updateUserName = (uid: string, newName: string) => {
   );
 };
 
+export const updateUserDOB = (uid: string, newDOB: Date) => {
+  const userRef = doc(db, 'users', uid);
+  setDoc(
+    userRef,
+    { dob: newDOB },
+    { merge: true },
+  );
+};
+
 export const getUserData = (uid: string) => {
   const userRef = doc(db, 'users', uid);
   return getDoc(userRef);

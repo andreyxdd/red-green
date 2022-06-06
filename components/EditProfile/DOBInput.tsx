@@ -5,6 +5,7 @@ import {
 import { User } from 'firebase/auth';
 import { useTailwind } from 'tailwind-rn';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import { format } from 'date-fns';
 import { Text, View } from '../Themed';
 import { getUserData, updateUserDOB } from '../../firebase';
 import DatePickerModal from '../DatePickerModal';
@@ -69,7 +70,7 @@ export default function DOBInput({ user }: IDOBInput) {
       >
         <Text style={[tailwind('text-placeholder'), styles.titleText]}>Date of Birth</Text>
         <View style={tailwind('flex items-center flex-row')}>
-          <Text style={[tailwind('text-text'), styles.inputText]}>{DOB && DOB.toLocaleString()}</Text>
+          <Text style={[tailwind('text-text'), styles.inputText]}>{DOB && format(DOB, 'dd-MM-yyyy')}</Text>
         </View>
       </TouchableOpacity>
       {DOB && (

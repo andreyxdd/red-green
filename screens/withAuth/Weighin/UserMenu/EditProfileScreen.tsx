@@ -8,6 +8,7 @@ import NameInput from '../../../../components/EditProfile/NameInput';
 import DOBInput from '../../../../components/EditProfile/DOBInput';
 import { View } from '../../../../components/Themed';
 import useAuthentication from '../../../../hooks/useAuthentification';
+import UnitToggle from '../../../../components/EditProfile/UnitToggle';
 
 const styles = StyleSheet.create({
   container: {
@@ -32,6 +33,7 @@ export default function UserMenuScreen() {
       <>
         <NameInput user={user} />
         <DOBInput user={user} />
+        <UnitToggle user={user} />
       </>
       )}
       {/* Use a light status bar on iOS to account for the black space above the modal */}

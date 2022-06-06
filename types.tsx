@@ -41,4 +41,9 @@ export type RootTabParamList = {
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<
   BottomTabScreenProps<RootTabParamList, Screen>,
   NativeStackScreenProps<RootStackParamList>
->;
+  >;
+
+export const enum UNITS {
+  METRIC = 'METRIC',
+  IMPERIAL = 'IMPERIAL',
+}

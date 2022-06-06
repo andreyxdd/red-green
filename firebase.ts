@@ -68,6 +68,15 @@ export const updateUserDOB = (uid: string, newDOB: Date) => {
   );
 };
 
+export const updateUserUnits = (uid: string, newUnits: string) => {
+  const userRef = doc(db, 'users', uid);
+  setDoc(
+    userRef,
+    { units: newUnits },
+    { merge: true },
+  );
+};
+
 export const getUserData = (uid: string) => {
   const userRef = doc(db, 'users', uid);
   return getDoc(userRef);

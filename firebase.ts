@@ -4,7 +4,7 @@ import { getAuth } from 'firebase/auth';
 import {
   getFirestore, onSnapshot, DocumentSnapshot,
   DocumentData, FirestoreError,
-  setDoc, doc,
+  setDoc, doc, getDoc,
 } from 'firebase/firestore';
 import Constants from 'expo-constants';
 
@@ -32,7 +32,7 @@ export const auth = getAuth();
 getAuth().useDeviceLanguage();
 
 // ---
-export const streamUserCounter = (
+export const streamUser = (
   uid: string,
   snapshot: ((snapshot: DocumentSnapshot<DocumentData>) => void),
   error?: ((error: FirestoreError) => void),
@@ -43,7 +43,23 @@ export const streamUserCounter = (
 
 export const updateUserCounter = (uid: string, newCount: number) => {
   const userRef = doc(db, 'users', uid);
-  setDoc(userRef, {
-    counter: newCount,
-  });
+  setDoc(
+    userRef,
+    { counter: newCount },
+    { merge: true },
+  );
+};
+
+export const updateUserName = (uid: string, newName: string) => {
+  const userRef = doc(db, 'users', uid);
+  setDoc(
+    userRef,
+    { name: newName },
+    { merge: true },
+  );
+};
+
+export const getUserData = (uid: string) => {
+  const userRef = doc(db, 'users', uid);
+  return getDoc(userRef);
 };

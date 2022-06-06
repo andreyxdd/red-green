@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { FirestoreError } from 'firebase/firestore';
 import { Text, View } from './Themed';
-import { streamUserCounter, updateUserCounter } from '../firebase';
+import { streamUser, updateUserCounter } from '../firebase';
 import useAuthentication from '../hooks/useAuthentification';
 
 const styles = StyleSheet.create({
@@ -34,7 +34,7 @@ export default function Counter() {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     let unsubscribe = () => { };
     if (user && user.uid) {
-      unsubscribe = streamUserCounter(
+      unsubscribe = streamUser(
         user.uid,
         (docSnapshot) => {
           const updatedUserCounter = docSnapshot?.data()?.counter;

@@ -3,7 +3,8 @@ import { StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { User } from 'firebase/auth';
 import { useTailwind } from 'tailwind-rn';
 import { Text, View } from '../Themed';
-import { getUserData, updateUserName } from '../../firebase';
+import { updateUserName } from '../../firebase';
+import useStore, { IStore } from '../../hooks/useStore';
 
 const styles = StyleSheet.create({
   inputText: {
@@ -33,18 +34,15 @@ export default function NameInput({ user }: INameInput) {
   const tailwind = useTailwind();
   const inputRef = React.useRef<TextInput | null>(null);
   const [name, setName] = React.useState('');
+  const initName = useStore((state: IStore) => state.name);
 
   const handleSubmitEditing = () => {
     if (user) updateUserName(user.uid, name);
   };
 
   React.useEffect(() => {
-    const fetch = async () => {
-      const userName = (await getUserData(user.uid))?.data()?.name;
-      if (userName) setName(userName);
-    };
-    fetch();
-  }, [user.uid]);
+    setName(initName);
+  }, [initName, setName]);
 
   const handleChange = (newName: string) => {
     setName(newName);

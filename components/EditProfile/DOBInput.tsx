@@ -7,8 +7,9 @@ import { useTailwind } from 'tailwind-rn';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { format } from 'date-fns';
 import { Text, View } from '../Themed';
-import { getUserData, updateUserDOB } from '../../firebase';
+import { updateUserDOB } from '../../firebase';
 import DatePickerModal from '../DatePickerModal';
+import useStore, { IStore } from '../../hooks/useStore';
 
 const styles = StyleSheet.create({
   inputText: {
@@ -36,7 +37,12 @@ interface IDOBInput {
 
 export default function DOBInput({ user }: IDOBInput) {
   const tailwind = useTailwind();
+  const initDOB = useStore((state: IStore) => state.dob);
+
   const [DOB, setDOB] = React.useState<Date>();
+  React.useEffect(() => {
+    setDOB(initDOB);
+  }, [initDOB]);
 
   const datePickerRef = React.useRef<RBSheet>(null);
   const toggleDatePicker = () => {
@@ -53,14 +59,6 @@ export default function DOBInput({ user }: IDOBInput) {
   const handleClose = () => {
     if (user && DOB) updateUserDOB(user.uid, DOB);
   };
-
-  React.useEffect(() => {
-    const fetch = async () => {
-      const userDOB = (await getUserData(user.uid))?.data()?.dob.toDate();
-      if (userDOB) setDOB(userDOB);
-    };
-    fetch();
-  }, [user.uid]);
 
   return (
     <>

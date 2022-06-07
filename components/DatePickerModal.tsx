@@ -5,7 +5,7 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 
 export interface DatePickerModal {
   value: Date;
-  setValue: Dispatch<SetStateAction<Date | undefined>>;
+  setValue: Dispatch<SetStateAction<Date | undefined>> | ((dob: Date) => void);
   id: string;
   handleClose?: () => void;
 }

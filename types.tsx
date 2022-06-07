@@ -43,7 +43,34 @@ export type RootTabScreenProps<Screen extends keyof RootTabParamList> = Composit
   NativeStackScreenProps<RootStackParamList>
   >;
 
+// User data types
+
 export const enum UNITS {
   METRIC = 'METRIC',
   IMPERIAL = 'IMPERIAL',
+}
+
+const enum PLANS {
+  MAINTENANCE = 'MAINTENANCE',
+  LOSING = 'LOSING',
+}
+export type IHistory = {
+  date: Date;
+  weightIn: number;
+}
+
+export type IPlan = {
+  history: Array<IHistory>;
+  type: PLANS;
+  startDate: Date;
+  endDate: Date;
+  goalWieght: number;
+}
+
+export type IUserData = {
+  uid: string;
+  name: string;
+  dob: Date;
+  units: UNITS;
+  // plans: Array<IPlan>
 }

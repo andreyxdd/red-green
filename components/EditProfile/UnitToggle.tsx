@@ -4,7 +4,8 @@ import {
 } from 'react-native';
 import { User } from 'firebase/auth';
 import { useTailwind } from 'tailwind-rn';
-import { getUserData, updateUserUnits } from '../../firebase';
+import { updateUserUnits } from '../../firebase';
+import useStore, { IStore } from '../../hooks/useStore';
 import { UNITS } from '../../types';
 
 const windowWidth = Dimensions.get('window').width;
@@ -33,15 +34,12 @@ interface IUnitToggle {
 
 function UnitToggle({ user }:IUnitToggle) {
   const tailwind = useTailwind();
+  const globalUnits = useStore((state: IStore) => state.units);
   const [units, setUnits] = React.useState<UNITS>(UNITS.METRIC);
 
   React.useEffect(() => {
-    const fetch = async () => {
-      const userUnits = (await getUserData(user.uid))?.data()?.units;
-      if (userUnits) setUnits(userUnits);
-    };
-    fetch();
-  }, [user.uid]);
+    setUnits(globalUnits);
+  }, [globalUnits]);
 
   return (
     <View>

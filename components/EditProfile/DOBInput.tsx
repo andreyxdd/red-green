@@ -2,7 +2,6 @@ import React from 'react';
 import {
   StyleSheet, TouchableOpacity, Keyboard, Platform,
 } from 'react-native';
-import { User } from 'firebase/auth';
 import { useTailwind } from 'tailwind-rn';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { format } from 'date-fns';
@@ -31,18 +30,14 @@ const styles = StyleSheet.create({
   },
 });
 
-interface IDOBInput {
-  user: User;
-}
-
-export default function DOBInput({ user }: IDOBInput) {
+export default function DOBInput() {
   const tailwind = useTailwind();
-  const initDOB = useStore((state: IStore) => state.dob);
+  const [uid, baseData] = useStore((state: IStore) => [state.uid, state.baseData]);
 
   const [DOB, setDOB] = React.useState<Date>();
   React.useEffect(() => {
-    setDOB(initDOB);
-  }, [initDOB]);
+    if (baseData) setDOB(baseData.dob);
+  }, [baseData]);
 
   const datePickerRef = React.useRef<RBSheet>(null);
   const toggleDatePicker = () => {
@@ -57,7 +52,7 @@ export default function DOBInput({ user }: IDOBInput) {
   };
 
   const handleClose = () => {
-    if (user && DOB) updateUserDOB(user.uid, DOB);
+    if (uid && DOB) updateUserDOB(uid, DOB);
   };
 
   return (

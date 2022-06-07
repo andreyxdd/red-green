@@ -5,16 +5,16 @@ import { MenuProvider } from 'react-native-popup-menu';
 
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
-import useUserData from './hooks/useUserData';
+import useBaseData from './hooks/useBaseData';
 import Navigation from './navigation/Navigation';
 import Loader from './components/Loader';
 
 export default function App() {
   const isCacheLoadingComplete = useCachedResources();
   const colorScheme = useColorScheme();
-  const isUserDataLoadingComplete = useUserData();
+  useBaseData();
 
-  if (!isCacheLoadingComplete || !isUserDataLoadingComplete) {
+  if (!isCacheLoadingComplete) {
     return <Loader />;
   }
 

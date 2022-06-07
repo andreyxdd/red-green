@@ -2,36 +2,30 @@ import React from 'react';
 import { Alert } from 'react-native';
 
 import { FirestoreError } from 'firebase/firestore';
-import useAuthentification from './useAuthentification';
+import shallow from 'zustand/shallow';
 import useStore, { IStore } from './useStore';
 import { streamUser } from '../firebase';
 
-const useUserData = () => {
-  const { user } = useAuthentification();
-  const setUserData = useStore((state: IStore) => state.setUserData);
-  const [isLoadingComplete, setIsLoading] = React.useState(false);
+const useBaseData = () => {
+  const [uid, setBaseData] = useStore((state: IStore) => [state.uid, state.setBaseData], shallow);
 
   React.useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     let unsubscribe = () => { };
 
-    if (user && user.uid) {
-      setIsLoading(false);
-
+    if (uid) {
       unsubscribe = streamUser(
-        user.uid,
+        uid,
         (docSnapshot) => {
           const res = docSnapshot?.data();
           if (res) {
-            setUserData({
-              uid: user.uid,
+            setBaseData({
               name: res.name,
               units: res.units,
               dob: res.dob.toDate(),
               height: res.height,
               weight: res.weight,
             });
-            setIsLoading(true);
           }
         },
         (error: FirestoreError) => Alert.alert(error.toString()),
@@ -39,9 +33,7 @@ const useUserData = () => {
     }
 
     return unsubscribe;
-  }, [user, setUserData]);
-
-  return isLoadingComplete;
+  }, [setBaseData, uid]);
 };
 
-export default useUserData;
+export default useBaseData;

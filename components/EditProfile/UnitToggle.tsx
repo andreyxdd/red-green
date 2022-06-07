@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { User } from 'firebase/auth';
 import { useTailwind } from 'tailwind-rn';
+import shallow from 'zustand/shallow';
 import { updateUserUnits } from '../../firebase';
 import useStore, { IStore } from '../../hooks/useStore';
 import { UNITS } from '../../types';
@@ -34,12 +35,12 @@ interface IUnitToggle {
 
 function UnitToggle({ user }:IUnitToggle) {
   const tailwind = useTailwind();
-  const globalUnits = useStore((state: IStore) => state.units);
+  const [uid, baseData] = useStore((state: IStore) => [state.uid, state.baseData], shallow);
   const [units, setUnits] = React.useState<UNITS>(UNITS.METRIC);
 
   React.useEffect(() => {
-    setUnits(globalUnits);
-  }, [globalUnits]);
+    if (baseData) setUnits(baseData.units);
+  }, [baseData]);
 
   return (
     <View>
@@ -48,7 +49,7 @@ function UnitToggle({ user }:IUnitToggle) {
         <TouchableOpacity
           onPress={() => {
             Keyboard.dismiss();
-            updateUserUnits(user.uid, UNITS.METRIC);
+            if (uid) updateUserUnits(uid, UNITS.METRIC);
             setUnits(UNITS.METRIC);
           }}
         >

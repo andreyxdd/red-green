@@ -33,10 +33,10 @@ export default function UserMenuScreen() {
       />
       {user ? (
         <>
-          <NameInput user={user} />
-          <DOBInput user={user} />
+          <NameInput />
+          <DOBInput />
           <UnitToggle user={user} />
-          <HeightInput user={user} />
+          <HeightInput />
           <WeightField />
         </>
       ) : null}

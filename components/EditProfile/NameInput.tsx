@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, TextInput } from 'react-native';
-import { User } from 'firebase/auth';
 import { useTailwind } from 'tailwind-rn';
+import shallow from 'zustand/shallow';
 import { Text, View } from '../Themed';
 import { updateUserName } from '../../firebase';
 import useStore, { IStore } from '../../hooks/useStore';
@@ -26,23 +26,19 @@ const styles = StyleSheet.create({
   },
 });
 
-interface INameInput {
-  user: User;
-}
-
-export default function NameInput({ user }: INameInput) {
+export default function NameInput() {
   const tailwind = useTailwind();
   const inputRef = React.useRef<TextInput | null>(null);
   const [name, setName] = React.useState('');
-  const initName = useStore((state: IStore) => state.name);
+  const [uid, baseData] = useStore((state: IStore) => [state.uid, state.baseData], shallow);
 
   const handleSubmitEditing = () => {
-    if (user) updateUserName(user.uid, name);
+    if (uid) updateUserName(uid, name);
   };
 
   React.useEffect(() => {
-    setName(initName);
-  }, [initName, setName]);
+    if (baseData) setName(baseData.name);
+  }, [baseData]);
 
   const handleChange = (newName: string) => {
     setName(newName);

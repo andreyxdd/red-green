@@ -1,29 +1,29 @@
 import create from 'zustand';
-import { IUserData, UNITS } from '../types';
+import { UNITS } from '../types';
+
+interface IBaseData{
+  name: string;
+  dob: Date | undefined;
+  units: UNITS;
+  height: number;
+  weight: number
+}
+
+interface IState{
+  uid?: string;
+  baseData?: IBaseData;
+}
 
 /* eslint-disable no-unused-vars */
-export interface IStore extends IUserData{
-  setUserData: (user: IUserData) => void,
+export interface IStore extends IState{
+  setUID: (uid: string) => void;
+  setBaseData: (baseData: IBaseData) => void,
 }
 /* eslint-enable no-unused-vars */
 
-const initialState: IUserData = {
-  uid: '',
-  name: '',
-  dob: new Date(),
-  units: UNITS.METRIC,
-  height: 0,
-  weight: 0,
-  // plans: [],
-};
-
 const useStore = create<IStore>((set: any) => ({
-  ...initialState,
-  setUserData: ({
-    uid, name, dob, units, height, weight,
-  }: IUserData) => set({
-    uid, name, dob, units, height, weight,
-  }),
+  setUID: (uid: string) => set({ uid }),
+  setBaseData: (baseData: IBaseData) => set({ baseData }),
 }));
 
 export default useStore;

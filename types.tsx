@@ -65,14 +65,15 @@ export type IPlan = {
   startDate: Date;
   endDate: Date;
   goalWieght: number;
+  active: boolean;
 }
 
 export type IUserData = {
-  uid: string;
-  name: string;
-  dob: Date;
-  units: UNITS;
-  height: number;
-  weight: number;
-  // plans: Array<IPlan>
+  uid?: string;
+  name?: string;
+  dob?: Date;
+  units?: UNITS;
+  height?: number;
+  weight?: number;
+  plans?: Array<IPlan>
 }

@@ -3,7 +3,6 @@ import {
   StyleSheet, TouchableOpacity, TextInput,
 } from 'react-native';
 import { useTailwind } from 'tailwind-rn';
-import shallow from 'zustand/shallow';
 import { Text, View } from '../Themed';
 import useStore, { IStore } from '../../hooks/useStore';
 import { UNITS } from '../../types';
@@ -28,30 +27,23 @@ const styles = StyleSheet.create({
   },
 });
 
+const converter = 2.20462;
 function adjustWeight(currentUnits: UNITS, weight: number) {
   if (currentUnits === UNITS.IMPERIAL) {
-    return weight * 2.20462;
+    return weight * converter;
   }
-  return weight / 2.20462;
+  return weight;
 }
 
 export default function NameInput() {
   const tailwind = useTailwind();
   const inputRef = React.useRef<TextInput | null>(null);
   const [weight, setWeight] = React.useState<number>();
-  const [initWeightMetric, units] = useStore(
-    (state: IStore) => [state.weight, state.units],
-    shallow,
-  );
+  const baseData = useStore((state: IStore) => state.baseData);
 
   React.useEffect(() => {
-    setWeight(initWeightMetric);
-  }, [initWeightMetric, setWeight]);
-
-  React.useEffect(() => {
-    if (weight) setWeight(adjustWeight(units, weight));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [units]);
+    if (baseData) setWeight(baseData.weight);
+  }, [baseData]);
 
   return (
     <TouchableOpacity
@@ -62,13 +54,13 @@ export default function NameInput() {
     >
       <Text style={[tailwind('text-placeholder'), styles.titleText]}>Weight</Text>
       <View style={tailwind('flex items-center flex-row')}>
-        {weight ? (
+        {baseData && weight ? (
           <Text style={[
             tailwind('text-text'),
             styles.inputText,
             { paddingVertical: 0 }]}
           >
-            {weight.toFixed(1)}
+            {adjustWeight(baseData.units, weight).toFixed(1)}
           </Text>
         ) : null}
       </View>

@@ -38,16 +38,16 @@ export default function EditPlanScreen() {
       <View>
         <Button onPress={toggleDatePicker} title="Show date picker!" />
       </View>
-      {date && (
-      <>
-        <Text>
-          selected:
-          {' '}
-          {date.toLocaleString()}
-        </Text>
-        <DatePickerModal ref={datePickerRef} value={date} setValue={setDate} id="datePickerGoal" />
-      </>
-      )}
+      {date ? (
+        <>
+          <Text>
+            selected:
+            {' '}
+            {date.toLocaleString()}
+          </Text>
+          <DatePickerModal ref={datePickerRef} value={date} setValue={setDate} id="datePickerGoal" />
+        </>
+      ) : null}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
     </View>
   );

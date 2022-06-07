@@ -12,15 +12,17 @@ const initialState: IUserData = {
   name: '',
   dob: new Date(),
   units: UNITS.METRIC,
+  height: 0,
+  weight: 0,
   // plans: [],
 };
 
 const useStore = create<IStore>((set: any) => ({
   ...initialState,
   setUserData: ({
-    uid, name, dob, units,
+    uid, name, dob, units, height, weight,
   }: IUserData) => set({
-    uid, name, dob, units,
+    uid, name, dob, units, height, weight,
   }),
 }));
 

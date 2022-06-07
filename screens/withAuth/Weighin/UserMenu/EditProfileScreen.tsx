@@ -9,6 +9,8 @@ import DOBInput from '../../../../components/EditProfile/DOBInput';
 import { View } from '../../../../components/Themed';
 import useAuthentication from '../../../../hooks/useAuthentification';
 import UnitToggle from '../../../../components/EditProfile/UnitToggle';
+import HeightInput from '../../../../components/EditProfile/HeightInput';
+import WeightField from '../../../../components/EditProfile/WeightField';
 
 const styles = StyleSheet.create({
   container: {
@@ -29,13 +31,15 @@ export default function UserMenuScreen() {
         color="grey"
         style={{ paddingTop: 20, paddingBottom: 20 }}
       />
-      {user && (
-      <>
-        <NameInput user={user} />
-        <DOBInput user={user} />
-        <UnitToggle user={user} />
-      </>
-      )}
+      {user ? (
+        <>
+          <NameInput user={user} />
+          <DOBInput user={user} />
+          <UnitToggle user={user} />
+          <HeightInput user={user} />
+          <WeightField />
+        </>
+      ) : null}
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
     </View>

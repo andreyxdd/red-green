@@ -77,6 +77,15 @@ export const updateUserUnits = (uid: string, newUnits: string) => {
   );
 };
 
+export const updateUserHeight = (uid: string, newHeight: number) => {
+  const userRef = doc(db, 'users', uid);
+  setDoc(
+    userRef,
+    { height: newHeight },
+    { merge: true },
+  );
+};
+
 export const getUserData = (uid: string) => {
   const userRef = doc(db, 'users', uid);
   return getDoc(userRef);

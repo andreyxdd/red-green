@@ -28,6 +28,8 @@ const useUserData = () => {
               name: res.name,
               units: res.units,
               dob: res.dob.toDate(),
+              height: res.height,
+              weight: res.weight,
             });
             setIsLoading(true);
           }

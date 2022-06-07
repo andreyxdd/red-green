@@ -150,15 +150,15 @@ function SignUpScreen() {
         >
           <Text style={styles.buttonOutlineText}>Sign Up</Text>
         </TouchableOpacity>
-        {appleAuthAvailable && (
-        <AppleAuthenticationButton
-          buttonType={AppleAuthenticationButtonType.SIGN_IN}
-          buttonStyle={AppleAuthenticationButtonStyle.WHITE_OUTLINE}
-          cornerRadius={8}
-          style={styles.appleButton}
-          onPress={handleAppleLogin}
-        />
-        )}
+        {appleAuthAvailable ? (
+          <AppleAuthenticationButton
+            buttonType={AppleAuthenticationButtonType.SIGN_IN}
+            buttonStyle={AppleAuthenticationButtonStyle.WHITE_OUTLINE}
+            cornerRadius={8}
+            style={styles.appleButton}
+            onPress={handleAppleLogin}
+          />
+        ) : null}
         <TouchableOpacity
           onPress={handleGoogleLogin}
           style={styles.button}

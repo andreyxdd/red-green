@@ -68,18 +68,18 @@ export default function DOBInput({ user }: IDOBInput) {
       >
         <Text style={[tailwind('text-placeholder'), styles.titleText]}>Date of Birth</Text>
         <View style={tailwind('flex items-center flex-row')}>
-          <Text style={[tailwind('text-text'), styles.inputText]}>{DOB && format(DOB, 'dd-MM-yyyy')}</Text>
+          <Text style={[tailwind('text-text'), styles.inputText]}>{DOB ? format(DOB, 'dd-MM-yyyy') : null}</Text>
         </View>
       </TouchableOpacity>
-      {DOB && (
-      <DatePickerModal
-        ref={datePickerRef}
-        value={DOB}
-        setValue={setDOB}
-        id="datePickerDOB"
-        handleClose={handleClose}
-      />
-      )}
+      {DOB ? (
+        <DatePickerModal
+          ref={datePickerRef}
+          value={DOB}
+          setValue={setDOB}
+          id="datePickerDOB"
+          handleClose={handleClose}
+        />
+      ) : null}
     </>
   );
 }

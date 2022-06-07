@@ -72,5 +72,7 @@ export type IUserData = {
   name: string;
   dob: Date;
   units: UNITS;
+  height: number;
+  weight: number;
   // plans: Array<IPlan>
 }

@@ -3,8 +3,8 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import {
   getFirestore, onSnapshot, DocumentSnapshot,
-  DocumentData, FirestoreError,
-  setDoc, doc, getDoc,
+  DocumentData, FirestoreError, getDocs,
+  setDoc, doc, getDoc, query, where, collection, QuerySnapshot,
 } from 'firebase/firestore';
 import Constants from 'expo-constants';
 
@@ -89,4 +89,34 @@ export const updateUserHeight = (uid: string, newHeight: number) => {
 export const getUserData = (uid: string) => {
   const userRef = doc(db, 'users', uid);
   return getDoc(userRef);
+};
+
+export const streamHistory = async (
+  uid: string,
+  snapshot: ((snapshot: QuerySnapshot<DocumentData>) => void),
+  error?: ((error: FirestoreError) => void),
+) => {
+  const plansQuery = query(
+    collection(db, 'users', uid, 'plans'),
+    where('active', '==', true),
+  );
+  const querySnapshot = await getDocs(plansQuery);
+
+  if (querySnapshot.docs[0]) {
+    const activePlanId = querySnapshot.docs[0].id;
+
+    const historyQuery = query(
+      collection(db, 'users', uid, 'plans', activePlanId, 'history'),
+      where('date', '==', new Date(new Date().toDateString())),
+    );
+    return onSnapshot(
+      historyQuery,
+      {},
+      snapshot,
+      error,
+    );
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  return () => { };
 };

@@ -10,7 +10,7 @@ interface IBaseData{
 }
 
 interface IState{
-  uid?: string;
+  uid: string;
   baseData?: IBaseData;
 }
 
@@ -22,6 +22,7 @@ export interface IStore extends IState{
 /* eslint-enable no-unused-vars */
 
 const useStore = create<IStore>((set: any) => ({
+  uid: '',
   setUID: (uid: string) => set({ uid }),
   setBaseData: (baseData: IBaseData) => set({ baseData }),
 }));

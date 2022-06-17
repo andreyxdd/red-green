@@ -50,10 +50,11 @@ function RootNavigator() {
                   style={({ pressed }) => ({
                     opacity: pressed ? 0.5 : 1,
                   })}
+                  hitSlop={50}
                 >
                   <FontAwesome
                     name="chevron-left"
-                    size={24}
+                    size={30}
                     color="grey"
                   />
                 </Pressable>
@@ -72,10 +73,11 @@ function RootNavigator() {
                   style={({ pressed }) => ({
                     opacity: pressed ? 0.5 : 1,
                   })}
+                  hitSlop={50}
                 >
                   <FontAwesome
                     name="chevron-left"
-                    size={40}
+                    size={30}
                     color="grey"
                   />
                 </Pressable>

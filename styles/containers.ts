@@ -2,14 +2,14 @@ import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
   default: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  main: {
+    flex: 1,
+  },
   button: {
     width: '60%',
-    justifyContent: 'center',
-    alignItems: 'center',
     marginVertical: 20,
   },
   input: {

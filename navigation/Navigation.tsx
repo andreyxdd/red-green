@@ -42,7 +42,7 @@ function RootNavigator() {
             name="SignIn"
             component={SignInScreen}
             options={({ navigation }) => ({
-              title: '',
+              title: 'Sign In',
               headerTransparent: true,
               headerLeft: () => (
                 <Pressable
@@ -65,7 +65,7 @@ function RootNavigator() {
             name="SignUp"
             component={SignUpScreen}
             options={({ navigation }) => ({
-              title: '',
+              title: 'Sign Up',
               headerTransparent: true,
               headerLeft: () => (
                 <Pressable

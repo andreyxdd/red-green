@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import {
-  Text, TouchableOpacity, View, KeyboardAvoidingView, Platform, Alert, TextInput,
+  Text, Pressable, View, KeyboardAvoidingView, Platform, Alert, TextInput,
 } from 'react-native';
 import { signInWithEmailAndPassword, signInWithCredential, updateEmail } from 'firebase/auth';
 import { AppleAuthenticationButton, AppleAuthenticationButtonType, AppleAuthenticationButtonStyle } from 'expo-apple-authentication';
@@ -59,26 +59,26 @@ function IntroScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={containers.default}
+      style={[containers.default, containers.main]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <View style={containers.button}>
+      <View style={[containers.default, containers.button]}>
         {appleAuthAvailable && (
         <AppleAuthenticationButton
           buttonType={AppleAuthenticationButtonType.CONTINUE}
           buttonStyle={AppleAuthenticationButtonStyle.BLACK}
           cornerRadius={8}
-          style={buttons.apple}
+          style={[buttons.default, buttons.apple]}
           onPress={handleAppleLogin}
         />
         )}
-        <TouchableOpacity
+        <Pressable
           onPress={handleGoogleLogin}
-          style={buttons.google}
+          style={[buttons.default, buttons.google]}
           disabled={!googleAuthLoading}
         >
           <Text style={typography.googleButton}>Continue with Google</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
       <Text style={typography.secondaryHeading}>OR</Text>
       <View style={containers.input}>
@@ -97,18 +97,18 @@ function IntroScreen() {
           style={inputs.text}
           secureTextEntry
         />
-        <TouchableOpacity
+        <Pressable
           onPress={handleLogin}
-          style={buttons.contained}
+          style={[buttons.default, buttons.contained]}
         >
-          <Text style={typography.buttonContained}>Sign In</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+          <Text style={typography.containedButton}>Sign In</Text>
+        </Pressable>
+        <Pressable
           onPress={() => { navigation.navigate('SignUp'); }}
-          style={buttons.outlined}
+          style={[buttons.default, buttons.outlined]}
         >
-          <Text style={typography.buttonOutlined}>Don&apos;t have an account?</Text>
-        </TouchableOpacity>
+          <Text style={typography.outlinedButton}>Don&apos;t have an account?</Text>
+        </Pressable>
       </View>
     </KeyboardAvoidingView>
   );

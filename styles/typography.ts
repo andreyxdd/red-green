@@ -17,12 +17,12 @@ export default StyleSheet.create({
     fontWeight: '600',
     fontSize: fonts.sizes.sm,
   },
-  buttonContained: {
+  containedButton: {
     color: colors.white,
     fontWeight: '600',
     fontSize: fonts.sizes.sm,
   },
-  buttonOutlined: {
+  outlinedButton: {
     color: colors.additional,
     fontWeight: '600',
     fontSize: fonts.sizes.sm,

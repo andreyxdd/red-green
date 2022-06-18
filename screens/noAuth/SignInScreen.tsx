@@ -12,6 +12,7 @@ import useGoogleAuthentication from '../../hooks/useGoogleAuthentification';
 import {
   buttons, containers, typography, inputs,
 } from '../../styles';
+import Divider from '../../components/Divider';
 
 function IntroScreen() {
   const [email, setEmail] = React.useState('');
@@ -80,7 +81,7 @@ function IntroScreen() {
           <Text style={typography.googleButton}>Continue with Google</Text>
         </Pressable>
       </View>
-      <Text style={typography.secondaryHeading}>OR</Text>
+      <Divider>OR</Divider>
       <View style={containers.input}>
         <Text style={[typography.label, { textAlign: 'left' }]}>Email:</Text>
         <TextInput
@@ -103,11 +104,14 @@ function IntroScreen() {
         >
           <Text style={typography.containedButton}>Sign In</Text>
         </Pressable>
+      </View>
+      <Divider />
+      <View style={containers.input}>
         <Pressable
           onPress={() => { navigation.navigate('SignUp'); }}
           style={[buttons.default, buttons.outlined]}
         >
-          <Text style={typography.outlinedButton}>Don&apos;t have an account?</Text>
+          <Text style={typography.outlinedButton}>Don&apos;t have an account? Sign Up</Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>

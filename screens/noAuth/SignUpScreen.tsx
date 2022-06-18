@@ -14,6 +14,7 @@ import useGoogleAuthentication from '../../hooks/useGoogleAuthentification';
 import {
   buttons, containers, typography, inputs,
 } from '../../styles';
+import Divider from '../../components/Divider';
 
 function SignUpScreen() {
   const [email, setEmail] = React.useState('');
@@ -84,7 +85,7 @@ function SignUpScreen() {
           <Text style={typography.googleButton}>Sign Up with Google</Text>
         </Pressable>
       </View>
-      <Text style={typography.secondaryHeading}>OR</Text>
+      <Divider>OR</Divider>
       <View style={containers.input}>
         <Text style={[typography.label, { textAlign: 'left' }]}>Email:</Text>
         <TextInput

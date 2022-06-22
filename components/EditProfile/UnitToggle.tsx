@@ -2,11 +2,9 @@ import React from 'react';
 import {
   StyleSheet, View, Text, TouchableOpacity, Keyboard, Dimensions,
 } from 'react-native';
-import { User } from 'firebase/auth';
 import { useTailwind } from 'tailwind-rn';
-import shallow from 'zustand/shallow';
 import { updateUserUnits } from '../../firebase';
-import useStore, { IStore } from '../../hooks/useStore';
+import useAuthentification from '../../hooks/useAuthentification';
 import { UNITS } from '../../types';
 
 const windowWidth = Dimensions.get('window').width;
@@ -30,17 +28,19 @@ const styles = StyleSheet.create({
 });
 
 interface IUnitToggle {
-  user: User;
+  unitsDB: UNITS;
+  height: number;
+  weight: number;
 }
 
-function UnitToggle({ user }:IUnitToggle) {
+function UnitToggle({ unitsDB, height, weight }:IUnitToggle) {
   const tailwind = useTailwind();
-  const [uid, baseData] = useStore((state: IStore) => [state.uid, state.baseData], shallow);
+
+  const { user } = useAuthentification();
+
   const [units, setUnits] = React.useState<UNITS>(UNITS.METRIC);
 
-  React.useEffect(() => {
-    if (baseData) setUnits(baseData.units);
-  }, [baseData]);
+  React.useEffect(() => { setUnits(unitsDB); }, [unitsDB]);
 
   return (
     <View>
@@ -49,7 +49,7 @@ function UnitToggle({ user }:IUnitToggle) {
         <TouchableOpacity
           onPress={() => {
             Keyboard.dismiss();
-            if (uid) updateUserUnits(uid, UNITS.METRIC);
+            if (user) updateUserUnits(user.uid, UNITS.METRIC, height, weight);
             setUnits(UNITS.METRIC);
           }}
         >
@@ -64,7 +64,7 @@ function UnitToggle({ user }:IUnitToggle) {
         <TouchableOpacity
           onPress={() => {
             Keyboard.dismiss();
-            updateUserUnits(user.uid, UNITS.IMPERIAL);
+            if (user) updateUserUnits(user.uid, UNITS.IMPERIAL, height, weight);
             setUnits(UNITS.IMPERIAL);
           }}
         >

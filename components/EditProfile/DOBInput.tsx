@@ -8,7 +8,7 @@ import { format } from 'date-fns';
 import { Text, View } from '../Themed';
 import { updateUserDOB } from '../../firebase';
 import DatePickerModal from '../DatePickerModal';
-import useStore, { IStore } from '../../hooks/useStore';
+import useAuthentification from '../../hooks/useAuthentification';
 
 const styles = StyleSheet.create({
   inputText: {
@@ -30,14 +30,19 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function DOBInput() {
-  const tailwind = useTailwind();
-  const [uid, baseData] = useStore((state: IStore) => [state.uid, state.baseData]);
+interface IDOBInput{
+  DOB: Date;
+}
 
-  const [DOB, setDOB] = React.useState<Date>();
+export default function DOBInput({ DOB }: IDOBInput) {
+  const tailwind = useTailwind();
+  const { user } = useAuthentification();
+
+  const [inputDOB, setInputDOB] = React.useState<Date>();
+
   React.useEffect(() => {
-    if (baseData) setDOB(baseData.dob);
-  }, [baseData]);
+    setInputDOB(DOB);
+  }, [DOB]);
 
   const datePickerRef = React.useRef<RBSheet>(null);
   const toggleDatePicker = () => {
@@ -52,7 +57,7 @@ export default function DOBInput() {
   };
 
   const handleClose = () => {
-    if (uid && DOB) updateUserDOB(uid, DOB);
+    if (user && inputDOB) updateUserDOB(user.uid, inputDOB);
   };
 
   return (
@@ -66,11 +71,11 @@ export default function DOBInput() {
           <Text style={[tailwind('text-text'), styles.inputText]}>{DOB ? format(DOB, 'dd-MM-yyyy') : null}</Text>
         </View>
       </TouchableOpacity>
-      {DOB ? (
+      {inputDOB ? (
         <DatePickerModal
           ref={datePickerRef}
-          value={DOB}
-          setValue={setDOB}
+          value={inputDOB}
+          setValue={setInputDOB}
           id="datePickerDOB"
           handleClose={handleClose}
         />

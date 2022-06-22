@@ -3,11 +3,9 @@ import {
   StyleSheet, TouchableOpacity, TextInput, Alert,
 } from 'react-native';
 import { useTailwind } from 'tailwind-rn';
-import shallow from 'zustand/shallow';
 import { Text, View } from '../Themed';
 import { updateUserHeight } from '../../firebase';
-import useStore, { IStore } from '../../hooks/useStore';
-import { UNITS } from '../../types';
+import useAuthentification from '../../hooks/useAuthentification';
 
 const styles = StyleSheet.create({
   inputText: {
@@ -29,33 +27,25 @@ const styles = StyleSheet.create({
   },
 });
 
-const converter = 30.48;
-function adjustHeight(currentUnits: UNITS, height: number) {
-  if (currentUnits === UNITS.IMPERIAL) {
-    return height / converter;
-  }
-  return height;
+interface IHeightInput{
+  value: number;
 }
 
-export default function NameInput() {
+export default function HeightInput({ value }:IHeightInput) {
   const tailwind = useTailwind();
   const inputRef = React.useRef<TextInput | null>(null);
   const [height, setHeight] = React.useState<number>();
-  const [uid, baseData] = useStore((state: IStore) => [state.uid, state.baseData], shallow);
+
+  const { user } = useAuthentification();
+  React.useEffect(() => { setHeight(value); }, [value]);
 
   const handleSubmitEditing = () => {
-    if (uid && baseData) updateUserHeight(uid, adjustHeight(baseData.units, baseData.height));
+    if (user && height) updateUserHeight(user.uid, height);
   };
-
-  React.useEffect(() => {
-    if (baseData) {
-      setHeight(baseData.height);
-    }
-  }, [baseData]);
 
   const handleChange = (newHeight: string) => {
     if (newHeight.match(/^-?\d*(\.\d+)?$/)) {
-      if (baseData) setHeight(adjustHeight(baseData.units, Number(newHeight)));
+      setHeight(Number(newHeight));
     } else {
       Alert.alert('Only number can be input');
     }
@@ -70,14 +60,14 @@ export default function NameInput() {
     >
       <Text style={[tailwind('text-placeholder'), styles.titleText]}>Height</Text>
       <View style={tailwind('flex items-center flex-row')}>
-        {baseData && height ? (
+        {height ? (
           <TextInput
             keyboardType="numeric"
             style={[tailwind('text-text'), styles.inputText, { paddingVertical: 0 }]}
             onChangeText={handleChange}
             onSubmitEditing={handleSubmitEditing}
             ref={inputRef}
-            value={adjustHeight(baseData.units, baseData.height).toFixed(1)}
+            value={height.toFixed(1)}
             returnKeyType="done"
           />
         ) : null}

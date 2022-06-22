@@ -7,6 +7,7 @@ import {
   setDoc, doc, getDoc, query, where, collection, QuerySnapshot,
 } from 'firebase/firestore';
 import Constants from 'expo-constants';
+import { UNITS } from './types';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -68,11 +69,37 @@ export const updateUserDOB = (uid: string, newDOB: Date) => {
   );
 };
 
-export const updateUserUnits = (uid: string, newUnits: string) => {
+const heightConverter = 30.48;
+function adjustHeight(currentUnits: UNITS, height: number) {
+  if (currentUnits === UNITS.IMPERIAL) {
+    return height / heightConverter;
+  }
+  return height * heightConverter;
+}
+
+const weightConverter = 2.20462;
+function adjustWeight(currentUnits: UNITS, weight: number) {
+  if (currentUnits === UNITS.IMPERIAL) {
+    return weight * weightConverter;
+  }
+  return weight / weightConverter;
+}
+
+export const updateUserUnits = async (
+  uid: string,
+  newUnits: UNITS,
+  height: number,
+  weight: number,
+) => {
   const userRef = doc(db, 'users', uid);
+
   setDoc(
     userRef,
-    { units: newUnits },
+    {
+      units: newUnits,
+      height: adjustHeight(newUnits, height),
+      weight: adjustWeight(newUnits, weight),
+    },
     { merge: true },
   );
 };
@@ -82,6 +109,15 @@ export const updateUserHeight = (uid: string, newHeight: number) => {
   setDoc(
     userRef,
     { height: newHeight },
+    { merge: true },
+  );
+};
+
+export const updateUserWeight = (uid: string, newWeight: number) => {
+  const userRef = doc(db, 'users', uid);
+  setDoc(
+    userRef,
+    { Weight: newWeight },
     { merge: true },
   );
 };

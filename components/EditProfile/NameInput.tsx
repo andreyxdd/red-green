@@ -1,10 +1,9 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { useTailwind } from 'tailwind-rn';
-import shallow from 'zustand/shallow';
 import { Text, View } from '../Themed';
 import { updateUserName } from '../../firebase';
-import useStore, { IStore } from '../../hooks/useStore';
+import useAuthentification from '../../hooks/useAuthentification';
 
 const styles = StyleSheet.create({
   inputText: {
@@ -26,22 +25,25 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function NameInput() {
+interface INameInput{
+  name: string;
+}
+
+export default function NameInput({ name }: INameInput) {
   const tailwind = useTailwind();
   const inputRef = React.useRef<TextInput | null>(null);
-  const [name, setName] = React.useState('');
-  const [uid, baseData] = useStore((state: IStore) => [state.uid, state.baseData], shallow);
+  const [inputName, setInputName] = React.useState('');
+
+  const { user } = useAuthentification();
 
   const handleSubmitEditing = () => {
-    if (uid) updateUserName(uid, name);
+    if (user && inputName) updateUserName(user.uid, inputName);
   };
 
-  React.useEffect(() => {
-    if (baseData) setName(baseData.name);
-  }, [baseData]);
+  React.useEffect(() => { setInputName(name); }, [name]);
 
   const handleChange = (newName: string) => {
-    setName(newName);
+    setInputName(newName);
   };
 
   return (
@@ -58,7 +60,7 @@ export default function NameInput() {
           onChangeText={handleChange}
           onSubmitEditing={handleSubmitEditing}
           ref={inputRef}
-          value={name}
+          value={inputName}
           returnKeyType="done"
         />
       </View>

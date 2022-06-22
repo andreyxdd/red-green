@@ -1,29 +1,36 @@
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Text, Pressable, View } from 'react-native';
-import { buttons, containers, typography } from '../../styles';
+import { Button, Headline } from 'react-native-paper';
+import Container from '../../components/Container';
+
+const styles = StyleSheet.create({
+  button: { width: '100%', paddingVertical: 4, marginVertical: 4 },
+});
 
 function IntroScreen() {
   const navigation = useNavigation();
 
   return (
-    <View style={[containers.default, containers.main]}>
-      <Text style={typography.heading}>Welcome to Red-Green</Text>
-      <View style={[containers.default, containers.button]}>
-        <Pressable
+    <Container style={{ flex: 1 }}>
+      <Headline>Welcome to Red-Green</Headline>
+      <Container style={{ width: '80%', marginVertical: 20 }}>
+        <Button
+          mode="contained"
           onPress={() => { navigation.navigate('SignIn'); }}
-          style={[buttons.default, buttons.contained]}
+          style={styles.button}
         >
-          <Text style={typography.containedButton}>Have an account?</Text>
-        </Pressable>
-        <Pressable
+          Have an account?
+        </Button>
+        <Button
+          mode="outlined"
           onPress={() => { navigation.navigate('SignUp'); }}
-          style={[buttons.default, buttons.outlined]}
+          style={styles.button}
         >
-          <Text style={typography.outlinedButton}>Don&apos;t have an account?</Text>
-        </Pressable>
-      </View>
-    </View>
+          Don&apos;t have an account?
+        </Button>
+      </Container>
+    </Container>
   );
 }
 

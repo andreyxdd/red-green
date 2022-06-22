@@ -1,6 +1,6 @@
 import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
-import { typography } from '../styles';
+import { View, StyleSheet } from 'react-native';
+import { Subheading } from 'react-native-paper';
 
 export interface IDivider{
   children?: React.ReactNode;
@@ -20,9 +20,9 @@ function Divider({ children }: IDivider) {
         ? (
           <>
             <View>
-              <Text style={[typography.secondaryHeading, styles.text]}>
+              <Subheading style={styles.text}>
                 {children}
-              </Text>
+              </Subheading>
             </View>
             <View style={styles.divider} />
           </>

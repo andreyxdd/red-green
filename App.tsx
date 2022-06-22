@@ -2,6 +2,7 @@ import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { MenuProvider } from 'react-native-popup-menu';
+import { Provider as PaperProvider } from 'react-native-paper';
 
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
@@ -22,16 +23,18 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <MenuProvider customStyles={{
-        backdrop: {
-          backgroundColor: 'grey',
-          opacity: 0.5,
-        },
-      }}
-      >
-        <Navigation colorScheme={colorScheme} />
-        <StatusBar />
-      </MenuProvider>
+      <PaperProvider>
+        <MenuProvider customStyles={{
+          backdrop: {
+            backgroundColor: 'grey',
+            opacity: 0.5,
+          },
+        }}
+        >
+          <Navigation colorScheme={colorScheme} />
+          <StatusBar />
+        </MenuProvider>
+      </PaperProvider>
     </SafeAreaProvider>
   );
 }

@@ -1,18 +1,20 @@
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
-import {
-  Text, Pressable, View, KeyboardAvoidingView, Platform, Alert, TextInput,
-} from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { signInWithEmailAndPassword, signInWithCredential, updateEmail } from 'firebase/auth';
 import { AppleAuthenticationButton, AppleAuthenticationButtonType, AppleAuthenticationButtonStyle } from 'expo-apple-authentication';
+import { Button, TextInput } from 'react-native-paper';
 import { auth } from '../../firebase';
 import useAuthentification from '../../hooks/useAuthentification';
 import useAppleAuthentication from '../../hooks/useAppleAuthentification';
 import useGoogleAuthentication from '../../hooks/useGoogleAuthentification';
-import {
-  buttons, containers, typography, inputs,
-} from '../../styles';
 import Divider from '../../components/Divider';
+import Container from '../../components/Container';
+
+const styles = StyleSheet.create({
+  button: { width: '80%', paddingVertical: 4, marginVertical: 4 },
+});
 
 function IntroScreen() {
   const [email, setEmail] = React.useState('');
@@ -59,62 +61,65 @@ function IntroScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={[containers.default, containers.main]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <View style={[containers.default, containers.button]}>
+    <KeyboardAwareScrollView contentContainerStyle={{ justifyContent: 'center', flex: 1 }}>
+      <Container style={{ marginVertical: 12 }}>
         {appleAuthAvailable && (
-        <AppleAuthenticationButton
-          buttonType={AppleAuthenticationButtonType.CONTINUE}
-          buttonStyle={AppleAuthenticationButtonStyle.BLACK}
-          cornerRadius={8}
-          style={[buttons.default, buttons.apple]}
-          onPress={handleAppleLogin}
-        />
+          <AppleAuthenticationButton
+            buttonType={AppleAuthenticationButtonType.CONTINUE}
+            buttonStyle={AppleAuthenticationButtonStyle.BLACK}
+            cornerRadius={4}
+            style={[styles.button, { height: 45 }]}
+            onPress={handleAppleLogin}
+          />
         )}
-        <Pressable
+        <Button
+          mode="contained"
           onPress={handleGoogleLogin}
-          style={[buttons.default, buttons.google]}
           disabled={!googleAuthLoading}
+          style={styles.button}
         >
-          <Text style={typography.googleButton}>Continue with Google</Text>
-        </Pressable>
-      </View>
+          Continue with Google
+        </Button>
+      </Container>
       <Divider>OR</Divider>
-      <View style={containers.input}>
-        <Text style={[typography.label, { textAlign: 'left' }]}>Email:</Text>
-        <TextInput
-          placeholder="Email"
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-          style={inputs.text}
-        />
-        <Text style={[typography.label, { textAlign: 'left' }]}>Password:</Text>
-        <TextInput
-          placeholder="Password"
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-          style={inputs.text}
-          secureTextEntry
-        />
-        <Pressable
+      <TextInput
+        label="Email"
+        placeholder="Email"
+        value={email}
+        onChangeText={(text) => setEmail(text)}
+        autoComplete
+        style={{ marginVertical: 6 }}
+        autoCapitalize="none"
+      />
+      <TextInput
+        label="Password"
+        placeholder="Password"
+        value={password}
+        onChangeText={(text) => setPassword(text)}
+        secureTextEntry
+        autoComplete
+        style={{ marginVertical: 6 }}
+      />
+      <Container style={{ marginVertical: 6 }}>
+        <Button
+          mode="contained"
           onPress={handleLogin}
-          style={[buttons.default, buttons.contained]}
+          style={styles.button}
         >
-          <Text style={typography.containedButton}>Sign In</Text>
-        </Pressable>
-      </View>
+          Sign In
+        </Button>
+      </Container>
       <Divider />
-      <View style={containers.input}>
-        <Pressable
+      <Container style={{ marginVertical: 12 }}>
+        <Button
+          mode="outlined"
           onPress={() => { navigation.navigate('SignUp'); }}
-          style={[buttons.default, buttons.outlined]}
+          style={styles.button}
         >
-          <Text style={typography.outlinedButton}>Don&apos;t have an account? Sign Up</Text>
-        </Pressable>
-      </View>
-    </KeyboardAvoidingView>
+          Don&apos;t have an account? Sign Up
+        </Button>
+      </Container>
+    </KeyboardAwareScrollView>
   );
 }
 

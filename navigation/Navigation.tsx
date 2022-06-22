@@ -43,7 +43,6 @@ function RootNavigator() {
             component={SignInScreen}
             options={({ navigation }) => ({
               title: 'Sign In',
-              headerTransparent: true,
               headerLeft: () => (
                 <Pressable
                   onPress={() => navigation.navigate('Intro')}
@@ -66,7 +65,6 @@ function RootNavigator() {
             component={SignUpScreen}
             options={({ navigation }) => ({
               title: 'Sign Up',
-              headerTransparent: true,
               headerLeft: () => (
                 <Pressable
                   onPress={() => navigation.navigate('Intro')}

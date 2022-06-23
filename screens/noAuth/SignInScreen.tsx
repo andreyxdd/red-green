@@ -100,7 +100,7 @@ function IntroScreen() {
         autoComplete
         style={{ marginVertical: 6 }}
       />
-      <Container style={{ marginVertical: 6 }}>
+      <Container style={{ marginVertical: 12 }}>
         <Button
           mode="contained"
           onPress={handleLogin}

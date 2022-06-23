@@ -8,7 +8,7 @@ export interface IDivider{
 
 const styles = StyleSheet.create({
   container: { flexDirection: 'row', alignItems: 'center' },
-  divider: { flex: 1, height: 1, backgroundColor: '#ccc' },
+  divider: { flex: 1, height: 2, backgroundColor: '#ccc' },
   text: { width: 50, textAlign: 'center' },
 });
 

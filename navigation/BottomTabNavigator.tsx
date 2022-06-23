@@ -30,6 +30,7 @@ function BottomTabNavigator() {
         component={TabOneScreen}
         options={() => ({
           title: 'Today',
+          headerTitleAlign: 'center',
           headerStyle: { backgroundColor: 'tomato', height: 80 },
           tabBarIcon: ({ color }) => (
             <AntDesign name="calendar" size={24} color={color} />
@@ -41,6 +42,7 @@ function BottomTabNavigator() {
         component={TabTwoScreen}
         options={({ navigation }: RootTabScreenProps<'TabTwo'>) => ({
           title: 'Weigh In',
+          headerTitleAlign: 'center',
           headerStyle: { backgroundColor: 'tomato', height: 80 },
           tabBarIcon: ({ color }) => (
             <AntDesign name="pluscircleo" size={24} color={color} />
@@ -67,6 +69,7 @@ function BottomTabNavigator() {
         component={TabThreeScreen}
         options={{
           title: 'Plan',
+          headerTitleAlign: 'center',
           headerStyle: { backgroundColor: 'tomato', height: 80 },
           headerRight: () => <MenuContextOpenner />,
           tabBarIcon: ({ color }) => <AntDesign name="barschart" size={24} color={color} />,

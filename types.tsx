@@ -22,6 +22,7 @@ export type RootStackParamList = {
   SignUp: undefined;
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
   UserMenu: undefined;
+  ManualWeighIn: { screenType: string, value?: number };
   EditProfile: undefined;
   EditPlan: undefined;
   NotFound: undefined;

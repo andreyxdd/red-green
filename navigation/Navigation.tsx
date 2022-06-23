@@ -12,6 +12,7 @@ import IntroScreen from '../screens/noAuth/IntroScreen';
 import SignInScreen from '../screens/noAuth/SignInScreen';
 import SignUpScreen from '../screens/noAuth/SignUpScreen';
 import UserMenuScreen from '../screens/withAuth/Weighin/UserMenu/UserMenuScreen';
+import ManualWeighInScreen from '../screens/withAuth/Weighin/ManualWeighIn/ManualWeighInScreen';
 import EditProfileScreen from '../screens/withAuth/Weighin/UserMenu/EditProfileScreen';
 import EditPlanScreen from '../screens/withAuth/Plan/EditPlanScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
@@ -106,6 +107,32 @@ function RootNavigator() {
                   style={({ pressed }) => ({
                     opacity: pressed ? 0.5 : 1,
                   })}
+                  hitSlop={50}
+                >
+                  <FontAwesome
+                    name="close"
+                    size={32}
+                    color="grey"
+                  />
+                </Pressable>
+              ),
+            })}
+          />
+          <Stack.Screen
+            name="ManualWeighIn"
+            component={ManualWeighInScreen}
+            options={({ navigation }) => ({
+              title: '',
+              animation: 'slide_from_bottom',
+              headerTransparent: true,
+              headerLeft: () => <View style={{ marginLeft: 50 }} />,
+              headerRight: () => (
+                <Pressable
+                  onPress={() => navigation.navigate('TabTwo')}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.5 : 1,
+                  })}
+                  hitSlop={50}
                 >
                   <FontAwesome
                     name="close"

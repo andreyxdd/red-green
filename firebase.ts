@@ -3,8 +3,8 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import {
   getFirestore, onSnapshot, DocumentSnapshot,
-  DocumentData, FirestoreError,
-  setDoc, doc, getDoc, query, collection, QuerySnapshot, orderBy,
+  DocumentData, FirestoreError, Timestamp,
+  setDoc, doc, getDoc, query, collection, QuerySnapshot, orderBy, addDoc,
 } from 'firebase/firestore';
 import Constants from 'expo-constants';
 import { UNITS } from './types';
@@ -117,7 +117,21 @@ export const updateUserWeight = (uid: string, newWeight: number) => {
   const userRef = doc(db, 'users', uid);
   setDoc(
     userRef,
-    { Weight: newWeight },
+    { weight: newWeight },
+    { merge: true },
+  );
+};
+
+export const updateUserLastHistoryItem = (
+  uid: string,
+  planId: string,
+  historyItemId: string,
+  newWeight: number,
+) => {
+  const historyItemRef = doc(db, 'users', uid, 'plans', planId, 'history', historyItemId);
+  setDoc(
+    historyItemRef,
+    { weightIn: newWeight },
     { merge: true },
   );
 };
@@ -165,5 +179,23 @@ export const streamPlans = (
     {},
     snapshot,
     error,
+  );
+};
+
+export const writeUserLastHistoryItem = (
+  uid: string,
+  planId: string,
+  newWeight: number,
+) => {
+  const historyRef = collection(db, 'users', uid, 'plans', planId, 'history');
+
+  const todayDate = new Date(new Date().setHours(0, 0, 0, 0));
+
+  addDoc(
+    historyRef,
+    {
+      weightIn: newWeight,
+      date: Timestamp.fromDate(new Date(todayDate)),
+    },
   );
 };

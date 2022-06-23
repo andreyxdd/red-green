@@ -2,12 +2,12 @@ import React from 'react';
 import { Alert } from 'react-native';
 import { FirestoreError } from 'firebase/firestore';
 import shallow from 'zustand/shallow';
-import useStore, { IStore } from './useStore';
+import useDataStore, { IDataStore } from './useDataStore';
 import { streamPlans } from '../firebase';
 
 const usePlans = () => {
-  const [uid, setPlans, setPlan] = useStore(
-    (state: IStore) => [state.uid, state.setPlans, state.setPlan],
+  const [uid, setPlans, setPlan] = useDataStore(
+    (state: IDataStore) => [state.uid, state.setPlans, state.setPlan],
     shallow,
   );
 

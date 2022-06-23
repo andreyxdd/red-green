@@ -2,13 +2,13 @@ import React from 'react';
 import { Alert } from 'react-native';
 import { FirestoreError } from 'firebase/firestore';
 import shallow from 'zustand/shallow';
-import useStore, { IStore } from './useStore';
+import useDataStore, { IDataStore } from './useDataStore';
 import { streamHistory } from '../firebase';
 import { IHistoryItem } from '../types';
 
 const useHistory = () => {
-  const [uid, plan, setHistory] = useStore(
-    (state: IStore) => [state.uid, state.plan, state.setHistory],
+  const [uid, plan, setHistory] = useDataStore(
+    (state: IDataStore) => [state.uid, state.plan, state.setHistory],
     shallow,
   );
 

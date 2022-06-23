@@ -6,9 +6,9 @@ export const dimensions = {
 };
 
 export const colors = {
-  red: '#F3533A',
-  yellow: '#FA9F42',
-  green: '#8AD879',
+  RED: '#F3533A',
+  YELLOW: '#FCF55F',
+  GREEN: '#8AD879',
   additional: '#5ACFC9',
   google: '#4C8BF5',
   white: 'white',

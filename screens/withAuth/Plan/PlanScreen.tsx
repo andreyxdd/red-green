@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
-import useStore, { IStore } from '../../../hooks/useStore';
+import shallow from 'zustand/shallow';
+import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
 import PopupPlanMenu from '../../../components/PopupPlanMenu';
 import { Text, View } from '../../../components/Themed';
 
@@ -21,8 +22,7 @@ const styles = StyleSheet.create({
 });
 
 export default function PlanScreen() {
-  const plan = useStore((state: IStore) => state.plan);
-  const history = useStore((state: IStore) => state.history);
+  const [plan, history] = useDataStore((state: IDataStore) => [state.plan, state.history], shallow);
 
   return (
     <View style={styles.container}>

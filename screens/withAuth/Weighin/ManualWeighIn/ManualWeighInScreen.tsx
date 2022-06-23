@@ -6,12 +6,12 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import React from 'react';
 import shallow from 'zustand/shallow';
 import { RootStackScreenProps } from '../../../../types';
-import useStore, { IStore } from '../../../../hooks/useStore';
+import useDataStore, { IDataStore } from '../../../../hooks/useDataStore';
 import { updateUserWeight, updateUserLastHistoryItem, writeUserLastHistoryItem } from '../../../../firebase';
 
 export default function ManualWeighInScreen({ route, navigation }: RootStackScreenProps<'ManualWeighIn'>) {
-  const [uid, plan, history] = useStore(
-    (state: IStore) => [state.uid, state.plan, state.history],
+  const [uid, plan, history] = useDataStore(
+    (state: IDataStore) => [state.uid, state.plan, state.history],
     shallow,
   );
   const { screenType, value } = route.params;

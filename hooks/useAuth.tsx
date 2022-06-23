@@ -1,10 +1,10 @@
 import React from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import useStore, { IStore } from './useStore';
+import useDataStore, { IDataStore } from './useDataStore';
 import { auth } from '../firebase';
 
 function useAuth() {
-  const setUID = useStore((state: IStore) => state.setUID);
+  const setUID = useDataStore((state: IDataStore) => state.setUID);
 
   const authChanged = React.useCallback((currentUser) => {
     if (currentUser) {

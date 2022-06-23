@@ -78,3 +78,11 @@ export type IProfileData = {
   height: number;
   weight: number;
 }
+
+// Interface types:
+
+export const enum SIGNS {
+  GREEN = 'GREEN',
+  YELLOW = 'YELLOW',
+  RED = 'RED',
+}

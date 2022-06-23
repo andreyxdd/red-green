@@ -1,11 +1,32 @@
 import { Button, Headline, Text } from 'react-native-paper';
-import useStore, { IStore } from '../../../hooks/useStore';
+import React from 'react';
+import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
+import useInterfaceStore, { IInterfaceStore } from '../../../hooks/useInterfaceStore';
 
 import Container from '../../../components/Container';
-import { RootTabScreenProps } from '../../../types';
+import { RootTabScreenProps, SIGNS } from '../../../types';
+import { getRelativeChange } from '../../../utils/calculate';
 
 export default function WeighInScreen({ navigation: { navigate } }: RootTabScreenProps<'TabTwo'>) {
-  const [history, plan] = useStore((state: IStore) => [state.history, state.plan]);
+  const [history, plan] = useDataStore((state: IDataStore) => [state.history, state.plan]);
+  const setSign = useInterfaceStore((state: IInterfaceStore) => state.setSign);
+
+  React.useEffect(() => {
+    if (history.length > 0
+        && plan
+        && history[0].date.setHours(0, 0, 0, 0) === (new Date()).setHours(0, 0, 0, 0)
+      && plan.active) {
+      const relativeChange = getRelativeChange(plan.goalWeight, history[0].weightIn); // in %
+
+      if (relativeChange > 2.0) {
+        setSign(SIGNS.RED);
+      } else if (relativeChange < 0.0) {
+        setSign(SIGNS.GREEN);
+      } else {
+        setSign(SIGNS.YELLOW);
+      }
+    }
+  }, [history, plan, setSign]);
 
   return (
     <Container style={{ flex: 1 }}>

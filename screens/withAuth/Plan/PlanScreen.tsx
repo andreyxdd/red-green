@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import usePlan from '../../../hooks/usePlan';
+import useStore, { IStore } from '../../../hooks/useStore';
 import PopupPlanMenu from '../../../components/PopupPlanMenu';
 import { Text, View } from '../../../components/Themed';
 
@@ -21,12 +21,26 @@ const styles = StyleSheet.create({
 });
 
 export default function PlanScreen() {
-  const { plan, loading, error } = usePlan();
+  const plan = useStore((state: IStore) => state.plan);
+  const history = useStore((state: IStore) => state.history);
 
   return (
     <View style={styles.container}>
-      {plan.data && !loading && !error
-        ? <Text style={styles.title}>{plan.data.type}</Text>
+      {plan && history
+        ? (
+          <>
+            <Text style={styles.title}>{plan.type}</Text>
+            <Text style={styles.title}>{plan.goalWeight}</Text>
+            <View style={{ paddingVertical: 20 }}>
+              {history.map((historyItem) => (
+                <View key={historyItem.id}>
+                  <Text>{historyItem.date.toDateString()}</Text>
+                  <Text>{historyItem.weightIn}</Text>
+                </View>
+              ))}
+            </View>
+          </>
+        )
         : null}
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <PopupPlanMenu />

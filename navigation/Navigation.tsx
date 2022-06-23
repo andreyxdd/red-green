@@ -43,6 +43,7 @@ function RootNavigator() {
             component={SignInScreen}
             options={({ navigation }) => ({
               title: 'Sign In',
+              headerTitleAlign: 'center',
               headerLeft: () => (
                 <Pressable
                   onPress={() => navigation.navigate('Intro')}
@@ -65,6 +66,7 @@ function RootNavigator() {
             component={SignUpScreen}
             options={({ navigation }) => ({
               title: 'Sign Up',
+              headerTitleAlign: 'center',
               headerLeft: () => (
                 <Pressable
                   onPress={() => navigation.navigate('Intro')}

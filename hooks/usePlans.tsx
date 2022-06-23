@@ -3,12 +3,11 @@ import { Alert } from 'react-native';
 import { FirestoreError } from 'firebase/firestore';
 import shallow from 'zustand/shallow';
 import useStore, { IStore } from './useStore';
-import { streamHistory } from '../firebase';
-import { IHistoryItem } from '../types';
+import { streamPlans } from '../firebase';
 
-const useHistory = () => {
-  const [uid, plan, setHistory] = useStore(
-    (state: IStore) => [state.uid, state.plan, state.setHistory],
+const usePlans = () => {
+  const [uid, setPlans, setPlan] = useStore(
+    (state: IStore) => [state.uid, state.setPlans, state.setPlan],
     shallow,
   );
 
@@ -16,22 +15,26 @@ const useHistory = () => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     let unsubscribe = () => { };
 
-    if (uid && plan) {
-      unsubscribe = streamHistory(
+    if (uid) {
+      unsubscribe = streamPlans(
         uid,
-        plan.id,
         (querySnapshot) => {
           const result = querySnapshot.docs;
           if (result) {
-            const planHistory: Array<IHistoryItem> = result.map((doc) => ({
+            const userPlans = result.map((doc) => ({
               id: doc.id,
-              date: doc.data().date.toDate(),
-              weightIn: doc.data().weightIn,
+              type: doc.data().type,
+              startDate: doc.data().startDate.toDate(),
+              endDate: doc.data().endDate.toDate(),
+              goalWeight: doc.data().goalWeight,
+              active: doc.data().active,
             }));
 
-            setHistory(planHistory);
+            setPlans(userPlans);
+            setPlan(userPlans[0]);
           } else {
-            setHistory([]);
+            setPlans([]);
+            setPlan(null);
           }
         },
         (error: FirestoreError) => {
@@ -42,7 +45,7 @@ const useHistory = () => {
     }
 
     return unsubscribe;
-  }, [uid, plan, setHistory]);
+  }, [uid, setPlans, setPlan]);
 };
 
-export default useHistory;
+export default usePlans;

@@ -3,8 +3,8 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import {
   getFirestore, onSnapshot, DocumentSnapshot,
-  DocumentData, FirestoreError, getDocs,
-  setDoc, doc, getDoc, query, where, collection, QuerySnapshot, orderBy,
+  DocumentData, FirestoreError,
+  setDoc, doc, getDoc, query, collection, QuerySnapshot, orderBy,
 } from 'firebase/firestore';
 import Constants from 'expo-constants';
 import { UNITS } from './types';
@@ -127,33 +127,43 @@ export const getUserData = (uid: string) => {
   return getDoc(userRef);
 };
 
-export const streamHistory = async (
+export const streamHistory = (
+  uid: string,
+  planId: string,
+  snapshot: ((snapshot: QuerySnapshot<DocumentData>) => void),
+  error?: ((error: FirestoreError) => void),
+) => {
+  const historyQuery = query(
+    collection(db, 'users', uid, 'plans', planId, 'history'),
+    orderBy('date', 'desc'),
+    // where('date', '==', new Date(new Date().toDateString())),
+  );
+  return onSnapshot(
+    historyQuery,
+    {},
+    snapshot,
+    error,
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  return () => { };
+};
+
+export const streamPlans = (
   uid: string,
   snapshot: ((snapshot: QuerySnapshot<DocumentData>) => void),
   error?: ((error: FirestoreError) => void),
 ) => {
   const plansQuery = query(
     collection(db, 'users', uid, 'plans'),
-    where('active', '==', true),
+    orderBy('active', 'desc'),
+    orderBy('startDate', 'desc'),
   );
-  const querySnapshot = await getDocs(plansQuery);
 
-  if (querySnapshot.docs[0]) {
-    const activePlanId = querySnapshot.docs[0].id;
-
-    const historyQuery = query(
-      collection(db, 'users', uid, 'plans', activePlanId, 'history'),
-      orderBy('date', 'desc'),
-      // where('date', '==', new Date(new Date().toDateString())),
-    );
-    return onSnapshot(
-      historyQuery,
-      {},
-      snapshot,
-      error,
-    );
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  return () => { };
+  return onSnapshot(
+    plansQuery,
+    {},
+    snapshot,
+    error,
+  );
 };

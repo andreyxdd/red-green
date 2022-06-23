@@ -4,7 +4,7 @@ import { getAuth } from 'firebase/auth';
 import {
   getFirestore, onSnapshot, DocumentSnapshot,
   DocumentData, FirestoreError, getDocs,
-  setDoc, doc, getDoc, query, where, collection, QuerySnapshot,
+  setDoc, doc, getDoc, query, where, collection, QuerySnapshot, orderBy,
 } from 'firebase/firestore';
 import Constants from 'expo-constants';
 import { UNITS } from './types';
@@ -143,7 +143,8 @@ export const streamHistory = async (
 
     const historyQuery = query(
       collection(db, 'users', uid, 'plans', activePlanId, 'history'),
-      where('date', '==', new Date(new Date().toDateString())),
+      orderBy('date', 'desc'),
+      // where('date', '==', new Date(new Date().toDateString())),
     );
     return onSnapshot(
       historyQuery,

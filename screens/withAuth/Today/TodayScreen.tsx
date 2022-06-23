@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
+import usePlan from '../../../hooks/usePlan';
 
-import EditScreenInfo from '../../../components/EditScreenInfo';
 import { Text, View } from '../../../components/Themed';
 
 const styles = StyleSheet.create({
@@ -21,11 +21,14 @@ const styles = StyleSheet.create({
 });
 
 export default function TodayScreen() {
+  const { plan, loading, error } = usePlan();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
+      {plan.data && !loading && !error
+        ? <Text style={styles.title}>{plan.data.type}</Text>
+        : null}
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="/screens/TodayScreen.tsx" />
     </View>
   );
 }

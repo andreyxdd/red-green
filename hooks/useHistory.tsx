@@ -1,24 +1,27 @@
 import React from 'react';
 import { Alert } from 'react-native';
 import { FirestoreError } from 'firebase/firestore';
-import useStore, { IStore } from './useStore';
+// import useStore, { IStore } from './useStore';
+import useAuthentification from './useAuthentification';
 import { streamHistory } from '../firebase';
 
 const useHistory = () => {
-  const uid = useStore((state: IStore) => state.uid);
+  const { user } = useAuthentification();
+  // const uid = useStore((state: IStore) => state.uid);
 
   React.useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     let unsubscribe = () => { };
 
     async function fetchStream() {
-      if (uid) {
+      if (user) {
         unsubscribe = await streamHistory(
-          uid,
+          user.uid,
           (querySnapshot) => {
             const res = querySnapshot.docs;
-            if (res[0]) console.log(res[0].data()['weight-in']);
-            else console.log('No weight-in today yet');
+            res.forEach((d) => { console.log(d.data()); });
+            // if (res[0]) console.log(res[0].data()['weight-in']);
+            // else console.log('No weight-in today yet');
           },
           (error: FirestoreError) => Alert.alert(error.toString()),
         );
@@ -28,7 +31,7 @@ const useHistory = () => {
     fetchStream();
 
     return unsubscribe;
-  }, [uid]);
+  }, [user]);
 };
 
 export default useHistory;

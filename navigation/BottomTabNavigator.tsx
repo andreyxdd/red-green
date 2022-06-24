@@ -5,7 +5,7 @@ import TabOneScreen from '../screens/withAuth/Today/TodayScreen';
 import TabTwoScreen from '../screens/withAuth/Weighin/WeighInScreen';
 import TabThreeScreen from '../screens/withAuth/Plan/PlanScreen';
 import { RootTabParamList, RootTabScreenProps } from '../types';
-import { MenuContextOpenner } from '../components/PopupPlanMenu';
+import { MenuContextOpenner } from '../components/Plan/PopupPlanMenu';
 import useInterfaceStore, { IInterfaceStore } from '../hooks/useInterfaceStore';
 import { colors } from '../styles/base';
 

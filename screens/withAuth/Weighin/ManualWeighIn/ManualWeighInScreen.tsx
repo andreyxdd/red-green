@@ -21,13 +21,15 @@ export default function ManualWeighInScreen({ route, navigation }: RootStackScre
   React.useEffect(() => { if (value) setInputWeight(value.toFixed(1)); }, [value]);
 
   const handleSubmitEditing = () => {
-    if (uid && inputWeight && plan && history) {
-      updateUserWeight(uid, Number(inputWeight));
+    const weightInValue = inputWeight ? parseFloat(inputWeight.replaceAll(',', '.')) : NaN;
+
+    if (uid && Number.isFinite(weightInValue) && plan && history) {
+      updateUserWeight(uid, weightInValue);
 
       if (screenType === 'edit') {
-        updateUserLastHistoryItem(uid, plan.id, history[0].id, Number(inputWeight));
+        updateUserLastHistoryItem(uid, plan.id, history[0].id, weightInValue);
       } else {
-        writeUserLastHistoryItem(uid, plan.id, Number(inputWeight));
+        writeUserLastHistoryItem(uid, plan.id, weightInValue);
       }
 
       navigation.goBack();

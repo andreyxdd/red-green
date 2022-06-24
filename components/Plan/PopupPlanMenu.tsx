@@ -9,7 +9,7 @@ import {
 import { Pressable } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Text, View } from './Themed';
+import { Text, View } from '../Themed';
 
 const { SlideInMenu } = renderers;
 

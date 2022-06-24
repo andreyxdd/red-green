@@ -1,7 +1,8 @@
 import { StyleSheet } from 'react-native';
 import shallow from 'zustand/shallow';
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
-import PopupPlanMenu from '../../../components/PopupPlanMenu';
+import PopupPlanMenu from '../../../components/Plan/PopupPlanMenu';
+import HistoryPlot from '../../../components/Plan/HistoryPlot';
 import { Text, View } from '../../../components/Themed';
 
 const styles = StyleSheet.create({
@@ -31,18 +32,11 @@ export default function PlanScreen() {
           <>
             <Text style={styles.title}>{plan.type}</Text>
             <Text style={styles.title}>{plan.goalWeight}</Text>
-            <View style={{ paddingVertical: 20 }}>
-              {history.map((historyItem) => (
-                <View key={historyItem.id}>
-                  <Text>{historyItem.date.toDateString()}</Text>
-                  <Text>{historyItem.weightIn}</Text>
-                </View>
-              ))}
-            </View>
+            <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+            <HistoryPlot />
           </>
         )
         : null}
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <PopupPlanMenu />
     </View>
   );

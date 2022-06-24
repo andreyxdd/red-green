@@ -191,6 +191,8 @@ export const writeUserLastHistoryItem = (
 
   const todayDate = new Date(new Date().setHours(0, 0, 0, 0));
 
+  console.log(newWeight);
+
   addDoc(
     historyRef,
     {

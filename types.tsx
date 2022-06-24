@@ -86,3 +86,8 @@ export const enum SIGNS {
   YELLOW = 'YELLOW',
   RED = 'RED',
 }
+
+export const enum PLAN_VIEWS {
+  HISTORY = 'HISTORY',
+  BREAKDOWN = 'BREAKDOWN',
+}

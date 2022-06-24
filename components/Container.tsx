@@ -4,11 +4,11 @@ function Container(props: ViewProps) {
   return (
     <View
       {...props}
-      style={[props.style, {
+      style={[{
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.0)',
-      }]}
+      }, props.style]}
     >
       {props.children}
     </View>

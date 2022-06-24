@@ -1,19 +1,33 @@
-import { StyleSheet } from 'react-native';
+import {
+  StyleSheet, ScrollView, FlatList,
+} from 'react-native';
 import shallow from 'zustand/shallow';
+import { differenceInDays, format } from 'date-fns';
+import React from 'react';
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
 import PopupPlanMenu from '../../../components/Plan/PopupPlanMenu';
 import HistoryPlot from '../../../components/Plan/HistoryPlot';
-import { Text, View } from '../../../components/Themed';
+import { View, Text } from '../../../components/Themed';
+import { PLAN_VIEWS, SIGNS } from '../../../types';
+import PlanViewToggle from '../../../components/Plan/PlanViewToggle';
+import { colors } from '../../../styles/base';
+import { getRelativeChange } from '../../../utils/calculate';
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
+  rowContainer: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(0, 0, 0, 0.0)',
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  label: {
+    fontWeight: '600',
+    textAlign: 'right',
+    paddingRight: 10,
+  },
+  text: {
+    textAlign: 'left',
+    fontWeight: '300',
   },
   separator: {
     marginVertical: 30,
@@ -24,20 +38,114 @@ const styles = StyleSheet.create({
 
 export default function PlanScreen() {
   const [plan, history] = useDataStore((state: IDataStore) => [state.plan, state.history], shallow);
+  const [planView, setPlanView] = React.useState<PLAN_VIEWS>(PLAN_VIEWS.HISTORY);
 
   return (
-    <View style={styles.container}>
+    <>
       {plan && history
         ? (
-          <>
-            <Text style={styles.title}>{plan.type}</Text>
-            <Text style={styles.title}>{plan.goalWeight}</Text>
-            <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-            <HistoryPlot />
-          </>
-        )
-        : null}
+          <View style={{ flex: 4 }}>
+            <View style={{
+              flexDirection: 'row', paddingTop: 10, paddingBottom: 6, borderBottomWidth: 1, borderColor: '#ccc',
+            }}
+            >
+              <View style={{ flex: 2 }}>
+                <Text style={styles.label}>Current plan:</Text>
+              </View>
+              <View style={{ flex: 2 }}>
+                <Text style={styles.text}>{plan.type}</Text>
+              </View>
+            </View>
+            <View style={{
+              flexDirection: 'row', paddingVertical: 6, borderBottomWidth: 1, borderColor: '#ccc',
+            }}
+            >
+              <View style={{ flex: 2 }}>
+                <Text style={styles.label}>Duration:</Text>
+              </View>
+              <View style={{ flex: 2 }}>
+                <Text style={styles.text}>
+                  {differenceInDays(plan.endDate, plan.startDate)}
+                  {' '}
+                  days
+                </Text>
+              </View>
+            </View>
+            <View style={{
+              flexDirection: 'row', paddingVertical: 6,
+            }}
+            >
+              <View style={{ flex: 2 }}>
+                <Text style={styles.label}>Goal Weight:</Text>
+              </View>
+              <View style={{ flex: 2 }}>
+                <Text style={styles.text}>{plan.goalWeight.toFixed(1)}</Text>
+              </View>
+            </View>
+            <PlanViewToggle planView={planView} setPlanView={setPlanView} />
+
+            {planView === PLAN_VIEWS.HISTORY
+              ? (
+                <ScrollView contentContainerStyle={{
+                  flexGrow: 1,
+                  justifyContent: 'flex-start',
+                }}
+                >
+                  <HistoryPlot history={history.slice().reverse()} plan={plan} />
+                </ScrollView>
+              )
+              : (
+                <FlatList
+                  data={history}
+                  renderItem={({ item }) => {
+                    const relativeChange = getRelativeChange(plan.goalWeight, item.weightIn);
+
+                    let color;
+                    if (relativeChange > 2.0) {
+                      color = SIGNS.RED;
+                    } else if (relativeChange < 0.0) {
+                      color = SIGNS.GREEN;
+                    } else {
+                      color = SIGNS.YELLOW;
+                    }
+                    return (
+                      <View style={{
+                        backgroundColor: colors[color],
+                        borderColor: '#ccc',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        padding: 20,
+                        marginVertical: 6,
+                        marginHorizontal: 16,
+                        flex: 4,
+                      }}
+                      >
+                        <View style={{ flexDirection: 'row', backgroundColor: colors[color] }}>
+                          <View style={{ flex: 1, backgroundColor: colors[color] }}>
+                            <Text style={styles.label}>Weigh-in:</Text>
+                          </View>
+                          <View style={{ flex: 3, backgroundColor: colors[color] }}>
+                            <Text style={styles.text}>{item.weightIn}</Text>
+                          </View>
+                        </View>
+                        <View style={{ flexDirection: 'row', backgroundColor: colors[color] }}>
+                          <View style={{ flex: 1, backgroundColor: colors[color] }}>
+                            <Text style={styles.label}>When:</Text>
+                          </View>
+                          <View style={{ flex: 3, backgroundColor: colors[color] }}>
+                            <Text style={styles.text}>{format(item.date, 'PPPP')}</Text>
+                          </View>
+                        </View>
+                      </View>
+                    );
+                  }}
+                  keyExtractor={(item) => item.id}
+                />
+              )}
+
+          </View>
+        ) : null}
       <PopupPlanMenu />
-    </View>
+    </>
   );
 }

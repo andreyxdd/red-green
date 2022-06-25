@@ -6,6 +6,7 @@ import { MenuProvider } from 'react-native-popup-menu';
 import { Provider as PaperProvider } from 'react-native-paper';
 import usePlans from './hooks/usePlans';
 import useHistory from './hooks/useHistory';
+import useProfileData from './hooks/useProfileData';
 
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
@@ -18,6 +19,7 @@ export default function App() {
   const isCacheLoadingComplete = useCachedResources();
   const colorScheme = useColorScheme();
 
+  useProfileData();
   usePlans();
   useHistory();
 

@@ -12,7 +12,7 @@ export type IUserData = {
 /* eslint-disable no-unused-vars */
 export interface IDataStore extends IUserData{
   setUID: (uid: string | null) => void;
-  setProfileData: (profileData: string | null) => void;
+  setProfileData: (profileData: IProfileData | null) => void;
   setPlans: (plans: Array<IPlan>) => void;
   setPlan: (activePlan: IPlan | null) => void;
   setHistory: (history: Array<IHistoryItem>) => void;
@@ -31,7 +31,7 @@ const initialState = {
 const useDataStore = create<IDataStore>((set: any) => ({
   ...initialState,
   setUID: (uid: string | null) => set({ uid }),
-  setProfileData: (profileData: string | null) => set({ profileData }),
+  setProfileData: (profileData: IProfileData | null) => set({ profileData }),
   setPlans: (plans: Array<IPlan>) => set({ plans }),
   setPlan: (plan: IPlan | null) => set({ plan }),
   setHistory: (history: Array<IHistoryItem>) => set({ history }),

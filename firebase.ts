@@ -212,3 +212,12 @@ export const writeUserLastHistoryItem = (
     },
   );
 };
+
+export const streamProfileData = (
+  uid: string,
+  snapshot: ((snapshot: DocumentSnapshot<DocumentData>) => void),
+  error?: ((error: FirestoreError) => void),
+) => {
+  const userRef = doc(db, 'users', uid);
+  return onSnapshot(userRef, {}, snapshot, error);
+};

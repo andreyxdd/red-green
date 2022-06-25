@@ -92,7 +92,6 @@ function SignUpScreen() {
         placeholder="Email"
         value={email}
         onChangeText={(text) => setEmail(text)}
-        autoComplete
         style={{ marginVertical: 6 }}
         autoCapitalize="none"
       />
@@ -101,7 +100,6 @@ function SignUpScreen() {
         placeholder="Email"
         value={email}
         onChangeText={(text) => setEmailConfirm(text)}
-        autoComplete
         style={{ marginVertical: 6 }}
         autoCapitalize="none"
       />
@@ -111,7 +109,6 @@ function SignUpScreen() {
         value={password}
         onChangeText={(text) => setPassword(text)}
         secureTextEntry
-        autoComplete
         style={{ marginVertical: 6 }}
       />
       <Container style={{ marginVertical: 6 }}>

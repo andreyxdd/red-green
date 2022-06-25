@@ -87,7 +87,6 @@ function IntroScreen() {
         placeholder="Email"
         value={email}
         onChangeText={(text) => setEmail(text)}
-        autoComplete
         style={{ marginVertical: 6 }}
         autoCapitalize="none"
       />
@@ -97,7 +96,6 @@ function IntroScreen() {
         value={password}
         onChangeText={(text) => setPassword(text)}
         secureTextEntry
-        autoComplete
         style={{ marginVertical: 6 }}
       />
       <Container style={{ marginVertical: 12 }}>

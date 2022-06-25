@@ -22,6 +22,7 @@ import LinkingConfiguration from './LinkingConfiguration';
 
 import BottomTabNavigator from './BottomTabNavigator';
 import useDataStore, { IDataStore } from '../hooks/useDataStore';
+import { auth } from '../firebase';
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -97,7 +98,30 @@ function RootNavigator() {
         <Stack.Screen
           name="NoProfileData"
           component={NoProfileDataScreen}
-          options={{ title: 'Profile Data' }}
+          options={({ navigation }) => ({
+            title: 'Profile Data',
+            headerTitleAlign: 'center',
+            headerLeft: () => (
+              <Pressable
+                onPress={() => auth
+                  .signOut()
+                  .then(() => {
+                    navigation.navigate('Intro');
+                  })
+                  .catch((e) => console.log(e))}
+                style={({ pressed }) => ({
+                  opacity: pressed ? 0.5 : 1,
+                })}
+                hitSlop={50}
+              >
+                <FontAwesome
+                  name="chevron-left"
+                  size={30}
+                  color="grey"
+                />
+              </Pressable>
+            ),
+          })}
         />
       </Stack.Navigator>
     );

@@ -4,20 +4,21 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 export interface DatePickerModal {
-  value: Date;
-  setValue: Dispatch<SetStateAction<Date | undefined>> | ((dob: Date) => void);
   id: string;
+  value: Date;
+  onChange?: any;
+  setValue?: Dispatch<SetStateAction<Date | undefined>> | ((dob: Date) => void);
   handleClose?: () => void;
 }
 
 const DatePickerModal = React.forwardRef<RBSheet, DatePickerModal>((
   {
-    value, setValue, id, handleClose,
+    value, setValue, id, handleClose, onChange,
   },
   ref,
 ) => {
   const onChangeDate = (_event: unknown, selectedDate?: Date) => {
-    if (selectedDate) setValue(selectedDate);
+    if (selectedDate && setValue) setValue(selectedDate);
   };
 
   return (
@@ -38,10 +39,11 @@ const DatePickerModal = React.forwardRef<RBSheet, DatePickerModal>((
         testID={id}
         value={value || new Date()}
         mode="date"
-        onChange={onChangeDate}
+        onChange={onChange || onChangeDate}
         style={{ width: Dimensions.get('window').width * 0.9 }}
         display="spinner"
       />
+      )
     </RBSheet>
   );
 });

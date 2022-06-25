@@ -7,7 +7,7 @@ import {
   setDoc, doc, getDoc, query, collection, QuerySnapshot, orderBy, addDoc,
 } from 'firebase/firestore';
 import Constants from 'expo-constants';
-import { UNITS } from './types';
+import { IProfileData, UNITS } from './types';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -220,4 +220,23 @@ export const streamProfileData = (
 ) => {
   const userRef = doc(db, 'users', uid);
   return onSnapshot(userRef, {}, snapshot, error);
+};
+
+export const writeProfileData = (
+  uid: string,
+  profileData: IProfileData,
+) => {
+  const userRef = doc(db, 'users', uid);
+
+  setDoc(
+    userRef,
+    {
+      name: profileData.name,
+      dob: new Date(new Date(profileData.dob).setHours(0, 0, 0, 0)),
+      units: 'METRIC',
+      height: profileData.height,
+      weight: profileData.weight,
+    },
+    { merge: true },
+  );
 };

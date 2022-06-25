@@ -74,7 +74,7 @@ export type IPlan = {
 
 export type IProfileData = {
   name: string;
-  dob: Date | null;
+  dob: Date;
   units: UNITS;
   height: number;
   weight: number;

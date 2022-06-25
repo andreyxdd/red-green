@@ -51,7 +51,6 @@ export default function ManualWeighInScreen({ route, navigation }: RootStackScre
         onChangeText={handleChange}
         onSubmitEditing={handleSubmitEditing}
         style={{ marginVertical: 12 }}
-        autoComplete={Platform.OS === 'web' ? 'none' : 'off'}
       />
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />

@@ -5,9 +5,12 @@ import {
 } from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
-// import { useTailwind } from 'tailwind-rn';
+import { differenceInDays } from 'date-fns';
+import shallow from 'zustand/shallow';
 import { Text, View } from '../../../components/Themed';
 import DatePickerModal from '../../../components/DatePickerModal';
+import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
+import { updateUserPlan } from '../../../firebase';
 
 const styles = StyleSheet.create({
   container: {
@@ -18,7 +21,7 @@ const styles = StyleSheet.create({
 });
 
 export default function EditPlanScreen() {
-  // const tailwind = useTailwind();
+  const [uid, plan] = useDataStore((state: IDataStore) => [state.uid, state.plan], shallow);
   const [date, setDate] = React.useState<Date>();
 
   const datePickerRef = React.useRef<RBSheet>(null);
@@ -30,6 +33,20 @@ export default function EditPlanScreen() {
       } else {
         datePickerRef.current.open();
       }
+    }
+  };
+
+  React.useEffect(() => {
+    if (plan?.endDate) setDate(plan?.endDate);
+  }, [plan?.endDate]);
+
+  const handleClose = () => {
+    if (
+      uid && plan && date
+      && differenceInDays(date, new Date()) > 1
+      && differenceInDays(date, plan.startDate)
+    ) {
+      updateUserPlan(uid, plan.id, date);
     }
   };
 
@@ -45,7 +62,13 @@ export default function EditPlanScreen() {
             {' '}
             {date.toLocaleString()}
           </Text>
-          <DatePickerModal ref={datePickerRef} value={date} setValue={setDate} id="datePickerGoal" />
+          <DatePickerModal
+            ref={datePickerRef}
+            value={date}
+            setValue={setDate}
+            id="datePickerendDate"
+            handleClose={handleClose}
+          />
         </>
       ) : null}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />

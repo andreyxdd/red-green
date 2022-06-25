@@ -14,7 +14,7 @@ const chartConfig = {
   strokeWidth: 2, // optional, default 3
   barPercentage: 0.5,
   propsForVerticalLabels: {
-    fontSize: '10',
+    fontSize: '8',
   },
 };
 
@@ -50,11 +50,11 @@ function HistoryPlot({ history, plan }: IHistoryPlot) {
       <LineChart
         data={data}
         width={dimensions.fullWidth}
-        height={dimensions.fullHeight / 1.8}
+        height={dimensions.fullHeight / 1.5}
         chartConfig={chartConfig}
         bezier
         verticalLabelRotation={-75}
-        xLabelsOffset={45}
+        xLabelsOffset={35}
         // hidePointsAtIndex={[...new Array(history.length).keys()].filter((n) => n % 2 !== 0)}
         getDotColor={(dataPoint) => {
           const relativeChange = getRelativeChange(plan.goalWeight, dataPoint);

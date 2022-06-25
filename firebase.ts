@@ -136,6 +136,20 @@ export const updateUserLastHistoryItem = (
   );
 };
 
+export const updateUserPlan = (
+  uid: string,
+  planId: string,
+  newEndDate: Date,
+) => {
+  const planRef = doc(db, 'users', uid, 'plans', planId);
+
+  setDoc(
+    planRef,
+    { endDate: new Date(newEndDate.setHours(0, 0, 0, 0)) },
+    { merge: true },
+  );
+};
+
 export const getUserData = (uid: string) => {
   const userRef = doc(db, 'users', uid);
   return getDoc(userRef);
@@ -158,9 +172,6 @@ export const streamHistory = (
     snapshot,
     error,
   );
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  return () => { };
 };
 
 export const streamPlans = (

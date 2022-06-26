@@ -24,6 +24,7 @@ export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
   UserMenu: undefined;
   ManualWeighIn: { screenType: string, value?: number };
+  CreatePlan: undefined;
   EditProfile: undefined;
   EditPlan: undefined;
   NotFound: undefined;
@@ -52,7 +53,7 @@ export const enum UNITS {
   IMPERIAL = 'IMPERIAL',
 }
 
-const enum PLANS {
+export const enum PLANS {
   MAINTENANCE = 'MAINTENANCE',
   LOSING = 'LOSING',
 }

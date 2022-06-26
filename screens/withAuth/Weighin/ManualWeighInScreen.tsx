@@ -5,9 +5,9 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import React from 'react';
 import shallow from 'zustand/shallow';
-import { RootStackScreenProps } from '../../../../types';
-import useDataStore, { IDataStore } from '../../../../hooks/useDataStore';
-import { updateUserWeight, updateUserLastHistoryItem, writeUserLastHistoryItem } from '../../../../firebase';
+import { RootStackScreenProps } from '../../../types';
+import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
+import { updateUserWeight, updateUserLastHistoryItem, writeUserLastHistoryItem } from '../../../firebase';
 
 export default function ManualWeighInScreen({ route, navigation }: RootStackScreenProps<'ManualWeighIn'>) {
   const [uid, plan, history] = useDataStore(
@@ -21,7 +21,13 @@ export default function ManualWeighInScreen({ route, navigation }: RootStackScre
   React.useEffect(() => { if (value) setInputWeight(value.toFixed(1)); }, [value]);
 
   const handleSubmitEditing = () => {
-    const weightInValue = inputWeight ? parseFloat(inputWeight.replaceAll(',', '.')) : NaN;
+    const weightInValue = inputWeight
+      ? parseFloat(
+        inputWeight.indexOf(',') > 0
+          ? inputWeight.replaceAll(',', '.')
+          : inputWeight,
+      )
+      : NaN;
 
     if (uid && Number.isFinite(weightInValue) && plan && history) {
       updateUserWeight(uid, weightInValue);

@@ -1,9 +1,9 @@
 import React from 'react';
 import {
-  StyleSheet, View, Text, TouchableOpacity, Keyboard, Platform,
+  StyleSheet, View, TouchableOpacity, Keyboard, Platform,
 } from 'react-native';
 import {
-  TextInput, Button, Switch, HelperText,
+  TextInput, Button, HelperText,
 } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -11,19 +11,18 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import RBSheet from 'react-native-raw-bottom-sheet';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
-import { IProfileData } from '../../types';
+import { PLANS, RootStackScreenProps } from '../../types';
 import DatePickerModal from '../../components/DatePickerModal';
 import { dimensions } from '../../styles/base';
 import useDataStore, { IDataStore } from '../../hooks/useDataStore';
-import { writeProfileData } from '../../firebase';
+import { writeMaintenancePlan } from '../../firebase';
 
-interface FormData extends IProfileData {
-  termsAccepted: boolean;
+interface FormData {
+  type?: PLANS;
+  endDate: Date;
+  startWeight?: number;
+  goalWeight: number;
 }
-
-const REGEX = {
-  personalName: /^[a-z ,.'-]+$/i,
-};
 
 const ERROR_MESSAGES = {
   REQUIRED: 'This Field Is Required',
@@ -42,7 +41,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function NoProfileDataScreen() {
+export default function CreatePlanScreen({ navigation }: RootStackScreenProps<'CreatePlan'>) {
   const uid = useDataStore((state: IDataStore) => state.uid);
 
   const { control, handleSubmit, formState: { errors, isValid } } = useForm<FormData>({
@@ -59,44 +58,17 @@ export default function NoProfileDataScreen() {
   };
 
   const onSubmit = (data: FormData) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { termsAccepted, ...profileData } = data;
-
-    if (uid) writeProfileData(uid, profileData as IProfileData);
+    if (uid) {
+      writeMaintenancePlan(uid, data.endDate, data.goalWeight as number);
+      navigation.goBack(); // pass props to show if it's the very first weigh-in for the plan
+    }
   };
 
   return (
     <KeyboardAwareScrollView contentContainerStyle={styles.container}>
       <Controller
         control={control}
-        defaultValue=""
-        name="name"
-        rules={{
-          required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-          pattern: { message: ERROR_MESSAGES.NAME, value: REGEX.personalName },
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <>
-            <TextInput
-              label="Name"
-              style={styles.input}
-              value={value}
-              onBlur={onBlur}
-              onChangeText={(v) => onChange(v)}
-              error={errors.name && true}
-            />
-            <HelperText
-              visible={!errors.name}
-              type="error"
-            >
-              {errors.name?.message}
-            </HelperText>
-          </>
-        )}
-      />
-      <Controller
-        control={control}
-        name="dob"
+        name="endDate"
         defaultValue={new Date()}
         rules={{
           required: { value: true, message: ERROR_MESSAGES.REQUIRED },
@@ -110,12 +82,12 @@ export default function NoProfileDataScreen() {
                 onChange={(_e: unknown, d?: Date) => {
                   onChange(d);
                 }}
-                id="dobPicker"
+                id="endDatePicker"
               />
             )}
             {Platform.OS === 'android' && showAndroidDatePicker && (
               <DateTimePicker
-                testID="dobPicker"
+                testID="endDatePicker"
                 value={value || new Date()}
                 mode="date"
                 onChange={(_e: unknown, d?: Date) => {
@@ -129,14 +101,14 @@ export default function NoProfileDataScreen() {
             <TouchableOpacity onPress={toggleDatePicker}>
               <View pointerEvents="none">
                 <TextInput
-                  label="Birthdate"
+                  label="Goal Date"
                   style={styles.input}
                   value={value && format(value, 'yyyy-MM-dd')}
-                  error={errors.dob && true}
+                  error={errors.endDate && true}
                 />
               </View>
             </TouchableOpacity>
-            <HelperText type="error">{errors.dob?.message}</HelperText>
+            <HelperText type="error">{errors.endDate?.message}</HelperText>
           </>
         )}
       />
@@ -165,7 +137,7 @@ export default function NoProfileDataScreen() {
       /> */}
       <Controller
         control={control}
-        name="height"
+        name="goalWeight"
         defaultValue={0.0}
         rules={{
           required: { message: ERROR_MESSAGES.REQUIRED, value: true },
@@ -174,59 +146,19 @@ export default function NoProfileDataScreen() {
           <>
             <TextInput
               value={value.toString()}
-              label="Height"
+              label="Goal Weight"
               style={styles.input}
               onBlur={onBlur}
               onChangeText={(v) => onChange(v)}
-              error={errors.height && true}
+              error={errors.goalWeight && true}
               keyboardType="numeric"
               returnKeyType="done"
               selectTextOnFocus
             />
-            <HelperText type="error">{errors.height?.message}</HelperText>
+            <HelperText type="error">{errors.goalWeight?.message}</HelperText>
           </>
         )}
       />
-      <Controller
-        control={control}
-        name="weight"
-        defaultValue={0.0}
-        rules={{
-          required: { message: ERROR_MESSAGES.REQUIRED, value: true },
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <>
-            <TextInput
-              value={value.toString()}
-              label="Weight"
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={(v) => onChange(v)}
-              error={errors.weight && true}
-              keyboardType="numeric"
-              returnKeyType="done"
-              selectTextOnFocus
-            />
-            <HelperText type="error">{errors.weight?.message}</HelperText>
-          </>
-        )}
-      />
-      <View style={styles.row}>
-        <Text>Terms Accept</Text>
-        <Controller
-          control={control}
-          defaultValue={false}
-          name="termsAccepted"
-          rules={{ required: { value: true, message: ERROR_MESSAGES.TERMS } }}
-          render={({ field: { onChange, value } }) => (
-            <Switch
-              value={value}
-              onValueChange={(v) => onChange(v)}
-            />
-          )}
-        />
-      </View>
-      <HelperText type="error">{errors.termsAccepted?.message}</HelperText>
       <Button
         mode="contained"
         onPress={handleSubmit(onSubmit)}

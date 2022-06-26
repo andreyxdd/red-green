@@ -7,7 +7,7 @@ import {
   setDoc, doc, getDoc, query, collection, QuerySnapshot, orderBy, addDoc,
 } from 'firebase/firestore';
 import Constants from 'expo-constants';
-import { IProfileData, UNITS } from './types';
+import { IProfileData, PLANS, UNITS } from './types';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -226,7 +226,7 @@ export const writeProfileData = (
   uid: string,
   profileData: IProfileData,
 ) => {
-  const userRef = doc(db, 'users', uid);
+  const userRef = doc(db, 'users', uid, 'plans');
 
   setDoc(
     userRef,
@@ -238,5 +238,24 @@ export const writeProfileData = (
       weight: profileData.weight,
     },
     { merge: true },
+  );
+};
+
+export const writeMaintenancePlan = (
+  uid: string,
+  endDate: Date,
+  goalWeight: number,
+) => {
+  const planRef = collection(db, 'users', uid, 'plans');
+
+  addDoc(
+    planRef,
+    {
+      active: true,
+      type: PLANS.MAINTENANCE,
+      startDate: new Date(new Date().setHours(0, 0, 0, 0)),
+      endDate,
+      goalWeight: Number(goalWeight),
+    },
   );
 };

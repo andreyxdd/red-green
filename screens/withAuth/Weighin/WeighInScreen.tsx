@@ -28,13 +28,28 @@ export default function WeighInScreen({ navigation: { navigate } }: RootTabScree
     }
   }, [history, plan, setSign]);
 
+  if (!plan || !plan.active) {
+    return (
+      <Container style={{ flex: 1 }}>
+        <Container style={{ width: '80%' }}>
+          <Headline style={{ width: '100%', marginVertical: 12 }}>No Active plans</Headline>
+          <Button
+            mode="contained"
+            style={{ width: '100%', marginVertical: 12 }}
+            onPress={() => { navigate('CreatePlan'); }}
+          >
+            Create new plan
+          </Button>
+        </Container>
+      </Container>
+    );
+  }
+
   return (
     <Container style={{ flex: 1 }}>
       {(
         history.length > 0
-        && plan
         && history[0].date.setHours(0, 0, 0, 0) === (new Date()).setHours(0, 0, 0, 0)
-        && plan.active
       ) ? (
         <Container style={{ width: '80%' }}>
           <Headline style={{ width: '100%', marginVertical: 12 }}>Todays weight-in:</Headline>

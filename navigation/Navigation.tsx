@@ -13,7 +13,7 @@ import SignInScreen from '../screens/noAuth/SignInScreen';
 import SignUpScreen from '../screens/noAuth/SignUpScreen';
 import NoProfileDataScreen from '../screens/withAuth/NoProfileDataScreen';
 import UserMenuScreen from '../screens/withAuth/Weighin/UserMenu/UserMenuScreen';
-import ManualWeighInScreen from '../screens/withAuth/Weighin/ManualWeighIn/ManualWeighInScreen';
+import ManualWeighInScreen from '../screens/withAuth/Weighin/ManualWeighInScreen';
 import EditProfileScreen from '../screens/withAuth/Weighin/UserMenu/EditProfileScreen';
 import EditPlanScreen from '../screens/withAuth/Plan/EditPlanScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
@@ -23,6 +23,7 @@ import LinkingConfiguration from './LinkingConfiguration';
 import BottomTabNavigator from './BottomTabNavigator';
 import useDataStore, { IDataStore } from '../hooks/useDataStore';
 import { auth } from '../firebase';
+import CreatePlanScreen from '../screens/withAuth/CreatePlanScreen';
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -138,6 +139,31 @@ function RootNavigator() {
         <Stack.Screen
           name="UserMenu"
           component={UserMenuScreen}
+          options={({ navigation }) => ({
+            title: '',
+            animation: 'slide_from_bottom',
+            headerTransparent: true,
+            headerLeft: () => <View style={{ marginLeft: 50 }} />,
+            headerRight: () => (
+              <Pressable
+                onPress={() => navigation.navigate('TabTwo')}
+                style={({ pressed }) => ({
+                  opacity: pressed ? 0.5 : 1,
+                })}
+                hitSlop={50}
+              >
+                <FontAwesome
+                  name="close"
+                  size={32}
+                  color="grey"
+                />
+              </Pressable>
+            ),
+          })}
+        />
+        <Stack.Screen
+          name="CreatePlan"
+          component={CreatePlanScreen}
           options={({ navigation }) => ({
             title: '',
             animation: 'slide_from_bottom',

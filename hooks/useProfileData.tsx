@@ -20,10 +20,11 @@ const useProfileData = () => {
         uid,
         (querySnapshot) => {
           const result = querySnapshot.data();
-          if (result) {
+          if (result && Object.keys(result).length !== 0) {
             const {
               name, dob, units, height, weight,
             } = result;
+
             setProfileData({
               name,
               dob: dob.toDate(),

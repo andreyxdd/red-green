@@ -9,7 +9,7 @@ import PopupPlanMenu from '../../../components/Plan/PopupPlanMenu';
 import HistoryPlot from '../../../components/Plan/HistoryPlot';
 import { View, Text } from '../../../components/Themed';
 import { PLAN_VIEWS, SIGNS } from '../../../types';
-import PlanViewToggle from '../../../components/Plan/PlanViewToggle';
+import Toggle from '../../../components/Toggle';
 import { colors } from '../../../styles/base';
 import { getRelativeChange } from '../../../utils/calculate';
 
@@ -82,8 +82,14 @@ export default function PlanScreen() {
                 <Text style={styles.text}>{plan.goalWeight.toFixed(1)}</Text>
               </View>
             </View>
-            <PlanViewToggle planView={planView} setPlanView={setPlanView} />
-
+            <Toggle
+              selection={planView}
+              options={{
+                first: { field: PLAN_VIEWS.HISTORY, text: 'HISTORY' },
+                second: { field: PLAN_VIEWS.BREAKDOWN, text: 'BREAKDOWN' },
+              }}
+              setSelection={setPlanView}
+            />
             {planView === PLAN_VIEWS.HISTORY
               ? (
                 <ScrollView contentContainerStyle={{

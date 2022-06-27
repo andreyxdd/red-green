@@ -1,13 +1,13 @@
 import { FontAwesome } from '@expo/vector-icons';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
+import React from 'react';
 
 export default function useCachedResources() {
-  const [isLoadingComplete, setLoadingComplete] = useState(false);
+  const [isLoaded, setLoaded] = React.useState(false);
 
   // Load any resources or data that we need prior to rendering the app
-  useEffect(() => {
+  React.useEffect(() => {
     async function loadResourcesAndDataAsync() {
       try {
         SplashScreen.preventAutoHideAsync();
@@ -22,7 +22,7 @@ export default function useCachedResources() {
         // We might want to provide this error information to an error reporting service
         console.warn(e);
       } finally {
-        setLoadingComplete(true);
+        setLoaded(true);
         SplashScreen.hideAsync();
       }
     }
@@ -30,5 +30,16 @@ export default function useCachedResources() {
     loadResourcesAndDataAsync();
   }, []);
 
-  return isLoadingComplete;
+  const onLayoutRootView = React.useCallback(async () => {
+    if (isLoaded) {
+      // This tells the splash screen to hide immediately! If we call this after
+      // `setAppIsReady`, then we may see a blank screen while the app is
+      // loading its initial state and rendering its first pixels. So instead,
+      // we hide the splash screen once we know the root view has already
+      // performed layout.
+      await SplashScreen.hideAsync();
+    }
+  }, [isLoaded]);
+
+  return { isLoaded, onLayoutRootView };
 }

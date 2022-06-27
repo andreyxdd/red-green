@@ -6,6 +6,7 @@ import useDataStore, { IDataStore } from './useDataStore';
 import { streamPlans } from '../firebase/firebase';
 
 const usePlans = () => {
+  const [isLoaded, setLoaded] = React.useState(false);
   const [uid, setPlans, setPlan] = useDataStore(
     (state: IDataStore) => [state.uid, state.setPlans, state.setPlan],
     shallow,
@@ -19,6 +20,7 @@ const usePlans = () => {
       unsubscribe = streamPlans(
         uid,
         (querySnapshot) => {
+          setLoaded(false);
           const result = querySnapshot.docs;
           if (result) {
             const userPlans = result.map((doc) => ({
@@ -36,16 +38,23 @@ const usePlans = () => {
             setPlans([]);
             setPlan(null);
           }
+          setLoaded(true);
         },
         (error: FirestoreError) => {
           console.log(error.toString());
           Alert.alert(error.toString());
         },
       );
+    } else {
+      setPlans([]);
+      setPlan(null);
+      setLoaded(true);
     }
 
     return unsubscribe;
   }, [uid, setPlans, setPlan]);
+
+  return isLoaded;
 };
 
 export default usePlans;

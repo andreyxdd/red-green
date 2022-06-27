@@ -1,11 +1,15 @@
 import React from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
+import shallow from 'zustand/shallow';
 import useDataStore, { IDataStore } from './useDataStore';
 import { auth } from '../firebase/firebase';
 
 function useAuthentication() {
   const [user, setUser] = React.useState<User>();
-  const setUID = useDataStore((state: IDataStore) => state.setUID);
+  const [setUID, setProfileData] = useDataStore(
+    (state: IDataStore) => [state.setUID, state.setProfileData],
+    shallow,
+  );
 
   React.useEffect(() => {
     const unsubscribeFromAuthStatuChanged = onAuthStateChanged(auth, (currentUser) => {
@@ -14,12 +18,14 @@ function useAuthentication() {
         setUser(currentUser);
       } else {
         // User is signed out
+        setUID('');
+        setProfileData(null);
         setUser(undefined);
       }
     });
 
     return unsubscribeFromAuthStatuChanged;
-  }, [setUID]);
+  }, [setUID, setProfileData]);
 
   return {
     user,

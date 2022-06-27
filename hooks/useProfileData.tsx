@@ -6,6 +6,7 @@ import useDataStore, { IDataStore } from './useDataStore';
 import { streamProfileData } from '../firebase/firebase';
 
 const useProfileData = () => {
+  const [isLoaded, setLoaded] = React.useState(false);
   const [uid, setProfileData] = useDataStore(
     (state: IDataStore) => [state.uid, state.setProfileData],
     shallow,
@@ -19,6 +20,7 @@ const useProfileData = () => {
       unsubscribe = streamProfileData(
         uid,
         (querySnapshot) => {
+          setLoaded(false);
           const result = querySnapshot.data();
           if (result && Object.keys(result).length !== 0) {
             const {
@@ -35,16 +37,21 @@ const useProfileData = () => {
           } else {
             setProfileData(null);
           }
+          setLoaded(true);
         },
         (error: FirestoreError) => {
-          console.log(error.toString());
           Alert.alert(error.toString());
         },
       );
+    } else {
+      setProfileData(null);
+      setLoaded(true);
     }
 
     return unsubscribe;
   }, [uid, setProfileData]);
+
+  return isLoaded;
 };
 
 export default useProfileData;

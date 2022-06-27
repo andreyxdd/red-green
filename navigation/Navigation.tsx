@@ -1,5 +1,7 @@
 import React from 'react';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import {
+  NavigationContainer, DefaultTheme, DarkTheme, useNavigation,
+} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Alert, ColorSchemeName, View } from 'react-native';
 import shallow from 'zustand/shallow';
@@ -30,16 +32,32 @@ import { RootStackParamList } from '../types';
  */
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-function RootNavigator() {
+function Navigator() {
+  const nav = useNavigation();
   const [uid, profileData] = useDataStore(
     (state: IDataStore) => [state.profileData, state.uid],
     shallow,
   );
 
-  // no authorized user
-  if (!uid) {
-    return (
-      <Stack.Navigator>
+  React.useEffect(() => {
+    if (!uid) {
+      nav.navigate('Intro');
+    }
+
+    if (uid && !profileData) {
+      nav.navigate('NoProfileData');
+    }
+
+    if (uid && profileData) {
+      nav.navigate('Root');
+    }
+  }, [uid, profileData, nav]);
+
+  return (
+    <Stack.Navigator>
+      {/* no authorized user */}
+      {!uid && (
+      <Stack.Group>
         <Stack.Screen
           options={{ headerShown: false }}
           name="Intro"
@@ -63,39 +81,33 @@ function RootNavigator() {
             headerLeft: () => (<GoBack onPress={() => navigation.goBack()} />),
           })}
         />
-      </Stack.Navigator>
-    );
-  }
+      </Stack.Group>
+      )}
 
-  // user is authorized but profile is not completed
-  if (uid && !profileData) {
-    return (
-      <Stack.Navigator>
-        <Stack.Screen
-          name="NoProfileData"
-          component={NoProfileDataScreen}
-          options={({ navigation }) => ({
-            title: 'Profile Data',
-            headerTitleAlign: 'center',
-            headerLeft: () => (
-              <GoBack onPress={() => auth
-                .signOut()
-                .then(() => {
-                  navigation.navigate('Intro');
-                })
-                .catch((e) => Alert.alert('Error', e))}
-              />
-            ),
-          })}
-        />
-      </Stack.Navigator>
-    );
-  }
+      {/* user is authorized but profile is not completed */}
+      {uid && !profileData && (
+      <Stack.Screen
+        name="NoProfileData"
+        component={NoProfileDataScreen}
+        options={({ navigation }) => ({
+          title: 'Profile Data',
+          headerTitleAlign: 'center',
+          headerLeft: () => (
+            <GoBack onPress={() => auth
+              .signOut()
+              .then(() => {
+                navigation.navigate('Intro');
+              })
+              .catch((e) => Alert.alert('Error', e))}
+            />
+          ),
+        })}
+      />
+      )}
 
-  // user is authorized and profile is filled out
-  if (uid && profileData) {
-    return (
-      <Stack.Navigator>
+      {/* user is authorized and profile is filled out */}
+      {uid && profileData && (
+      <Stack.Group>
         <Stack.Screen
           name="Root"
           component={BottomTabNavigator}
@@ -167,13 +179,10 @@ function RootNavigator() {
             ),
           })}
         />
-      </Stack.Navigator>
-    );
-  }
+      </Stack.Group>
+      )}
 
-  // no authorized user and something is wrong
-  return (
-    <Stack.Navigator>
+      {/* no authorized user and something is wrong */}
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
@@ -189,7 +198,7 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
       linking={LinkingConfiguration}
       theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
     >
-      <RootNavigator />
+      <Navigator />
     </NavigationContainer>
   );
 }

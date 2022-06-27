@@ -1,10 +1,14 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Button, Headline } from 'react-native-paper';
-import Container from '../../components/Container';
 
 const styles = StyleSheet.create({
+  container: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.0)',
+  },
   button: { width: '100%', paddingVertical: 4, marginVertical: 4 },
 });
 
@@ -12,9 +16,9 @@ function IntroScreen() {
   const navigation = useNavigation();
 
   return (
-    <Container style={{ flex: 1 }}>
+    <View style={[styles.container, { flex: 1 }]}>
       <Headline>Welcome to Red-Green</Headline>
-      <Container style={{ width: '80%', marginVertical: 20 }}>
+      <View style={[styles.container, { width: '80%', marginVertical: 20 }]}>
         <Button
           mode="contained"
           onPress={() => { navigation.navigate('SignIn'); }}
@@ -29,8 +33,8 @@ function IntroScreen() {
         >
           Don&apos;t have an account?
         </Button>
-      </Container>
-    </Container>
+      </View>
+    </View>
   );
 }
 

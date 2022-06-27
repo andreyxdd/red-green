@@ -9,22 +9,29 @@ import useHistory from './hooks/useHistory';
 import useProfileData from './hooks/useProfileData';
 
 import useCachedResources from './hooks/useCachedResources';
+import useAuth from './hooks/useAuth';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation/Navigation';
-import Loader from './components/Loader';
+import { View } from './components/Themed';
 
 LogBox.ignoreLogs(['Setting a timer']);
 
 export default function App() {
-  const isCacheLoadingComplete = useCachedResources();
+  const { isLoaded: isCacheLoaded, onLayoutRootView } = useCachedResources();
+  const isAuthLoaded = useAuth();
+  const isProfileDataLoaded = useProfileData();
+  const isPlansLoaded = usePlans();
+  const isHistoryLoafed = useHistory();
+
   const colorScheme = useColorScheme();
 
-  useProfileData();
-  usePlans();
-  useHistory();
-
-  if (!isCacheLoadingComplete) {
-    return <Loader />;
+  if (!isCacheLoaded
+    && !isAuthLoaded
+    && !isProfileDataLoaded
+    && !isPlansLoaded
+    && !isHistoryLoafed
+  ) {
+    return null;
   }
 
   return (
@@ -37,10 +44,13 @@ export default function App() {
           },
         }}
         >
-          <Navigation colorScheme={colorScheme} />
-          <StatusBar />
+          <View onLayout={onLayoutRootView}>
+            <StatusBar />
+            <Navigation colorScheme={colorScheme} />
+          </View>
         </MenuProvider>
       </PaperProvider>
+
     </SafeAreaProvider>
   );
 }

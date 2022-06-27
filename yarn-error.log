@@ -1,5 +1,5 @@
 Arguments: 
-  /snap/node/6331/bin/node /snap/node/6331/bin/yarn.js add react-select
+  /snap/node/6331/bin/node /snap/node/6331/bin/yarn.js add react-native-responsive-fontsize
 
 PATH: 
   /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/volkov/Android/Sdk/emulator:/home/volkov/Android/Sdk/platform-tools:/home/volkov/.pub-cache/bin:/home/volkov/Android/Sdk/emulator:/home/volkov/Android/Sdk/platform-tools:/home/volkov/.pub-cache/bin
@@ -14,17 +14,7 @@ Platform:
   linux x64
 
 Trace: 
-  Error: EACCES: permission denied, write
-      at writeSync (fs.js:737:3)
-      at SyncWriteStream._write (internal/fs/sync_write_stream.js:24:3)
-      at writeOrBuffer (internal/streams/writable.js:358:12)
-      at SyncWriteStream.Writable.write (internal/streams/writable.js:303:10)
-      at Object.clearLine (readline.js:1384:17)
-      at clearLine (/snap/node/6331/lib/cli.js:49463:12)
-      at ConsoleReporter.warn (/snap/node/6331/lib/cli.js:92854:43)
-      at Add.<anonymous> (/snap/node/6331/lib/cli.js:7270:23)
-      at Generator.next (<anonymous>)
-      at step (/snap/node/6331/lib/cli.js:310:30)
+  Error: EACCES: permission denied, unlink '/home/volkov/dev/lance/red-green/node_modules/.yarn-integrity'
 
 npm manifest: 
   {

@@ -181,7 +181,6 @@ function Navigator() {
         />
       </Stack.Group>
       )}
-
       {/* no authorized user and something is wrong */}
       <Stack.Screen
         name="NotFound"

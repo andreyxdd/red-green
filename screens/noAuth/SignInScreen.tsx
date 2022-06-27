@@ -4,7 +4,9 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { signInWithCredential, updateEmail } from 'firebase/auth';
 import { AppleAuthenticationButton, AppleAuthenticationButtonType, AppleAuthenticationButtonStyle } from 'expo-apple-authentication';
 import { Button } from 'react-native-paper';
+
 import { useNavigation } from '@react-navigation/native';
+import { FontAwesome } from '@expo/vector-icons';
 import { auth } from '../../firebase/firebase';
 import useAppleAuthentication from '../../hooks/useAppleAuthentification';
 import useGoogleAuthentication from '../../hooks/useGoogleAuthentification';
@@ -75,6 +77,8 @@ function SignInScreen() {
           disabled={!googleAuthLoading}
           style={styles.button}
         >
+          <FontAwesome name="google" size={16} color="white" />
+          {'  '}
           Continue with Google
         </Button>
       </View>

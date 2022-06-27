@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 import { FirestoreError } from 'firebase/firestore';
 import shallow from 'zustand/shallow';
 import useDataStore, { IDataStore } from './useDataStore';
-import { streamHistory } from '../firebase';
+import { streamHistory } from '../firebase/firebase';
 import { IHistoryItem } from '../types';
 
 const useHistory = () => {

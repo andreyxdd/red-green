@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { useTailwind } from 'tailwind-rn';
 import { Text, View } from '../Themed';
-import { updateUserHeight } from '../../firebase';
+import { updateUserHeight } from '../../firebase/firebase';
 import useAuthentification from '../../hooks/useAuthentification';
 
 const styles = StyleSheet.create({

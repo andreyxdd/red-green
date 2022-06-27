@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 import { FirestoreError } from 'firebase/firestore';
 import shallow from 'zustand/shallow';
 import useDataStore, { IDataStore } from './useDataStore';
-import { streamPlans } from '../firebase';
+import { streamPlans } from '../firebase/firebase';
 
 const usePlans = () => {
   const [uid, setPlans, setPlan] = useDataStore(

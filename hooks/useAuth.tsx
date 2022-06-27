@@ -1,7 +1,7 @@
 import React from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import useDataStore, { IDataStore } from './useDataStore';
-import { auth } from '../firebase';
+import { auth } from '../firebase/firebase';
 
 function useAuth() {
   const setUID = useDataStore((state: IDataStore) => state.setUID);

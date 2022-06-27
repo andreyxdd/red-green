@@ -15,7 +15,7 @@ import { IProfileData } from '../../types';
 import DatePickerModal from '../../components/DatePickerModal';
 import { dimensions } from '../../styles/base';
 import useDataStore, { IDataStore } from '../../hooks/useDataStore';
-import { writeProfileData } from '../../firebase';
+import { writeProfileData } from '../../firebase/firebase';
 
 interface FormData extends IProfileData {
   termsAccepted: boolean;

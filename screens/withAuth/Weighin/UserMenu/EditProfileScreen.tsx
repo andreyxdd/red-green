@@ -4,7 +4,7 @@ import { Platform, StyleSheet } from 'react-native';
 import { doc } from 'firebase/firestore';
 import { FontAwesome } from '@expo/vector-icons';
 import { useDocument } from 'react-firebase-hooks/firestore';
-import { db } from '../../../../firebase';
+import { db } from '../../../../firebase/firebase';
 import NameInput from '../../../../components/EditProfile/NameInput';
 import DOBInput from '../../../../components/EditProfile/DOBInput';
 import { View } from '../../../../components/Themed';

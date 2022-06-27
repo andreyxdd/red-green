@@ -1,12 +1,8 @@
-import { FontAwesome } from '@expo/vector-icons';
+import React from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import * as React from 'react';
-import {
-  ColorSchemeName, Pressable, View,
-} from 'react-native';
-
-import useAuthentication from '../hooks/useAuthentification';
+import { Alert, ColorSchemeName, View } from 'react-native';
+import shallow from 'zustand/shallow';
 
 import IntroScreen from '../screens/noAuth/IntroScreen';
 import SignInScreen from '../screens/noAuth/SignInScreen';
@@ -17,25 +13,31 @@ import ManualWeighInScreen from '../screens/withAuth/Weighin/ManualWeighInScreen
 import EditProfileScreen from '../screens/withAuth/Weighin/UserMenu/EditProfileScreen';
 import EditPlanScreen from '../screens/withAuth/Plan/EditPlanScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
-import { RootStackParamList } from '../types';
-import LinkingConfiguration from './LinkingConfiguration';
 
+import LinkingConfiguration from './LinkingConfiguration';
 import BottomTabNavigator from './BottomTabNavigator';
+
 import useDataStore, { IDataStore } from '../hooks/useDataStore';
-import { auth } from '../firebase';
+import { auth } from '../firebase/firebase';
 import CreatePlanScreen from '../screens/withAuth/CreatePlanScreen';
+import GoBack from '../components/IconButtons/GoBack';
+import Close from '../components/IconButtons/Close';
+
+import { RootStackParamList } from '../types';
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
- * https://reactnavigation.org/docs/modal
  */
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
-  const { user } = useAuthentication();
-  const profileData = useDataStore((state: IDataStore) => state.profileData);
+  const [uid, profileData] = useDataStore(
+    (state: IDataStore) => [state.profileData, state.uid],
+    shallow,
+  );
 
-  if (!user) {
+  // no authorized user
+  if (!uid) {
     return (
       <Stack.Navigator>
         <Stack.Screen
@@ -49,21 +51,7 @@ function RootNavigator() {
           options={({ navigation }) => ({
             title: 'Sign In',
             headerTitleAlign: 'center',
-            headerLeft: () => (
-              <Pressable
-                onPress={() => navigation.navigate('Intro')}
-                style={({ pressed }) => ({
-                  opacity: pressed ? 0.5 : 1,
-                })}
-                hitSlop={50}
-              >
-                <FontAwesome
-                  name="chevron-left"
-                  size={30}
-                  color="grey"
-                />
-              </Pressable>
-            ),
+            headerLeft: () => (<GoBack onPress={() => navigation.goBack()} />),
           })}
         />
         <Stack.Screen
@@ -72,28 +60,15 @@ function RootNavigator() {
           options={({ navigation }) => ({
             title: 'Sign Up',
             headerTitleAlign: 'center',
-            headerLeft: () => (
-              <Pressable
-                onPress={() => navigation.navigate('Intro')}
-                style={({ pressed }) => ({
-                  opacity: pressed ? 0.5 : 1,
-                })}
-                hitSlop={50}
-              >
-                <FontAwesome
-                  name="chevron-left"
-                  size={30}
-                  color="grey"
-                />
-              </Pressable>
-            ),
+            headerLeft: () => (<GoBack onPress={() => navigation.goBack()} />),
           })}
         />
       </Stack.Navigator>
     );
   }
 
-  if (user && !profileData) {
+  // user is authorized but profile is not completed
+  if (uid && !profileData) {
     return (
       <Stack.Navigator>
         <Stack.Screen
@@ -103,24 +78,13 @@ function RootNavigator() {
             title: 'Profile Data',
             headerTitleAlign: 'center',
             headerLeft: () => (
-              <Pressable
-                onPress={() => auth
-                  .signOut()
-                  .then(() => {
-                    navigation.navigate('Intro');
-                  })
-                  .catch((e) => console.log(e))}
-                style={({ pressed }) => ({
-                  opacity: pressed ? 0.5 : 1,
-                })}
-                hitSlop={50}
-              >
-                <FontAwesome
-                  name="chevron-left"
-                  size={30}
-                  color="grey"
-                />
-              </Pressable>
+              <GoBack onPress={() => auth
+                .signOut()
+                .then(() => {
+                  navigation.navigate('Intro');
+                })
+                .catch((e) => Alert.alert('Error', e))}
+              />
             ),
           })}
         />
@@ -128,7 +92,8 @@ function RootNavigator() {
     );
   }
 
-  if (user && profileData) {
+  // user is authorized and profile is filled out
+  if (uid && profileData) {
     return (
       <Stack.Navigator>
         <Stack.Screen
@@ -140,24 +105,13 @@ function RootNavigator() {
           name="UserMenu"
           component={UserMenuScreen}
           options={({ navigation }) => ({
-            title: '',
-            animation: 'slide_from_bottom',
+            title: 'Account',
+            headerTitleAlign: 'center',
             headerTransparent: true,
+            animation: 'slide_from_bottom',
             headerLeft: () => <View style={{ marginLeft: 50 }} />,
             headerRight: () => (
-              <Pressable
-                onPress={() => navigation.navigate('TabTwo')}
-                style={({ pressed }) => ({
-                  opacity: pressed ? 0.5 : 1,
-                })}
-                hitSlop={50}
-              >
-                <FontAwesome
-                  name="close"
-                  size={32}
-                  color="grey"
-                />
-              </Pressable>
+              <Close onPress={() => navigation.goBack()} />
             ),
           })}
         />
@@ -165,24 +119,13 @@ function RootNavigator() {
           name="CreatePlan"
           component={CreatePlanScreen}
           options={({ navigation }) => ({
-            title: '',
-            animation: 'slide_from_bottom',
+            title: 'Create Plan',
+            headerTitleAlign: 'center',
             headerTransparent: true,
+            animation: 'slide_from_bottom',
             headerLeft: () => <View style={{ marginLeft: 50 }} />,
             headerRight: () => (
-              <Pressable
-                onPress={() => navigation.navigate('TabTwo')}
-                style={({ pressed }) => ({
-                  opacity: pressed ? 0.5 : 1,
-                })}
-                hitSlop={50}
-              >
-                <FontAwesome
-                  name="close"
-                  size={32}
-                  color="grey"
-                />
-              </Pressable>
+              <Close onPress={() => navigation.goBack()} />
             ),
           })}
         />
@@ -190,24 +133,13 @@ function RootNavigator() {
           name="ManualWeighIn"
           component={ManualWeighInScreen}
           options={({ navigation }) => ({
-            title: '',
-            animation: 'slide_from_bottom',
+            title: 'Manual Weigh-In',
+            headerTitleAlign: 'center',
             headerTransparent: true,
+            animation: 'slide_from_bottom',
             headerLeft: () => <View style={{ marginLeft: 50 }} />,
             headerRight: () => (
-              <Pressable
-                onPress={() => navigation.navigate('TabTwo')}
-                style={({ pressed }) => ({
-                  opacity: pressed ? 0.5 : 1,
-                })}
-                hitSlop={50}
-              >
-                <FontAwesome
-                  name="close"
-                  size={32}
-                  color="grey"
-                />
-              </Pressable>
+              <Close onPress={() => navigation.goBack()} />
             ),
           })}
         />
@@ -216,20 +148,10 @@ function RootNavigator() {
           component={EditProfileScreen}
           options={({ navigation }) => ({
             title: 'Profile',
+            headerTitleAlign: 'center',
             headerTransparent: true,
             headerLeft: () => (
-              <Pressable
-                onPress={() => navigation.navigate('UserMenu')}
-                style={({ pressed }) => ({
-                  opacity: pressed ? 0.5 : 1,
-                })}
-              >
-                <FontAwesome
-                  name="chevron-left"
-                  size={32}
-                  color="grey"
-                />
-              </Pressable>
+              <GoBack onPress={() => navigation.goBack()} />
             ),
           })}
         />
@@ -238,20 +160,10 @@ function RootNavigator() {
           component={EditPlanScreen}
           options={({ navigation }) => ({
             title: 'Edit Plan',
+            headerTitleAlign: 'center',
             headerTransparent: true,
             headerLeft: () => (
-              <Pressable
-                onPress={() => navigation.navigate('TabThree')}
-                style={({ pressed }) => ({
-                  opacity: pressed ? 0.5 : 1,
-                })}
-              >
-                <FontAwesome
-                  name="chevron-left"
-                  size={32}
-                  color="grey"
-                />
-              </Pressable>
+              <GoBack onPress={() => navigation.navigate('TabThree')} />
             ),
           })}
         />
@@ -259,6 +171,7 @@ function RootNavigator() {
     );
   }
 
+  // no authorized user and something is wrong
   return (
     <Stack.Navigator>
       <Stack.Screen

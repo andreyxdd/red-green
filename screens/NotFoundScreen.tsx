@@ -1,7 +1,7 @@
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
 import { Text, View } from '../components/Themed';
-import { auth } from '../firebase';
+import { auth } from '../firebase/firebase';
 import { RootStackScreenProps } from '../types';
 
 const styles = StyleSheet.create({

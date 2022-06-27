@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 import { FirestoreError } from 'firebase/firestore';
 import shallow from 'zustand/shallow';
 import useDataStore, { IDataStore } from './useDataStore';
-import { streamProfileData } from '../firebase';
+import { streamProfileData } from '../firebase/firebase';
 
 const useProfileData = () => {
   const [uid, setProfileData] = useDataStore(

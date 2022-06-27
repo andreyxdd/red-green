@@ -1,7 +1,7 @@
 import React from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import useDataStore, { IDataStore } from './useDataStore';
-import { auth } from '../firebase';
+import { auth } from '../firebase/firebase';
 
 function useAuthentication() {
   const [user, setUser] = React.useState<User>();

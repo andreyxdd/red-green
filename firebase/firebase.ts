@@ -7,7 +7,7 @@ import {
   setDoc, doc, getDoc, query, collection, QuerySnapshot, orderBy, addDoc,
 } from 'firebase/firestore';
 import Constants from 'expo-constants';
-import { IProfileData, PLANS, UNITS } from './types';
+import { IProfileData, PLANS, UNITS } from '../types';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries

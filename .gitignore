@@ -19,3 +19,6 @@ web-build/
 
 # logs
 *.log
+
+# other
+metro.config.js

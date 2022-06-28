@@ -2,9 +2,9 @@ import { StatusBar } from 'expo-status-bar';
 import { Platform, StyleSheet, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { auth } from '../../../../firebase';
+import { auth } from '../../../../firebase/firebase';
 import { Text, View } from '../../../../components/Themed';
-import useAuthentication from '../../../../hooks/useAuthentification';
+import useDataStore, { IDataStore } from '../../../../hooks/useDataStore';
 
 const styles = StyleSheet.create({
   container: {
@@ -59,21 +59,20 @@ const styles = StyleSheet.create({
 });
 
 export default function UserMenuScreen() {
-  const { user } = useAuthentication();
+  const userEmail = useDataStore((state: IDataStore) => state.email);
   const navigation = useNavigation();
 
   const handleSignOut = () => {
     auth
       .signOut()
-      .then(() => {
+      /* .then(() => {
         navigation.navigate('Intro');
-      })
+      }) */
       .catch((e) => console.log(e));
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Account</Text>
       <FontAwesome
         name="user-circle-o"
         size={100}
@@ -81,7 +80,7 @@ export default function UserMenuScreen() {
         style={{ paddingTop: 20, paddingBottom: 20 }}
       />
       <Text style={styles.subTitle}>Username</Text>
-      <Text style={styles.text}>{user?.email}</Text>
+      <Text style={styles.text}>{userEmail}</Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.buttonItem]}

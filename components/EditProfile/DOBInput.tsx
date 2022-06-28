@@ -6,7 +6,7 @@ import { useTailwind } from 'tailwind-rn';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { format } from 'date-fns';
 import { Text, View } from '../Themed';
-import { updateUserDOB } from '../../firebase';
+import { updateUserDOB } from '../../firebase/firebase';
 import DatePickerModal from '../DatePickerModal';
 import useAuthentification from '../../hooks/useAuthentification';
 

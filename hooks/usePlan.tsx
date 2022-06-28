@@ -1,6 +1,6 @@
 import { collection, query, where } from 'firebase/firestore';
 import { useCollection } from 'react-firebase-hooks/firestore';
-import { db } from '../firebase';
+import { db } from '../firebase/firebase';
 import useAuthentification from './useAuthentification';
 import useLog from './useLog';
 

@@ -1,41 +1,40 @@
 import React from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { Alert, StyleSheet } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { signInWithEmailAndPassword, signInWithCredential, updateEmail } from 'firebase/auth';
+import { signInWithCredential, updateEmail } from 'firebase/auth';
 import { AppleAuthenticationButton, AppleAuthenticationButtonType, AppleAuthenticationButtonStyle } from 'expo-apple-authentication';
-import { Button, TextInput } from 'react-native-paper';
-import { auth } from '../../firebase';
-import useAuthentification from '../../hooks/useAuthentification';
+import { Button } from 'react-native-paper';
+
+import { useNavigation } from '@react-navigation/native';
+import { FontAwesome } from '@expo/vector-icons';
+import { auth } from '../../firebase/firebase';
 import useAppleAuthentication from '../../hooks/useAppleAuthentification';
 import useGoogleAuthentication from '../../hooks/useGoogleAuthentification';
 import Divider from '../../components/Divider';
 import Container from '../../components/Container';
+import SignInForm from '../../components/noAuth/SignInForm';
+import useDataStore, { IDataStore } from '../../hooks/useDataStore';
 
 const styles = StyleSheet.create({
+  container: {
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.0)',
+  },
   button: { width: '80%', paddingVertical: 4, marginVertical: 4 },
 });
 
-function IntroScreen() {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-
+function SignInScreen() {
   const navigation = useNavigation();
-  const { user } = useAuthentification();
+  const uidAndProfileData = useDataStore(
+    (state: IDataStore) => state.profileData && state.uid,
+  );
 
+  // TODO: correct navigation
   React.useEffect(() => {
-    if (user) {
+    if (uidAndProfileData) {
       navigation.navigate('Root');
     }
-  }, [user, navigation]);
-
-  const handleLogin = async () => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      Alert.alert('Error', 'Something went wrong. Please try again later.');
-    }
-  };
+  }, [uidAndProfileData, navigation]);
 
   const [appleAuthAvailable, authWithApple] = useAppleAuthentication();
   const handleAppleLogin = async () => {
@@ -46,7 +45,7 @@ function IntroScreen() {
         await updateEmail(appleUser, data.email);
       }
     } catch (error: any) {
-      Alert.alert('Error', 'Something went wrong. Please try again later.');
+      Alert.alert('Error', `Something went wrong:\n${error}`);
     }
   };
 
@@ -56,13 +55,13 @@ function IntroScreen() {
       const [credential] = await authWithGoogle();
       await signInWithCredential(auth, credential);
     } catch (error: any) {
-      Alert.alert('Error', 'Something went wrong. Please try again later.');
+      Alert.alert('Error', `Something went wrong:\n${error}`);
     }
   };
 
   return (
-    <KeyboardAwareScrollView contentContainerStyle={{ justifyContent: 'center', flex: 1 }}>
-      <Container style={{ marginVertical: 12 }}>
+    <KeyboardAwareScrollView contentContainerStyle={[styles.container, { flex: 1 }]}>
+      <View style={[styles.container, { alignItems: 'center' }]}>
         {appleAuthAvailable && (
           <AppleAuthenticationButton
             buttonType={AppleAuthenticationButtonType.CONTINUE}
@@ -78,36 +77,14 @@ function IntroScreen() {
           disabled={!googleAuthLoading}
           style={styles.button}
         >
+          <FontAwesome name="google" size={16} color="white" />
+          {'  '}
           Continue with Google
         </Button>
-      </Container>
-      <Divider>OR</Divider>
-      <TextInput
-        label="Email"
-        placeholder="Email"
-        value={email}
-        onChangeText={(text) => setEmail(text)}
-        style={{ marginVertical: 6 }}
-        autoCapitalize="none"
-      />
-      <TextInput
-        label="Password"
-        placeholder="Password"
-        value={password}
-        onChangeText={(text) => setPassword(text)}
-        secureTextEntry
-        style={{ marginVertical: 6 }}
-      />
-      <Container style={{ marginVertical: 12 }}>
-        <Button
-          mode="contained"
-          onPress={handleLogin}
-          style={styles.button}
-        >
-          Sign In
-        </Button>
-      </Container>
-      <Divider />
+      </View>
+      <Divider containerStyle={{ marginVertical: 4 }}>OR</Divider>
+      <SignInForm />
+      <Divider containerStyle={{ marginVertical: 4 }} />
       <Container style={{ marginVertical: 12 }}>
         <Button
           mode="outlined"
@@ -121,4 +98,4 @@ function IntroScreen() {
   );
 }
 
-export default IntroScreen;
+export default SignInScreen;

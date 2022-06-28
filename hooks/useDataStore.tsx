@@ -3,6 +3,7 @@ import { IProfileData, IPlan, IHistoryItem } from '../types';
 
 export type IUserData = {
   uid: string | null;
+  email: string | null;
   profileData: IProfileData | null;
   plans: Array<IPlan>;
   plan: IPlan | null; // plan to show
@@ -12,6 +13,7 @@ export type IUserData = {
 /* eslint-disable no-unused-vars */
 export interface IDataStore extends IUserData{
   setUID: (uid: string | null) => void;
+  setUserEmail: (email: string | null) => void;
   setProfileData: (profileData: IProfileData | null) => void;
   setPlans: (plans: Array<IPlan>) => void;
   setPlan: (activePlan: IPlan | null) => void;
@@ -21,6 +23,7 @@ export interface IDataStore extends IUserData{
 
 const initialState = {
   uid: null,
+  email: null,
   profileData: null,
   plans: [],
   plan: null,
@@ -31,6 +34,7 @@ const initialState = {
 const useDataStore = create<IDataStore>((set: any) => ({
   ...initialState,
   setUID: (uid: string | null) => set({ uid }),
+  setUserEmail: (email: string | null) => set({ email }),
   setProfileData: (profileData: IProfileData | null) => set({ profileData }),
   setPlans: (plans: Array<IPlan>) => set({ plans }),
   setPlan: (plan: IPlan | null) => set({ plan }),

@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { useTailwind } from 'tailwind-rn';
 import { Text, View } from '../Themed';
-import { updateUserName } from '../../firebase';
+import { updateUserName } from '../../firebase/firebase';
 import useAuthentification from '../../hooks/useAuthentification';
 
 const styles = StyleSheet.create({

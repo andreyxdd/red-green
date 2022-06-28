@@ -3,7 +3,7 @@ import {
   StyleSheet, View, Text, TouchableOpacity, Keyboard, Dimensions,
 } from 'react-native';
 import { useTailwind } from 'tailwind-rn';
-import { updateUserUnits } from '../../firebase';
+import { updateUserUnits } from '../../firebase/firebase';
 import useAuthentification from '../../hooks/useAuthentification';
 import { UNITS } from '../../types';
 

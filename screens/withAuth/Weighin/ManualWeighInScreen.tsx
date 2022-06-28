@@ -7,7 +7,7 @@ import React from 'react';
 import shallow from 'zustand/shallow';
 import { RootStackScreenProps } from '../../../types';
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
-import { updateUserWeight, updateUserLastHistoryItem, writeUserLastHistoryItem } from '../../../firebase';
+import { updateUserWeight, updateUserLastHistoryItem, writeUserLastHistoryItem } from '../../../firebase/firebase';
 
 export default function ManualWeighInScreen({ route, navigation }: RootStackScreenProps<'ManualWeighIn'>) {
   const [uid, plan, history] = useDataStore(

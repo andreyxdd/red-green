@@ -4,6 +4,7 @@ import { Subheading } from 'react-native-paper';
 
 export interface IDivider{
   children?: React.ReactNode;
+  containerStyle?: any;
 }
 
 const styles = StyleSheet.create({
@@ -12,9 +13,9 @@ const styles = StyleSheet.create({
   text: { width: 50, textAlign: 'center' },
 });
 
-function Divider({ children }: IDivider) {
+function Divider({ children, containerStyle }: IDivider) {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]}>
       <View style={styles.divider} />
       {children
         ? (

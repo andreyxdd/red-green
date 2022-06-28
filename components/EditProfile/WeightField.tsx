@@ -5,7 +5,7 @@ import {
 import { useTailwind } from 'tailwind-rn';
 import { Text, View } from '../Themed';
 import useAuthentification from '../../hooks/useAuthentification';
-import { updateUserWeight } from '../../firebase';
+import { updateUserWeight } from '../../firebase/firebase';
 
 const styles = StyleSheet.create({
   inputText: {

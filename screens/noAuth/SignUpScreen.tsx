@@ -7,7 +7,7 @@ import {
   createUserWithEmailAndPassword, signInWithCredential, updateEmail,
 } from 'firebase/auth';
 import { AppleAuthenticationButton, AppleAuthenticationButtonType, AppleAuthenticationButtonStyle } from 'expo-apple-authentication';
-import { auth } from '../../firebase';
+import { auth } from '../../firebase/firebase';
 import useAuthentification from '../../hooks/useAuthentification';
 import useAppleAuthentication from '../../hooks/useAppleAuthentification';
 import useGoogleAuthentication from '../../hooks/useGoogleAuthentification';

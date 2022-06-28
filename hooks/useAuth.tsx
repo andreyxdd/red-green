@@ -8,7 +8,7 @@ function useAuthentication() {
   const setUser = useDataStore((state: IDataStore) => state.setUser);
 
   React.useEffect(() => {
-    if (user) setUser(user);
+    if (user) { setUser(user); } else { setUser(null); }
   }, [setUser, user]);
 
   return { loading, error };

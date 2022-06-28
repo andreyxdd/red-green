@@ -2,9 +2,9 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View } from 'react-native';
 
-import UserMenuScreen from '../screens/auth/WeighinTab/UserMenu/UserMenuScreen';
+import UserMenuScreen from '../screens/auth/WeighinTab/UserMenuScreen/UserMenuScreen';
 import ManualWeighInScreen from '../screens/auth/WeighinTab/ManualWeighInScreen';
-import EditProfileScreen from '../screens/auth/WeighinTab/UserMenu/EditProfileScreen';
+import EditProfileScreen from '../screens/auth/WeighinTab/UserMenuScreen/EditProfileScreen';
 import EditPlanScreen from '../screens/auth/Plan/EditPlanScreen';
 import CreatePlanScreen from '../screens/auth/CreatePlanScreen';
 

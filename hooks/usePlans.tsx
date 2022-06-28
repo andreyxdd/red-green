@@ -1,60 +1,46 @@
 import React from 'react';
-import { Alert } from 'react-native';
-import { FirestoreError } from 'firebase/firestore';
+import { collection, query, orderBy } from 'firebase/firestore';
 import shallow from 'zustand/shallow';
+import { useCollection } from 'react-firebase-hooks/firestore';
+
 import useDataStore, { IDataStore } from './useDataStore';
-import { streamPlans } from '../firebase/firebase';
+import { db } from '../firebase/firebase';
 
 const usePlans = () => {
-  const [isLoaded, setLoaded] = React.useState(false);
-  const [uid, setPlans, setPlan] = useDataStore(
-    (state: IDataStore) => [state.uid, state.setPlans, state.setPlan],
+  const [user, setPlans, setPlan] = useDataStore(
+    (state: IDataStore) => [state.user, state.setPlans, state.setPlan],
     shallow,
   );
 
+  const [value, loading, error] = useCollection(
+    user && query(
+      collection(db, 'users', user.uid, 'plans'),
+      orderBy('active', 'desc'),
+      orderBy('startDate', 'desc'),
+    ),
+  );
+
   React.useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    let unsubscribe = () => { };
+    const result = value?.docs;
+    if (result) {
+      const userPlans = result.map((doc) => ({
+        id: doc.id,
+        type: doc.data().type,
+        startDate: doc.data().startDate.toDate(),
+        endDate: doc.data().endDate.toDate(),
+        goalWeight: doc.data().goalWeight,
+        active: doc.data().active,
+      }));
 
-    if (uid) {
-      unsubscribe = streamPlans(
-        uid,
-        (querySnapshot) => {
-          setLoaded(false);
-          const result = querySnapshot.docs;
-          if (result) {
-            const userPlans = result.map((doc) => ({
-              id: doc.id,
-              type: doc.data().type,
-              startDate: doc.data().startDate.toDate(),
-              endDate: doc.data().endDate.toDate(),
-              goalWeight: doc.data().goalWeight,
-              active: doc.data().active,
-            }));
-
-            setPlans(userPlans);
-            setPlan(userPlans[0]);
-          } else {
-            setPlans([]);
-            setPlan(null);
-          }
-          setLoaded(true);
-        },
-        (error: FirestoreError) => {
-          console.log(error.toString());
-          Alert.alert(error.toString());
-        },
-      );
+      setPlans(userPlans);
+      setPlan(userPlans[0]);
     } else {
       setPlans([]);
       setPlan(null);
-      setLoaded(true);
     }
+  }, [setPlan, setPlans, value]);
 
-    return unsubscribe;
-  }, [uid, setPlans, setPlan]);
-
-  return isLoaded;
+  return { loading, error };
 };
 
 export default usePlans;

@@ -1,56 +1,41 @@
 import React from 'react';
-import { Alert } from 'react-native';
-import { FirestoreError } from 'firebase/firestore';
+import { collection, query, orderBy } from 'firebase/firestore';
 import shallow from 'zustand/shallow';
+import { useCollection } from 'react-firebase-hooks/firestore';
+
 import useDataStore, { IDataStore } from './useDataStore';
-import { streamHistory } from '../firebase/firebase';
+import { db } from '../firebase/firebase';
 import { IHistoryItem } from '../types';
 
 const useHistory = () => {
-  const [isLoaded, setLoaded] = React.useState(false);
-  const [uid, plan, setHistory] = useDataStore(
-    (state: IDataStore) => [state.uid, state.plan, state.setHistory],
+  const [user, plan, setHistory] = useDataStore(
+    (state: IDataStore) => [state.user, state.plan, state.setHistory],
     shallow,
   );
 
+  const [value, loading, error] = useCollection(
+    user && plan && query(
+      collection(db, 'users', user.uid, 'plans', plan.id, 'history'),
+      orderBy('date', 'desc'),
+    ),
+  );
+
   React.useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    let unsubscribe = () => { };
+    const result = value?.docs;
+    if (result) {
+      const planHistory: Array<IHistoryItem> = result.map((doc) => ({
+        id: doc.id,
+        date: doc.data().date.toDate(),
+        weightIn: doc.data().weightIn,
+      }));
 
-    if (uid && plan) {
-      unsubscribe = streamHistory(
-        uid,
-        plan.id,
-        (querySnapshot) => {
-          setLoaded(false);
-          const result = querySnapshot.docs;
-          if (result) {
-            const planHistory: Array<IHistoryItem> = result.map((doc) => ({
-              id: doc.id,
-              date: doc.data().date.toDate(),
-              weightIn: doc.data().weightIn,
-            }));
-
-            setHistory(planHistory);
-          } else {
-            setHistory([]);
-          }
-          setLoaded(true);
-        },
-        (error: FirestoreError) => {
-          console.log(error.toString());
-          Alert.alert(error.toString());
-        },
-      );
+      setHistory(planHistory);
     } else {
       setHistory([]);
-      setLoaded(true);
     }
+  }, [setHistory, value]);
 
-    return unsubscribe;
-  }, [uid, plan, setHistory]);
-
-  return isLoaded;
+  return { loading, error };
 };
 
 export default useHistory;

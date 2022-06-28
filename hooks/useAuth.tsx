@@ -1,34 +1,17 @@
 import React from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import shallow from 'zustand/shallow';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import useDataStore, { IDataStore } from './useDataStore';
 import { auth } from '../firebase/firebase';
 
 function useAuthentication() {
-  const [isLoaded, setLoaded] = React.useState(false);
-  const [setUID, setUserEmail] = useDataStore(
-    (state: IDataStore) => [state.setUID, state.setUserEmail],
-    shallow,
-  );
+  const [user, loading, error] = useAuthState(auth);
+  const setUser = useDataStore((state: IDataStore) => state.setUser);
 
   React.useEffect(() => {
-    const unsubscribeFromAuthStatuChanged = onAuthStateChanged(auth, (currentUser) => {
-      setLoaded(false);
-      if (currentUser) {
-        setUID(currentUser.uid);
-        setUserEmail(currentUser.email);
-      } else {
-        // User is signed out
-        setUID(null);
-        setUserEmail(null);
-      }
-      setLoaded(true);
-    });
+    if (user) setUser(user);
+  }, [setUser, user]);
 
-    return unsubscribeFromAuthStatuChanged;
-  }, [setUID, setUserEmail]);
-
-  return isLoaded;
+  return { loading, error };
 }
 
 export default useAuthentication;

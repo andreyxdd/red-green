@@ -4,7 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import React from 'react';
 
 export default function useCachedResources() {
-  const [isLoaded, setLoaded] = React.useState(false);
+  const [laoding, setLoading] = React.useState(true);
 
   // Load any resources or data that we need prior to rendering the app
   React.useEffect(() => {
@@ -22,7 +22,7 @@ export default function useCachedResources() {
         // We might want to provide this error information to an error reporting service
         console.warn(e);
       } finally {
-        setLoaded(true);
+        setLoading(false);
         SplashScreen.hideAsync();
       }
     }
@@ -30,5 +30,5 @@ export default function useCachedResources() {
     loadResourcesAndDataAsync();
   }, []);
 
-  return isLoaded;
+  return laoding;
 }

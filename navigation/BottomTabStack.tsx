@@ -1,8 +1,8 @@
 import { AntDesign } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import TabOneScreen from '../screens/withAuth/Today/TodayScreen';
-import TabTwoScreen from '../screens/withAuth/Weighin/WeighInScreen';
-import TabThreeScreen from '../screens/withAuth/Plan/PlanScreen';
+import TodayScreen from '../screens/withAuth/Today/TodayScreen';
+import WeighInScreen from '../screens/withAuth/Weighin/WeighInScreen';
+import PlanScreen from '../screens/withAuth/Plan/PlanScreen';
 import { AuthTabList, AuthTabProps } from './WithAuthStack';
 import { MenuContextOpenner } from '../components/Plan/PopupPlanMenu';
 import useInterfaceStore, { IInterfaceStore } from '../hooks/useInterfaceStore';
@@ -25,7 +25,7 @@ function BottomTabStack() {
     >
       <BottomTab.Screen
         name="TodayTab"
-        component={TabOneScreen}
+        component={TodayScreen}
         options={() => ({
           title: 'Today',
           headerTitleAlign: 'center',
@@ -37,7 +37,7 @@ function BottomTabStack() {
       />
       <BottomTab.Screen
         name="WeighInTab"
-        component={TabTwoScreen}
+        component={WeighInScreen}
         options={({ navigation }: AuthTabProps<'WeighInTab'>) => ({
           title: 'Weigh In',
           headerTitleAlign: 'center',
@@ -52,7 +52,7 @@ function BottomTabStack() {
       />
       <BottomTab.Screen
         name="PlanTab"
-        component={TabThreeScreen}
+        component={PlanScreen}
         options={{
           title: 'Plan',
           headerTitleAlign: 'center',

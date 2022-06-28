@@ -4,19 +4,16 @@ import { Alert } from 'react-native';
 
 import { auth } from '../firebase/firebase';
 
-import ReadTermsScreen from '../screens/withAuth/ReadTermsScreen';
-import NoProfileDataScreen from '../screens/withAuth/NoProfileDataScreen';
+import ReadTermsScreen from '../screens/auth/ReadTermsScreen';
+import NoProfileDataScreen from '../screens/auth/NoProfileDataScreen';
 
 import GoBack from '../components/IconButtons/GoBack';
 
-type NoProfileStackList = {
-  NoProfileData: undefined;
-  ReadTerms: undefined;
-};
+import { AuthNonProfileStackList } from '../types/navigation';
 
-const Stack = createNativeStackNavigator<NoProfileStackList>();
+const Stack = createNativeStackNavigator<AuthNonProfileStackList>();
 
-function AuthStack() {
+function AuthNonProfileStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -42,4 +39,4 @@ function AuthStack() {
   );
 }
 
-export default AuthStack;
+export default AuthNonProfileStack;

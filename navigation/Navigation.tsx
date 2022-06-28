@@ -3,9 +3,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import shallow from 'zustand/shallow';
 
 import LinkingConfiguration from './LinkingConfiguration';
-import WithAuthStack from './WithAuthStack';
-import NoProfileStack from './NoProfileStack';
-import NoAuthStack from './NoAuthStack';
+import AuthStack from './AuthStack';
+import AuthNonProfileStack from './AuthNonProfileStack';
+import NonAuthStack from './NonAuthStack';
 
 import useDataStore, { IDataStore } from '../hooks/useDataStore';
 
@@ -20,9 +20,9 @@ function Navigation() {
       {user ? (
         // eslint-disable-next-line react/jsx-no-useless-fragment
         <>
-          {profileData ? <WithAuthStack /> : <NoProfileStack />}
+          {profileData ? <AuthStack /> : <AuthNonProfileStack />}
         </>
-      ) : <NoAuthStack />}
+      ) : <NonAuthStack />}
     </NavigationContainer>
   );
 }

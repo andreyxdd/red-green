@@ -11,7 +11,8 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import RBSheet from 'react-native-raw-bottom-sheet';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
-import { PLANS, RootStackScreenProps } from '../../types';
+import { PLANS } from '../../types/enums';
+import { AuthStackScreenProps } from '../../types/navigation';
 import DatePickerModal from '../../components/DatePickerModal';
 import { dimensions } from '../../styles/base';
 import useDataStore, { IDataStore } from '../../hooks/useDataStore';
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function CreatePlanScreen({ navigation }: RootStackScreenProps<'CreatePlan'>) {
+export default function CreatePlanScreen({ navigation }: AuthStackScreenProps<'CreatePlan'>) {
   const uid = useDataStore((state: IDataStore) => state.uid);
 
   const { control, handleSubmit, formState: { errors, isValid } } = useForm<FormData>({

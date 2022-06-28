@@ -1,19 +1,15 @@
 import React from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Button } from 'react-native-paper';
 import { signInWithCredential, updateEmail } from 'firebase/auth';
 import { AppleAuthenticationButton, AppleAuthenticationButtonType, AppleAuthenticationButtonStyle } from 'expo-apple-authentication';
-import { Button } from 'react-native-paper';
-
-import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { auth } from '../../firebase/firebase';
 import useAppleAuthentication from '../../hooks/useAppleAuthentification';
 import useGoogleAuthentication from '../../hooks/useGoogleAuthentification';
 import Divider from '../../components/Divider';
-import Container from '../../components/Container';
-import SignInForm from '../../components/noAuth/SignInForm';
-import useDataStore, { IDataStore } from '../../hooks/useDataStore';
+import SignUpForm from '../../components/forms/SignUpForm';
 
 const styles = StyleSheet.create({
   container: {
@@ -23,19 +19,7 @@ const styles = StyleSheet.create({
   button: { width: '80%', paddingVertical: 4, marginVertical: 4 },
 });
 
-function SignInScreen() {
-  const navigation = useNavigation();
-  const uidAndProfileData = useDataStore(
-    (state: IDataStore) => state.profileData && state.uid,
-  );
-
-  // TODO: correct navigation
-  React.useEffect(() => {
-    if (uidAndProfileData) {
-      navigation.navigate('Root');
-    }
-  }, [uidAndProfileData, navigation]);
-
+function SignUpScreen() {
   const [appleAuthAvailable, authWithApple] = useAppleAuthentication();
   const handleAppleLogin = async () => {
     try {
@@ -62,15 +46,15 @@ function SignInScreen() {
   return (
     <KeyboardAwareScrollView contentContainerStyle={[styles.container, { flex: 1 }]}>
       <View style={[styles.container, { alignItems: 'center' }]}>
-        {appleAuthAvailable && (
+        {appleAuthAvailable ? (
           <AppleAuthenticationButton
-            buttonType={AppleAuthenticationButtonType.CONTINUE}
+            buttonType={AppleAuthenticationButtonType.SIGN_UP}
             buttonStyle={AppleAuthenticationButtonStyle.BLACK}
             cornerRadius={4}
             style={[styles.button, { height: 45 }]}
             onPress={handleAppleLogin}
           />
-        )}
+        ) : null}
         <Button
           mode="contained"
           onPress={handleGoogleLogin}
@@ -78,24 +62,14 @@ function SignInScreen() {
           style={styles.button}
         >
           <FontAwesome name="google" size={16} color="white" />
-          {'  '}
-          Continue with Google
+          {' '}
+          Sign Up with Google
         </Button>
       </View>
       <Divider containerStyle={{ marginVertical: 4 }}>OR</Divider>
-      <SignInForm />
-      <Divider containerStyle={{ marginVertical: 4 }} />
-      <Container style={{ marginVertical: 12 }}>
-        <Button
-          mode="outlined"
-          onPress={() => { navigation.navigate('SignUp'); }}
-          style={styles.button}
-        >
-          Don&apos;t have an account? Sign Up
-        </Button>
-      </Container>
+      <SignUpForm />
     </KeyboardAwareScrollView>
   );
 }
 
-export default SignInScreen;
+export default SignUpScreen;

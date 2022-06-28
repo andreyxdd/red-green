@@ -5,9 +5,9 @@
 import { LinkingOptions } from '@react-navigation/native';
 import { createURL } from 'expo-linking';
 
-import { RootStackParamList } from '../types';
+import { AuthStackList, AuthNonProfileStackList, NonAuthStackList } from '../types/navigation';
 
-const linking: LinkingOptions<RootStackParamList> = {
+const linking: LinkingOptions<AuthStackList|AuthNonProfileStackList|NonAuthStackList> = {
   prefixes: [createURL('/')],
   config: {
     screens: {
@@ -16,17 +16,17 @@ const linking: LinkingOptions<RootStackParamList> = {
       SignUp: 'sign-up',
       Root: {
         screens: {
-          TabOne: {
+          TodayTab: {
             screens: {
               TabOneScreen: 'one',
             },
           },
-          TabTwo: {
+          WeighInTab: {
             screens: {
               TabTwoScreen: 'two',
             },
           },
-          TabThree: {
+          PlanTab: {
             screens: {
               TabThreeScreen: 'three',
             },
@@ -35,7 +35,8 @@ const linking: LinkingOptions<RootStackParamList> = {
       },
       UserMenu: 'user-menu',
       EditProfile: 'edit-profile',
-      NotFound: '*',
+      EditPlan: 'edit-plan',
+      // NotFound: '*',
     },
   },
 };

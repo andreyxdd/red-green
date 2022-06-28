@@ -1,42 +1,22 @@
 import React from 'react';
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
-import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View } from 'react-native';
 
-import UserMenuScreen from '../screens/withAuth/Weighin/UserMenu/UserMenuScreen';
-import ManualWeighInScreen from '../screens/withAuth/Weighin/ManualWeighInScreen';
-import EditProfileScreen from '../screens/withAuth/Weighin/UserMenu/EditProfileScreen';
-import EditPlanScreen from '../screens/withAuth/Plan/EditPlanScreen';
-import CreatePlanScreen from '../screens/withAuth/CreatePlanScreen';
+import UserMenuScreen from '../screens/auth/WeighinTab/UserMenu/UserMenuScreen';
+import ManualWeighInScreen from '../screens/auth/WeighinTab/ManualWeighInScreen';
+import EditProfileScreen from '../screens/auth/WeighinTab/UserMenu/EditProfileScreen';
+import EditPlanScreen from '../screens/auth/Plan/EditPlanScreen';
+import CreatePlanScreen from '../screens/auth/CreatePlanScreen';
 
-import BottomTabStack from './BottomTabStack';
+import BottomTabStack from './AuthBottomTabStack';
 import GoBack from '../components/IconButtons/GoBack';
 import Close from '../components/IconButtons/Close';
 
-export type AuthTabList = {
-  TodayTab: undefined;
-  WeighInTab: undefined;
-  PlanTab: undefined;
-};
-
-type AuthStackList = {
-  Root: NavigatorScreenParams<AuthTabList> | undefined;
-  ManualWeighIn: { screenType: string, value?: number };
-  UserMenu: undefined;
-  EditProfile: undefined;
-  CreatePlan: undefined;
-  EditPlan: undefined;
-};
-
-export type AuthTabProps<Screen extends keyof AuthTabList> = CompositeScreenProps<
-  BottomTabScreenProps<AuthTabList, Screen>,
-  NativeStackScreenProps<AuthStackList>
->;
+import { AuthStackList } from '../types/navigation';
 
 const Stack = createNativeStackNavigator<AuthStackList>();
 
-function WithAuthStack() {
+function AuthStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -114,4 +94,4 @@ function WithAuthStack() {
   );
 }
 
-export default WithAuthStack;
+export default AuthStack;

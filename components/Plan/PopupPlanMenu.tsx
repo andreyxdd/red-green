@@ -8,20 +8,20 @@ import {
 } from 'react-native-popup-menu';
 import { Pressable } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+// import { useNavigation } from '@react-navigation/native';
 import { Text, View } from '../Themed';
 
 const { SlideInMenu } = renderers;
 
 export default function PopupPlanMenu() {
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
   return (
     <View>
       <Menu name="plan-menu" renderer={SlideInMenu}>
         <MenuTrigger />
         <MenuOptions>
-          <MenuOption onSelect={() => { navigation.navigate('EditPlan'); }} text="Edit" />
+          <MenuOption onSelect={() => { /* navigation.navigate('EditPlan'); */ }} text="Edit" />
           <MenuOption onSelect={() => alert('Delete')}>
             <Text style={{ color: 'red' }}>Delete</Text>
           </MenuOption>

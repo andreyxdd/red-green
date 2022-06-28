@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { Platform, StyleSheet, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+// import { useNavigation } from '@react-navigation/native';
 import { auth } from '../../../../firebase/firebase';
 import { Text, View } from '../../../../components/Themed';
 import useDataStore, { IDataStore } from '../../../../hooks/useDataStore';
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
 
 export default function UserMenuScreen() {
   const userEmail = useDataStore((state: IDataStore) => state.email);
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
   const handleSignOut = () => {
     auth
@@ -84,7 +84,7 @@ export default function UserMenuScreen() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.buttonItem]}
-          onPress={() => { navigation.navigate('EditProfile'); }}
+          onPress={() => { /* navigation.navigate('EditProfile'); */ }}
         >
           <Text style={styles.buttonText}>Profile</Text>
           <FontAwesome

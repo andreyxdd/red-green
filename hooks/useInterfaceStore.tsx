@@ -1,5 +1,5 @@
 import create from 'zustand';
-import { SIGNS } from '../types';
+import { SIGNS } from '../types/enums';
 
 export type IUserData = {
   sign: SIGNS;

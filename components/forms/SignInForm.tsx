@@ -21,7 +21,7 @@ const REGEX = {
 
 const styles = StyleSheet.create({
   container: { justifyContent: 'center', width: '100%' },
-  input: { marginVertical: 4, width: '90%', alignSelf: 'center' },
+  input: { marginVertical: 2, width: '90%', alignSelf: 'center' },
   button: {
     width: '80%', paddingVertical: 4, marginBottom: 14, alignSelf: 'center',
   },
@@ -104,7 +104,7 @@ function SignInForm() {
               error={errors.password && true}
               right={(
                 <TextInput.Icon
-                  name="eye"
+                  name={secureTextEntry ? 'eye' : 'eye-off'}
                   onPress={() => {
                     setSecureTextEntry(!secureTextEntry);
                     return false;

@@ -7,44 +7,42 @@ import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList {
-      later?: string;
-    }
-  }
-}
+// Auth screen stack types:
 
-export type RootStackParamList = {
+export type AuthTabList = {
+  TodayTab: undefined;
+  WeighInTab: undefined;
+  PlanTab: undefined;
+};
+
+type AuthStackList = {
+  Root: NavigatorScreenParams<AuthTabList> | undefined;
+  ManualWeighIn: { screenType: string, value?: number };
+  UserMenu: undefined;
+  EditProfile: undefined;
+  CreatePlan: undefined;
+  EditPlan: undefined;
+};
+
+export type AuthTabProps<Screen extends keyof AuthTabList> = CompositeScreenProps<
+  BottomTabScreenProps<AuthTabList, Screen>,
+  NativeStackScreenProps<AuthStackList>
+>;
+
+// Auth screen and non-profile stack types:
+
+export type NoProfileStackList = {
+  NoProfileData: undefined;
+  ReadTerms: undefined;
+};
+
+// Non-auth screen stack types:
+
+export type NoAuthStackList = {
   Intro: undefined;
   SignIn: undefined;
   SignUp: undefined;
-  NoProfileData: undefined;
-  Root: NavigatorScreenParams<RootTabParamList> | undefined;
-  UserMenu: undefined;
-  ManualWeighIn: { screenType: string, value?: number };
-  CreatePlan: undefined;
-  EditProfile: undefined;
-  EditPlan: undefined;
-  NotFound: undefined;
 };
-
-export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
-  RootStackParamList,
-  Screen
->;
-
-export type RootTabParamList = {
-  TabOne: undefined;
-  TabTwo: undefined;
-  TabThree: undefined;
-};
-
-export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<
-  BottomTabScreenProps<RootTabParamList, Screen>,
-  NativeStackScreenProps<RootStackParamList>
->;
 
 // User data types:
 

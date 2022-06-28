@@ -1,21 +1,17 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import IntroScreen from '../screens/noAuth/IntroScreen';
-import SignInScreen from '../screens/noAuth/SignInScreen';
-import SignUpScreen from '../screens/noAuth/SignUpScreen';
+import IntroScreen from '../screens/nonAuth/IntroScreen';
+import SignInScreen from '../screens/nonAuth/SignInScreen';
+import SignUpScreen from '../screens/nonAuth/SignUpScreen';
 
 import GoBack from '../components/IconButtons/GoBack';
 
-type NoAuthStackList = {
-  Intro: undefined;
-  SignIn: undefined;
-  SignUp: undefined;
-};
+import { NonAuthStackList } from '../types/navigation';
 
-const Stack = createNativeStackNavigator<NoAuthStackList>();
+const Stack = createNativeStackNavigator<NonAuthStackList>();
 
-function AuthStack() {
+function NonAuthStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -45,4 +41,4 @@ function AuthStack() {
   );
 }
 
-export default AuthStack;
+export default NonAuthStack;

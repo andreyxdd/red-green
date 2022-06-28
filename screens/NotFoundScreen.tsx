@@ -2,7 +2,6 @@ import { StyleSheet, TouchableOpacity } from 'react-native';
 
 import { Text, View } from '../components/Themed';
 import { auth } from '../firebase/firebase';
-import { RootStackScreenProps } from '../types';
 
 const styles = StyleSheet.create({
   container: {
@@ -25,7 +24,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function NotFoundScreen({ navigation }: RootStackScreenProps<'NotFound'>) {
+export default function NotFoundScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>This screen doesn&apos;t exist.</Text>
@@ -33,9 +32,6 @@ export default function NotFoundScreen({ navigation }: RootStackScreenProps<'Not
         onPress={() => {
           auth
             .signOut()
-            .then(() => {
-              navigation.navigate('Intro');
-            })
             .catch((e) => console.log(e));
         }}
         style={styles.link}

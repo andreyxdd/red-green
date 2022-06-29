@@ -12,12 +12,10 @@ import useGoogleAuthentication from '../../hooks/useGoogleAuthentification';
 import Divider from '../../components/Divider';
 import SignInForm from '../../components/forms/SignInForm';
 import { NonAuthStackScreenProps } from '../../types/navigation';
+import colors from '../../styles/colors';
 
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.0)',
-  },
+  container: { justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.0)' },
   button: { width: '80%', paddingVertical: 4, marginVertical: 4 },
 });
 
@@ -61,7 +59,7 @@ function SignInScreen({ navigation: { navigate } }: NonAuthStackScreenProps<'Sig
           mode="contained"
           onPress={handleGoogleLogin}
           disabled={!googleAuthLoading}
-          style={styles.button}
+          style={[styles.button, { backgroundColor: colors.google }]}
         >
           <FontAwesome name="google" size={16} color="white" />
           {' '}

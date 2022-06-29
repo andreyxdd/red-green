@@ -10,6 +10,7 @@ import useAppleAuthentication from '../../hooks/useAppleAuthentification';
 import useGoogleAuthentication from '../../hooks/useGoogleAuthentification';
 import Divider from '../../components/Divider';
 import SignUpForm from '../../components/forms/SignUpForm';
+import colors from '../../styles/colors';
 
 const styles = StyleSheet.create({
   container: {
@@ -59,7 +60,7 @@ function SignUpScreen() {
           mode="contained"
           onPress={handleGoogleLogin}
           disabled={!googleAuthLoading}
-          style={styles.button}
+          style={[styles.button, { backgroundColor: colors.google }]}
         >
           <FontAwesome name="google" size={16} color="white" />
           {' '}

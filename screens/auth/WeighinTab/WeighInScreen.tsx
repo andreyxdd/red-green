@@ -105,7 +105,7 @@ function WeighInScreen({ navigation: { navigate } }: AuthBottomTabProps<'WeighIn
             alignSelf: 'center',
           }}
           >
-            <Headline style={{ textAlign: 'center' }}>
+            <Headline style={{ textAlign: 'center', color: sign && colors[sign].primary }}>
               {history[0].weightIn}
               {' '}
               kg

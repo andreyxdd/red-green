@@ -1,5 +1,6 @@
 import React from 'react';
-import { LogBox, View } from 'react-native';
+import { LogBox } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ActivityIndicator, Provider as PaperProvider } from 'react-native-paper';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -25,36 +26,38 @@ export default function App() {
 
   if (isCacheLoading || isAuthLoading || isProfileLoading || isPlanLoading || isHistoryLoading) {
     return (
-      <View style={{
+      <GestureHandlerRootView style={{
         flex: 1,
         justifyContent: 'center',
       }}
       >
         <ActivityIndicator animating />
-      </View>
+      </GestureHandlerRootView>
     );
   }
 
   if (authError || profileError || planError || historyError) {
     return (
-      <View style={{
+      <GestureHandlerRootView style={{
         flex: 1,
         justifyContent: 'center',
       }}
       >
         <ActivityIndicator animating color="danger" />
-      </View>
+      </GestureHandlerRootView>
     );
   }
 
   return (
     <SafeAreaProvider>
-      <PaperProvider theme={theme}>
-        <MenuProvider customStyles={{ backdrop: { backgroundColor: 'grey', opacity: 0.5 } }}>
-          <StatusBar />
-          <Navigation />
-        </MenuProvider>
-      </PaperProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <PaperProvider theme={theme}>
+          <MenuProvider customStyles={{ backdrop: { backgroundColor: 'grey', opacity: 0.5 } }}>
+            <StatusBar />
+            <Navigation />
+          </MenuProvider>
+        </PaperProvider>
+      </GestureHandlerRootView>
     </SafeAreaProvider>
   );
 }

@@ -5,19 +5,19 @@ import { dimensions } from './base';
 const fontConfig = {
   web: {
     regular: {
-      fontFamily: 'sans-serif',
+      fontSize: RFValue(14, dimensions.fullHeight),
       fontWeight: 'normal',
     },
     medium: {
-      fontFamily: 'sans-serif-medium',
+      fontSize: RFValue(14, dimensions.fullHeight),
       fontWeight: 'normal',
     },
     light: {
-      fontFamily: 'sans-serif-light',
+      fontSize: RFValue(14, dimensions.fullHeight),
       fontWeight: 'normal',
     },
     thin: {
-      fontFamily: 'sans-serif-thin',
+      fontSize: RFValue(14, dimensions.fullHeight),
       fontWeight: 'normal',
     },
   },

@@ -1,6 +1,10 @@
-import { StyleSheet, View, ScrollView } from 'react-native';
+import React from 'react';
+import {
+  StyleSheet, View, ScrollView, Platform,
+} from 'react-native';
 import { Headline, Subheading } from 'react-native-paper';
 import { SvgCss } from 'react-native-svg';
+import { FontAwesome } from '@expo/vector-icons';
 import { SIGNS } from '../../types/enums';
 import GreenDay from './GreenDay';
 import YellowDay from './YellowDay';
@@ -54,14 +58,23 @@ function TodaysRecommendations({ sign }:ITodaysRecommendations) {
           marginVertical: 12,
         }}
       >
-        <SvgCss
-          xml={roundIconXML(colors[sign])}
-          width={28}
-          height={28}
-          style={{ marginRight: 20 }}
-        />
+        {Platform.OS === 'ios' || Platform.OS === 'android'
+          ? (
+            <SvgCss
+              xml={roundIconXML(colors[sign])}
+              width={28}
+              height={28}
+            />
+          )
+          : (
+            <FontAwesome
+              name="circle"
+              size={28}
+              color={sign && colors[sign].primary}
+            />
+          )}
         <Headline
-          style={{ marginVertical: 12 }}
+          style={{ marginVertical: 12, marginLeft: 20 }}
         >
           {sign}
           {' '}

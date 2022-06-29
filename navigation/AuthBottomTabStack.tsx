@@ -1,5 +1,5 @@
 import { AntDesign } from '@expo/vector-icons';
-import { Text } from 'react-native';
+import { Platform, Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import TodayScreen from '../screens/auth/TodayTab/TodayScreen';
 import WeighInScreen from '../screens/auth/WeighinTab/WeighInScreen';
@@ -29,7 +29,12 @@ function BottomTabStack() {
             <AntDesign name="calendar" size={24} color={sign ? colors[sign].primary : color} />
           ),
           tabBarLabel: ({ focused, color }) => (
-            <Text style={{ color: focused && sign ? colors[sign].primary : color, fontSize: 10 }}>
+            <Text style={{
+              color: focused && sign ? colors[sign].primary : color,
+              fontSize: Platform.OS === 'ios' || Platform.OS === 'android' ? 10 : undefined,
+              marginLeft: Platform.OS !== 'ios' && Platform.OS !== 'android' ? 20 : undefined,
+            }}
+            >
               Today
             </Text>
           ),
@@ -46,7 +51,12 @@ function BottomTabStack() {
             <AntDesign name="pluscircleo" size={24} color={sign ? colors[sign].primary : color} />
           ),
           tabBarLabel: ({ focused, color }) => (
-            <Text style={{ color: focused && sign ? colors[sign].primary : color, fontSize: 10 }}>
+            <Text style={{
+              color: focused && sign ? colors[sign].primary : color,
+              fontSize: Platform.OS === 'ios' || Platform.OS === 'android' ? 10 : undefined,
+              marginLeft: Platform.OS !== 'ios' && Platform.OS !== 'android' ? 20 : undefined,
+            }}
+            >
               Weigh In
             </Text>
           ),
@@ -65,7 +75,12 @@ function BottomTabStack() {
           headerRight: () => <MenuContextOpenner />,
           tabBarIcon: ({ color }) => <AntDesign name="barschart" size={24} color={sign ? colors[sign].primary : color} />,
           tabBarLabel: ({ focused, color }) => (
-            <Text style={{ color: focused && sign ? colors[sign].primary : color, fontSize: 10 }}>
+            <Text style={{
+              color: focused && sign ? colors[sign].primary : color,
+              fontSize: Platform.OS === 'ios' || Platform.OS === 'android' ? 10 : undefined,
+              marginLeft: Platform.OS !== 'ios' && Platform.OS !== 'android' ? 20 : undefined,
+            }}
+            >
               Plan
             </Text>
           ),

@@ -2,7 +2,7 @@ import React from 'react';
 import {
   StyleSheet, View, Text, TouchableOpacity, Keyboard,
 } from 'react-native';
-import { PLANS, PLAN_VIEWS, UNITS } from '../types';
+import { PLANS, PLAN_VIEWS, UNITS } from '../types/enums';
 
 const styles = StyleSheet.create({
   rowContainer: {

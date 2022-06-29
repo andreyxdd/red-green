@@ -16,7 +16,7 @@ import { AuthStackScreenProps } from '../../types/navigation';
 import DatePickerModal from '../../components/DatePickerModal';
 import { dimensions } from '../../styles/base';
 import useDataStore, { IDataStore } from '../../hooks/useDataStore';
-import { writeMaintenancePlan } from '../../firebase/firebase';
+import { writeMaintenancePlan } from '../../firebase/writes';
 
 interface FormData {
   type?: PLANS;

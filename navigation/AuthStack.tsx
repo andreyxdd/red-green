@@ -5,7 +5,7 @@ import { View } from 'react-native';
 import UserMenuScreen from '../screens/auth/WeighinTab/UserMenuScreen/UserMenuScreen';
 import ManualWeighInScreen from '../screens/auth/WeighinTab/ManualWeighInScreen';
 import EditProfileScreen from '../screens/auth/WeighinTab/UserMenuScreen/EditProfileScreen';
-import EditPlanScreen from '../screens/auth/Plan/EditPlanScreen';
+import EditPlanScreen from '../screens/auth/PlanTab/EditPlanScreen';
 import CreatePlanScreen from '../screens/auth/CreatePlanScreen';
 
 import BottomTabStack from './AuthBottomTabStack';
@@ -70,7 +70,7 @@ function AuthStack() {
         name="EditProfile"
         component={EditProfileScreen}
         options={({ navigation }) => ({
-          title: 'Profile',
+          title: 'Edit Profile',
           headerTitleAlign: 'center',
           headerTransparent: true,
           headerLeft: () => (

@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button, Headline, Text } from 'react-native-paper';
+import {
+  Button, Headline, Text, Subheading,
+} from 'react-native-paper';
 import shallow from 'zustand/shallow';
 
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
@@ -18,9 +20,22 @@ const styles = StyleSheet.create({
   button: { width: '80%', paddingVertical: 4, marginVertical: 4 },
 });
 
-export default function WeighInScreen({ navigation: { navigate } }: AuthBottomTabProps<'WeighInTab'>) {
-  const [user, history, plan] = useDataStore(
-    (state: IDataStore) => [state.user, state.history, state.plan],
+function ShowGreeting(name: string) {
+  return (
+    <View style={[styles.container, { width: '80%', alignSelf: 'center' }]}>
+      <Headline style={{ width: '100%', marginVertical: 12, textAlign: 'center' }}>
+        Hi,
+        {' '}
+        {name}
+        !
+      </Headline>
+    </View>
+  );
+}
+
+function WeighInScreen({ navigation: { navigate } }: AuthBottomTabProps<'WeighInTab'>) {
+  const [user, profileData, history, plan] = useDataStore(
+    (state: IDataStore) => [state.user, state.profileData, state.history, state.plan],
     shallow,
   );
   const setSign = useInterfaceStore((state: IInterfaceStore) => state.setSign);
@@ -45,30 +60,34 @@ export default function WeighInScreen({ navigation: { navigate } }: AuthBottomTa
   if (!plan || !plan.active) {
     return (
       <View style={[styles.container, { flex: 1 }]}>
-        <Headline style={{ width: '100%', marginVertical: 12, textAlign: 'center' }}>
-          No Active plans
-        </Headline>
-        <Button
-          mode="contained"
-          style={{ width: '100%', marginVertical: 12 }}
-          onPress={() => { navigate('CreatePlan'); }}
-        >
-          Create new plan
-        </Button>
+        {profileData ? ShowGreeting(profileData.name) : null}
+        <View style={[styles.container, { width: '80%', alignSelf: 'center' }]}>
+          <Subheading style={{ width: '100%', marginVertical: 12, textAlign: 'center' }}>
+            No Active plans
+          </Subheading>
+          <Button
+            mode="contained"
+            style={{ width: '100%', marginVertical: 12 }}
+            onPress={() => { navigate('CreatePlan'); }}
+          >
+            Create new plan
+          </Button>
+        </View>
       </View>
     );
   }
 
   return (
     <View style={[styles.container, { flex: 1 }]}>
+      {profileData ? ShowGreeting(profileData.name) : null}
       {(
         history.length > 0
         && history[0].date.setHours(0, 0, 0, 0) === (new Date()).setHours(0, 0, 0, 0)
       ) ? (
         <View style={[styles.container, { width: '80%', alignSelf: 'center' }]}>
-          <Headline style={{ width: '100%', marginVertical: 12, textAlign: 'center' }}>
+          <Subheading style={{ width: '100%', marginVertical: 12, textAlign: 'center' }}>
             Today&apos;s Weigh-In:
-          </Headline>
+          </Subheading>
           <Text style={{ width: '100%', marginVertical: 12, textAlign: 'center' }}>
             {history[0].weightIn}
           </Text>
@@ -90,14 +109,14 @@ export default function WeighInScreen({ navigation: { navigate } }: AuthBottomTa
         </View>
         ) : (
           <View style={[styles.container, { width: '80%', alignSelf: 'center' }]}>
-            <Headline style={{
+            <Subheading style={{
               width: '100%',
               marginVertical: 12,
               textAlign: 'center',
             }}
             >
               It&apos;s time to weigh-in
-            </Headline>
+            </Subheading>
             <Button
               mode="contained"
               disabled
@@ -124,3 +143,5 @@ export default function WeighInScreen({ navigation: { navigate } }: AuthBottomTa
     </View>
   );
 }
+
+export default WeighInScreen;

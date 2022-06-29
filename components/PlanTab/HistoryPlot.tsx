@@ -4,7 +4,7 @@ import { Subheading } from 'react-native-paper';
 import { LineChart } from 'react-native-chart-kit';
 import { format } from 'date-fns';
 import { dimensions } from '../../styles/base';
-import { IHistoryItem, IPlan } from '../../types';
+import { IHistoryItem, IPlan } from '../../types/data';
 import { getRelativeChange } from '../../utils/calculate';
 
 const chartConfig = {

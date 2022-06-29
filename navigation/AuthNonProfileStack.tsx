@@ -5,7 +5,7 @@ import { Alert } from 'react-native';
 import { auth } from '../firebase/firebase';
 
 import ReadTermsScreen from '../screens/auth/ReadTermsScreen';
-import NoProfileDataScreen from '../screens/auth/NoProfileDataScreen';
+import NonProfileDataScreen from '../screens/auth/NonProfileDataScreen';
 
 import GoBack from '../components/IconButtons/GoBack';
 
@@ -18,9 +18,9 @@ function AuthNonProfileStack() {
     <Stack.Navigator>
       <Stack.Screen
         name="NoProfileData"
-        component={NoProfileDataScreen}
+        component={NonProfileDataScreen}
         options={{
-          title: 'Profile Data',
+          title: 'Create Profile',
           headerTitleAlign: 'center',
           headerLeft: () => (
             <GoBack onPress={() => auth
@@ -31,9 +31,15 @@ function AuthNonProfileStack() {
         }}
       />
       <Stack.Screen
-        options={{ headerShown: false }}
         name="ReadTerms"
         component={ReadTermsScreen}
+        options={({ navigation }) => ({
+          title: 'Terms & Conditions',
+          headerTitleAlign: 'center',
+          headerLeft: () => (
+            <GoBack onPress={() => navigation.goBack()} />
+          ),
+        })}
       />
     </Stack.Navigator>
   );

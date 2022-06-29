@@ -2,7 +2,8 @@ import {
   Timestamp, setDoc, doc, collection, addDoc,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { IProfileData, PLANS } from '../types';
+import { IProfileData } from '../types/data';
+import { PLANS } from '../types/enums';
 
 export const writeUserLastHistoryItem = (
   uid: string,
@@ -26,7 +27,7 @@ export const writeProfileData = (
   uid: string,
   profileData: IProfileData,
 ) => {
-  const userRef = doc(db, 'users', uid, 'plans');
+  const userRef = doc(db, 'users', uid);
 
   const dob = new Date(new Date(profileData.dob).setHours(0, 0, 0, 0));
 

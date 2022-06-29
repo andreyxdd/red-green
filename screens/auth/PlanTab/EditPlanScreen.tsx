@@ -10,7 +10,7 @@ import shallow from 'zustand/shallow';
 import { Text, View } from '../../../components/Themed';
 import DatePickerModal from '../../../components/DatePickerModal';
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
-import { updateUserPlan } from '../../../firebase/firebase';
+// import { updateUserPlan } from '../../../firebase/updates';
 
 const styles = StyleSheet.create({
   container: {
@@ -46,7 +46,7 @@ export default function EditPlanScreen() {
       && differenceInDays(date, new Date()) > 1
       && differenceInDays(date, plan.startDate)
     ) {
-      updateUserPlan(uid, plan.id, date);
+      // updateUserPlan(uid, plan.id, date);
     }
   };
 

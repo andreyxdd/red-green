@@ -3,6 +3,15 @@ import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/n
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MANUAL_WEIGHIN } from './enums';
 
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace ReactNavigation {
+    interface RootParamList extends AuthStackList {
+      later?: string;
+    }
+  }
+}
+
 // Auth screen stack types:
 export type AuthBottomTabList = {
   TodayTab: undefined;
@@ -23,6 +32,7 @@ export type AuthStackList = {
   EditProfile: undefined;
   CreatePlan: undefined;
   EditPlan: undefined;
+  ReadTerms: undefined;
 };
 
 export type AuthStackScreenProps<Screen extends keyof AuthStackList> =

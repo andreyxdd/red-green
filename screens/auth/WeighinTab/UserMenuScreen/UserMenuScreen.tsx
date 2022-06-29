@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { FontAwesome } from '@expo/vector-icons';
+import shallow from 'zustand/shallow';
 import { auth } from '../../../../firebase/firebase';
 import useDataStore, { IDataStore } from '../../../../hooks/useDataStore';
 import { AuthStackScreenProps } from '../../../../types/navigation';
@@ -22,8 +23,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function UserMenuScreen({ navigation: { navigate } }: AuthStackScreenProps<'UserMenu'>) {
-  const user = useDataStore((state: IDataStore) => state.user);
+function UserMenuScreen({ navigation: { navigate } }: AuthStackScreenProps<'UserMenu'>) {
+  const [user, profileData] = useDataStore(
+    (state: IDataStore) => [state.user, state.profileData],
+    shallow,
+  );
 
   const handleSignOut = () => {
     auth
@@ -39,7 +43,7 @@ export default function UserMenuScreen({ navigation: { navigate } }: AuthStackSc
         color="grey"
         style={{ paddingTop: 20, paddingBottom: 20 }}
       />
-      {/* <Text style={styles.subTitle}>Username</Text> */}
+      {profileData ? <Text>{profileData.name}</Text> : null}
       {user ? <Text>{user.email}</Text> : null}
       <View style={styles.buttonContainer}>
         <Button
@@ -72,3 +76,5 @@ export default function UserMenuScreen({ navigation: { navigate } }: AuthStackSc
     </View>
   );
 }
+
+export default UserMenuScreen;

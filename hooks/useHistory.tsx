@@ -5,7 +5,7 @@ import { useCollection } from 'react-firebase-hooks/firestore';
 
 import useDataStore, { IDataStore } from './useDataStore';
 import { db } from '../firebase/firebase';
-import { IHistoryItem } from '../types';
+import { IHistoryItem } from '../types/data';
 
 const useHistory = () => {
   const [user, plan, setHistory] = useDataStore(

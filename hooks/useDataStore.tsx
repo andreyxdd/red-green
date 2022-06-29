@@ -1,6 +1,6 @@
 import { User } from 'firebase/auth';
 import create from 'zustand';
-import { IProfileData, IPlan, IHistoryItem } from '../types';
+import { IProfileData, IPlan, IHistoryItem } from '../types/data';
 
 export type IUserData = {
   user: User | null;

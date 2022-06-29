@@ -1,10 +1,10 @@
 import { AntDesign } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import TodayScreen from '../screens/auth/Today/TodayScreen';
+import TodayScreen from '../screens/auth/TodayTab/TodayScreen';
 import WeighInScreen from '../screens/auth/WeighinTab/WeighInScreen';
-import PlanScreen from '../screens/auth/Plan/PlanScreen';
+import PlanScreen from '../screens/auth/PlanTab/PlanScreen';
 import { AuthBottomTabList, AuthBottomTabProps } from '../types/navigation';
-import { MenuContextOpenner } from '../components/Plan/PopupPlanMenu';
+import { MenuContextOpenner } from '../components/PlanTab/PopupPlanMenu';
 import useInterfaceStore, { IInterfaceStore } from '../hooks/useInterfaceStore';
 import { colors } from '../styles/base';
 

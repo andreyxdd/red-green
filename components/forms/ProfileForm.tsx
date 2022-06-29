@@ -1,25 +1,18 @@
 import React from 'react';
 import {
-  StyleSheet, View, Text, TouchableOpacity, Keyboard, Platform,
+  StyleSheet, View, Pressable, Alert,
 } from 'react-native';
 import {
-  TextInput, Button, Switch, HelperText,
+  TextInput, Button, HelperText, Switch, Text,
 } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import RBSheet from 'react-native-raw-bottom-sheet';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
-import { IProfileData } from '../../types';
-import DatePickerModal from '../../components/DatePickerModal';
-import { dimensions } from '../../styles/base';
-import useDataStore, { IDataStore } from '../../hooks/useDataStore';
-import { writeProfileData } from '../../firebase/firebase';
-
-interface FormData extends IProfileData {
-  termsAccepted: boolean;
-}
+import { DatePickerModal } from 'react-native-paper-dates';
+import { useNavigation } from '@react-navigation/native';
+import { IProfileData } from '../../types/data';
+import parseStringNumbers from '../../utils/parseStringNumbers';
+import { writeProfileData } from '../../firebase/writes';
 
 const REGEX = {
   personalName: /^[a-z ,.'-]+$/i,
@@ -32,44 +25,72 @@ const ERROR_MESSAGES = {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', marginHorizontal: 30 },
-  input: { marginVertical: 5 },
+  container: {
+    justifyContent: 'center',
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.0)',
+    width: '100%',
+  },
+  input: { marginVertical: 2, width: '90%', alignSelf: 'center' },
+  button: {
+    width: '80%', paddingVertical: 4, marginBottom: 14, alignSelf: 'center',
+  },
   row: {
     alignItems: 'center',
+    alignSelf: 'center',
     flexDirection: 'row',
-    marginVertical: 20,
-    justifyContent: 'space-between',
+    marginVertical: 10,
   },
 });
 
-export default function NoProfileDataScreen() {
-  const uid = useDataStore((state: IDataStore) => state.uid);
+export type IProfileForm = {
+  initialValues?: IProfileData;
+  uid: string;
+}
 
-  const { control, handleSubmit, formState: { errors, isValid } } = useForm<FormData>({
+interface FormData extends IProfileData {
+  termsAccepted: boolean;
+}
+
+function ProfileForm({ initialValues, uid }: IProfileForm) {
+  const navigation = useNavigation();
+  const { control, handleSubmit, formState: { errors, isValid, isDirty } } = useForm<FormData>({
     mode: 'onChange',
+    defaultValues: { ...initialValues, termsAccepted: false } || {},
   });
 
-  const datePickerRef = React.useRef<RBSheet>(null);
-  const [showAndroidDatePicker, setShowAndroidDatePicker] = React.useState(false);
-  const toggleDatePicker = () => {
-    Keyboard.dismiss();
-    if (Platform.OS === 'android') {
-      setShowAndroidDatePicker(true);
-    } else if (datePickerRef.current) datePickerRef.current.open();
+  const onSubmit = ({
+    name, dob, height, weight,
+  }: FormData) => {
+    if (isValid) {
+      try {
+        const newHeight = parseStringNumbers(height);
+        const newWeight = parseStringNumbers(weight);
+
+        const newProfileData = {
+          name,
+          dob,
+          height: newHeight,
+          weight: newWeight,
+        };
+
+        writeProfileData(uid, newProfileData as IProfileData);
+        if (initialValues) navigation.navigate('UserMenu');
+      } catch (error: any) {
+        Alert.alert('Error', error.message);
+      }
+    }
   };
 
-  const onSubmit = (data: FormData) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { termsAccepted, ...profileData } = data;
-
-    if (uid) writeProfileData(uid, profileData as IProfileData);
-  };
+  // handling datepickers
+  const [showDatePicker, setShowDatePicker] = React.useState(false);
+  //--
 
   return (
-    <KeyboardAwareScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <Controller
         control={control}
-        defaultValue=""
+        defaultValue={initialValues ? initialValues.name : ''}
         name="name"
         rules={{
           required: { value: true, message: ERROR_MESSAGES.REQUIRED },
@@ -84,6 +105,8 @@ export default function NoProfileDataScreen() {
               onBlur={onBlur}
               onChangeText={(v) => onChange(v)}
               error={errors.name && true}
+              returnKeyType="done"
+              selectTextOnFocus
             />
             <HelperText
               visible={!errors.name}
@@ -96,37 +119,23 @@ export default function NoProfileDataScreen() {
       />
       <Controller
         control={control}
+        defaultValue={initialValues ? initialValues.dob : new Date()}
         name="dob"
-        defaultValue={new Date()}
         rules={{
           required: { value: true, message: ERROR_MESSAGES.REQUIRED },
         }}
         render={({ field: { onChange, value } }) => (
           <>
-            {Platform.OS === 'ios' && (
-              <DatePickerModal
-                ref={datePickerRef}
-                value={value}
-                onChange={(_e: unknown, d?: Date) => {
-                  onChange(d);
-                }}
-                id="dobPicker"
-              />
-            )}
-            {Platform.OS === 'android' && showAndroidDatePicker && (
-              <DateTimePicker
-                testID="dobPicker"
-                value={value || new Date()}
-                mode="date"
-                onChange={(_e: unknown, d?: Date) => {
-                  setShowAndroidDatePicker(false);
-                  onChange(d);
-                }}
-                style={{ width: dimensions.fullWidth * 0.8, height: '85%' }}
-                display="spinner"
-              />
-            )}
-            <TouchableOpacity onPress={toggleDatePicker}>
+            <DatePickerModal
+              locale="en"
+              mode="single"
+              date={value}
+              visible={showDatePicker}
+              onDismiss={() => { setShowDatePicker(false); }}
+              onConfirm={() => { setShowDatePicker(false); }}
+              onChange={({ date }) => { setShowDatePicker(false); onChange(date); }}
+            />
+            <Pressable onPress={() => { setShowDatePicker(true); }}>
               <View pointerEvents="none">
                 <TextInput
                   label="Birthdate"
@@ -135,7 +144,7 @@ export default function NoProfileDataScreen() {
                   error={errors.dob && true}
                 />
               </View>
-            </TouchableOpacity>
+            </Pressable>
             <HelperText type="error">{errors.dob?.message}</HelperText>
           </>
         )}
@@ -166,7 +175,7 @@ export default function NoProfileDataScreen() {
       <Controller
         control={control}
         name="height"
-        defaultValue={0.0}
+        defaultValue={initialValues ? initialValues.height : 0.0}
         rules={{
           required: { message: ERROR_MESSAGES.REQUIRED, value: true },
         }}
@@ -190,7 +199,7 @@ export default function NoProfileDataScreen() {
       <Controller
         control={control}
         name="weight"
-        defaultValue={0.0}
+        defaultValue={initialValues ? initialValues.weight : 0.0}
         rules={{
           required: { message: ERROR_MESSAGES.REQUIRED, value: true },
         }}
@@ -211,29 +220,41 @@ export default function NoProfileDataScreen() {
           </>
         )}
       />
-      <View style={styles.row}>
-        <Text>Terms Accept</Text>
-        <Controller
-          control={control}
-          defaultValue={false}
-          name="termsAccepted"
-          rules={{ required: { value: true, message: ERROR_MESSAGES.TERMS } }}
-          render={({ field: { onChange, value } }) => (
-            <Switch
-              value={value}
-              onValueChange={(v) => onChange(v)}
-            />
-          )}
-        />
-      </View>
+      {!initialValues ? (
+        <View style={styles.row}>
+          <Text style={{ marginHorizontal: 4 }}>Accept</Text>
+          <Text
+            style={{ color: '#33A1FF', paddingRight: 10 }}
+            onPress={() => { navigation.navigate('ReadTerms'); }}
+          >
+            terms and conditions
+          </Text>
+          <Controller
+            control={control}
+            defaultValue={false}
+            name="termsAccepted"
+            rules={{ required: { value: true, message: ERROR_MESSAGES.TERMS } }}
+            render={({ field: { onChange, value } }) => (
+              <Switch
+                style={{ marginLeft: 10 }}
+                value={value}
+                onValueChange={(v) => onChange(v)}
+              />
+            )}
+          />
+        </View>
+      ) : null}
       <HelperText type="error">{errors.termsAccepted?.message}</HelperText>
       <Button
         mode="contained"
         onPress={handleSubmit(onSubmit)}
-        disabled={!isValid}
+        style={styles.button}
+        disabled={!isValid || !isDirty}
       >
         Submit
       </Button>
-    </KeyboardAwareScrollView>
+    </View>
   );
 }
+
+export default ProfileForm;

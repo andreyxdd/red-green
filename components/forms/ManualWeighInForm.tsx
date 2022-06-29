@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { updateUserLastHistoryItem, updateUserWeight } from '../../firebase/updates';
 import { writeUserLastHistoryItem } from '../../firebase/writes';
 import { MANUAL_WEIGHIN } from '../../types/enums';
+import parseStringNumbers from '../../utils/parseStringNumbers';
 
 interface FormData {
   weighIn: number;
@@ -51,15 +52,9 @@ function ManualWeighInForm({
 
   // submit form
   const onSubmit = async ({ weighIn }: FormData) => {
-    const newValue = weighIn as unknown as string;
-
     if (isValid) {
       try {
-        const value = parseFloat(
-          newValue.indexOf(',') > 0
-            ? newValue.replaceAll(',', '.')
-            : newValue,
-        );
+        const value = parseStringNumbers(weighIn);
 
         if (Number.isFinite(value)) {
           updateUserWeight(uid, value);
@@ -110,7 +105,7 @@ function ManualWeighInForm({
         style={styles.button}
         disabled={!isDirty}
       >
-        Submit Weigh-In
+        Submit
       </Button>
     </View>
   );

@@ -2,26 +2,26 @@ import create from 'zustand';
 import { SIGNS } from '../types/enums';
 
 export type IUserData = {
-  sign: SIGNS;
+  sign?: SIGNS;
   dataIsLoading: boolean;
 }
 
 /* eslint-disable no-unused-vars */
 export interface IInterfaceStore extends IUserData{
-  setSign: (sign: SIGNS) => void;
+  setSign: (sign?: SIGNS) => void;
   setDataIsLoading: (dataIsLoading: boolean) => void;
 }
 /* eslint-enable no-unused-vars */
 
 const initialState = {
-  sign: SIGNS.YELLOW,
+  sign: undefined,
   dataIsLoading: false,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const useInterfaceStore = create<IInterfaceStore>((set: any) => ({
   ...initialState,
-  setSign: (sign: SIGNS) => set({ sign }),
+  setSign: (sign?: SIGNS) => set({ sign }),
   setDataIsLoading: (dataIsLoading: boolean) => set({ dataIsLoading }),
 }));
 

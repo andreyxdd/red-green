@@ -54,6 +54,8 @@ function WeighInScreen({ navigation: { navigate } }: AuthBottomTabProps<'WeighIn
       } else {
         setSign(SIGNS.YELLOW);
       }
+    } else {
+      setSign(undefined);
     }
   }, [history, plan, setSign]);
 

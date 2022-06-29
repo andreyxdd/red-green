@@ -4,6 +4,7 @@ import {
 import shallow from 'zustand/shallow';
 import { differenceInDays, format } from 'date-fns';
 import React from 'react';
+import { Subheading } from 'react-native-paper';
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
 import PopupPlanMenu from '../../../components/PlanTab/PopupPlanMenu';
 import HistoryPlot from '../../../components/PlanTab/HistoryPlot';
@@ -14,6 +15,10 @@ import { colors } from '../../../styles/base';
 import { getRelativeChange } from '../../../utils/calculate';
 
 const styles = StyleSheet.create({
+  container: {
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.0)',
+  },
   rowContainer: {
     flexDirection: 'row',
     backgroundColor: 'rgba(0, 0, 0, 0.0)',
@@ -41,7 +46,7 @@ export default function PlanScreen() {
   const [planView, setPlanView] = React.useState<PLAN_VIEWS>(PLAN_VIEWS.HISTORY);
 
   return (
-    <>
+    <View style={[styles.container, { flex: 1 }]}>
       {plan && history
         ? (
           <View style={{ flex: 4 }}>
@@ -150,8 +155,14 @@ export default function PlanScreen() {
               )}
 
           </View>
-        ) : null}
+        ) : (
+          <View style={[styles.container, { width: '80%', alignSelf: 'center' }]}>
+            <Subheading style={{ width: '100%', marginVertical: 12, textAlign: 'center' }}>
+              No Active plans
+            </Subheading>
+          </View>
+        )}
       <PopupPlanMenu />
-    </>
+    </View>
   );
 }

@@ -69,7 +69,7 @@ function UserMenuScreen({ navigation: { navigate } }: AuthStackScreenProps<'User
         >
           Notifications
         </Button>
-        <Button onPress={handleSignOut} mode="outlined" style={{ marginVertical: 12 }}>
+        <Button onPress={handleSignOut} mode="outlined" style={{ marginVertical: 12 }} color="red">
           Sign Out
         </Button>
       </View>

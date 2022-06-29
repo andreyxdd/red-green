@@ -16,7 +16,7 @@ function Profile({ onPress }:IProfile) {
     >
       <FontAwesome
         name="user-circle-o"
-        size={40}
+        size={35}
         color="grey"
         style={{ marginRight: 15 }}
       />

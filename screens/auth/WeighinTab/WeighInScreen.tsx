@@ -1,12 +1,11 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import {
-  Button, Headline, Text, Subheading,
-} from 'react-native-paper';
+import { View, StyleSheet, Dimensions } from 'react-native';
+import { Button, Headline, Subheading } from 'react-native-paper';
 import shallow from 'zustand/shallow';
 
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
 import useInterfaceStore, { IInterfaceStore } from '../../../hooks/useInterfaceStore';
+import colors from '../../../styles/colors';
 
 import { MANUAL_WEIGHIN, SIGNS } from '../../../types/enums';
 import { AuthBottomTabProps } from '../../../types/navigation';
@@ -18,12 +17,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.0)',
   },
   button: { width: '80%', paddingVertical: 4, marginVertical: 4 },
+  text: { width: '100%', marginVertical: 20, textAlign: 'center' },
 });
 
 function ShowGreeting(name: string) {
   return (
     <View style={[styles.container, { width: '80%', alignSelf: 'center' }]}>
-      <Headline style={{ width: '100%', marginVertical: 12, textAlign: 'center' }}>
+      <Headline style={styles.text}>
         Hi,
         {' '}
         {name}
@@ -38,7 +38,10 @@ function WeighInScreen({ navigation: { navigate } }: AuthBottomTabProps<'WeighIn
     (state: IDataStore) => [state.user, state.profileData, state.history, state.plan],
     shallow,
   );
-  const setSign = useInterfaceStore((state: IInterfaceStore) => state.setSign);
+  const [sign, setSign] = useInterfaceStore(
+    (state: IInterfaceStore) => [state.sign, state.setSign],
+    shallow,
+  );
 
   React.useEffect(() => {
     if (history.length > 0
@@ -64,7 +67,7 @@ function WeighInScreen({ navigation: { navigate } }: AuthBottomTabProps<'WeighIn
       <View style={[styles.container, { flex: 1 }]}>
         {profileData ? ShowGreeting(profileData.name) : null}
         <View style={[styles.container, { width: '80%', alignSelf: 'center' }]}>
-          <Subheading style={{ width: '100%', marginVertical: 12, textAlign: 'center' }}>
+          <Subheading style={styles.text}>
             No Active plans
           </Subheading>
           <Button
@@ -87,12 +90,27 @@ function WeighInScreen({ navigation: { navigate } }: AuthBottomTabProps<'WeighIn
         && history[0].date.setHours(0, 0, 0, 0) === (new Date()).setHours(0, 0, 0, 0)
       ) ? (
         <View style={[styles.container, { width: '80%', alignSelf: 'center' }]}>
-          <Subheading style={{ width: '100%', marginVertical: 12, textAlign: 'center' }}>
+          <Subheading style={styles.text}>
             Today&apos;s Weigh-In:
           </Subheading>
-          <Text style={{ width: '100%', marginVertical: 12, textAlign: 'center' }}>
-            {history[0].weightIn}
-          </Text>
+          <View style={{
+            width: Dimensions.get('window').height / 4,
+            height: Dimensions.get('window').height / 4,
+            marginBottom: 20,
+            backgroundColor: sign && colors[sign].secondary,
+            borderColor: sign && colors[sign].primary,
+            borderRadius: Dimensions.get('window').height / 8,
+            borderWidth: 4,
+            justifyContent: 'center',
+            alignSelf: 'center',
+          }}
+          >
+            <Headline style={{ textAlign: 'center' }}>
+              {history[0].weightIn}
+              {' '}
+              kg
+            </Headline>
+          </View>
           <Button
             mode="contained"
             style={{ width: '100%', marginVertical: 12 }}
@@ -111,12 +129,7 @@ function WeighInScreen({ navigation: { navigate } }: AuthBottomTabProps<'WeighIn
         </View>
         ) : (
           <View style={[styles.container, { width: '80%', alignSelf: 'center' }]}>
-            <Subheading style={{
-              width: '100%',
-              marginVertical: 12,
-              textAlign: 'center',
-            }}
-            >
+            <Subheading style={styles.text}>
               It&apos;s time to weigh-in
             </Subheading>
             <Button

@@ -20,7 +20,7 @@ function TodayScreen() {
         : (
           <View style={[styles.container, { width: '80%', alignSelf: 'center' }]}>
             <Subheading style={{ width: '100%', marginVertical: 12, textAlign: 'center' }}>
-              No Active plans
+              No Availble Data Yet
             </Subheading>
           </View>
         )}

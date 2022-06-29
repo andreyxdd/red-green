@@ -21,7 +21,7 @@ function EditProfileScreen() {
 
   return (
     <KeyboardAwareScrollView
-      style={[styles.container, { flex: 1 }]}
+      contentContainerStyle={[styles.container, { flex: 1 }]}
       keyboardDismissMode="on-drag"
       keyboardShouldPersistTaps="handled"
     >

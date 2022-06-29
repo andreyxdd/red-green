@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { FontAwesome } from '@expo/vector-icons';
 import shallow from 'zustand/shallow';
@@ -32,7 +32,7 @@ function UserMenuScreen({ navigation: { navigate } }: AuthStackScreenProps<'User
   const handleSignOut = () => {
     auth
       .signOut()
-      .catch((e) => console.log(e));
+      .catch((e) => Alert.alert(e));
   };
 
   return (
@@ -54,16 +54,14 @@ function UserMenuScreen({ navigation: { navigate } }: AuthStackScreenProps<'User
           Profile
         </Button>
         <Button
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
-          onPress={() => { }}
+          onPress={() => Alert.alert('The "Integrations" screen is not yet implemented')}
           icon="chevron-right"
           contentStyle={styles.button}
         >
           Integrations
         </Button>
         <Button
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
-          onPress={() => { }}
+          onPress={() => Alert.alert('The "Notifications" screen is not yet implemented')}
           icon="chevron-right"
           contentStyle={styles.button}
         >

@@ -42,8 +42,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function CreatePlanScreen({ navigation }: AuthStackScreenProps<'CreatePlan'>) {
-  const uid = useDataStore((state: IDataStore) => state.uid);
+function CreatePlanScreen({ navigation }: AuthStackScreenProps<'CreatePlan'>) {
+  const user = useDataStore((state: IDataStore) => state.user);
 
   const { control, handleSubmit, formState: { errors, isValid } } = useForm<FormData>({
     mode: 'onChange',
@@ -59,8 +59,9 @@ export default function CreatePlanScreen({ navigation }: AuthStackScreenProps<'C
   };
 
   const onSubmit = (data: FormData) => {
-    if (uid) {
-      writeMaintenancePlan(uid, data.endDate, data.goalWeight as number);
+    if (user?.uid) {
+      // console.log(data)
+      writeMaintenancePlan(user.uid, data.endDate, data.goalWeight as number);
       navigation.goBack(); // pass props to show if it's the very first weigh-in for the plan
     }
   };
@@ -170,3 +171,5 @@ export default function CreatePlanScreen({ navigation }: AuthStackScreenProps<'C
     </KeyboardAwareScrollView>
   );
 }
+
+export default CreatePlanScreen;

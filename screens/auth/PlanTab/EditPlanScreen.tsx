@@ -1,12 +1,10 @@
 import React from 'react';
-import { StatusBar } from 'expo-status-bar';
 import {
   Platform, StyleSheet, Button, Keyboard,
 } from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import { differenceInDays } from 'date-fns';
-import shallow from 'zustand/shallow';
 import { Text, View } from '../../../components/Themed';
 import DatePickerModal from '../../../components/DatePickerModal';
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
@@ -21,7 +19,7 @@ const styles = StyleSheet.create({
 });
 
 export default function EditPlanScreen() {
-  const [uid, plan] = useDataStore((state: IDataStore) => [state.uid, state.plan], shallow);
+  const plan = useDataStore((state: IDataStore) => state.plan);
   const [date, setDate] = React.useState<Date>();
 
   const datePickerRef = React.useRef<RBSheet>(null);
@@ -42,7 +40,7 @@ export default function EditPlanScreen() {
 
   const handleClose = () => {
     if (
-      uid && plan && date
+      plan && date
       && differenceInDays(date, new Date()) > 1
       && differenceInDays(date, plan.startDate)
     ) {
@@ -71,7 +69,6 @@ export default function EditPlanScreen() {
           />
         </>
       ) : null}
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
     </View>
   );
 }

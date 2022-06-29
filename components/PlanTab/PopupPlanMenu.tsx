@@ -6,7 +6,7 @@ import {
   withMenuContext,
   renderers,
 } from 'react-native-popup-menu';
-import { Pressable } from 'react-native';
+import { Pressable, Alert } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Text, View } from '../Themed';
@@ -22,16 +22,17 @@ export default function PopupPlanMenu() {
         <MenuTrigger />
         <MenuOptions>
           <MenuOption onSelect={() => { navigation.navigate('EditPlan'); }} text="Edit" />
-          <MenuOption onSelect={() => alert('Delete')}>
+          <MenuOption onSelect={() => Alert.alert('Delete')}>
             <Text style={{ color: 'red' }}>Delete</Text>
           </MenuOption>
-          <MenuOption onSelect={() => alert('Not called')} disabled text="Disabled" />
+          <MenuOption onSelect={() => Alert.alert('Not called')} disabled text="Disabled" />
         </MenuOptions>
       </Menu>
     </View>
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function MenuOpenner(props: any) {
   return (
     <Pressable

@@ -58,19 +58,19 @@ function TodaysRecommendations({ sign }:ITodaysRecommendations) {
           marginVertical: 12,
         }}
       >
-        {Platform.OS === 'ios' || Platform.OS === 'android'
+        {Platform.OS === 'web'
           ? (
-            <SvgCss
-              xml={roundIconXML(colors[sign])}
-              width={28}
-              height={28}
-            />
-          )
-          : (
             <FontAwesome
               name="circle"
               size={28}
               color={sign && colors[sign].primary}
+            />
+          )
+          : (
+            <SvgCss
+              xml={roundIconXML(colors[sign])}
+              width={28}
+              height={28}
             />
           )}
         <Headline

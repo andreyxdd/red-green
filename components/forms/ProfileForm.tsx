@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  StyleSheet, View, Pressable, Alert,
+  StyleSheet, View, Pressable, Alert, Platform, Keyboard, Dimensions,
 } from 'react-native';
 import {
   TextInput, Button, HelperText, Switch, Text, ActivityIndicator,
@@ -8,8 +8,12 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 
 import { format } from 'date-fns';
-import { DatePickerModal } from 'react-native-paper-dates';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import DatepickerIOS from '../DatepickerIOS';
 import { IProfileData } from '../../types/data';
 import parseStringNumbers from '../../utils/parseStringNumbers';
 import { writeProfileData } from '../../firebase/writes';
@@ -68,6 +72,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
     defaultValues: { ...initialValues, termsAccepted: false } || {},
   });
 
+  // -- watching the units
   const imperialUnitsWatcher = watch('units') === UNITS.IMPERIAL;
   const weightWatcher = watch('weight');
   const heightWatcher = watch('height');
@@ -90,6 +95,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
     setUnitsLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imperialUnitsWatcher]);
+  //--
 
   const onSubmit = ({
     name, dob, units, height, weight,
@@ -116,7 +122,17 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
   };
 
   // handling datepickers
-  const [showDatePicker, setShowDatePicker] = React.useState(false);
+  const datePickerRef = React.useRef<RBSheet>(null);
+  const [showAndroidDatePicker, setShowAndroidDatePicker] = React.useState(false);
+  const toggleDatepicker = () => {
+    Keyboard.dismiss();
+    if (Platform.OS === 'android' || Platform.OS === 'web') {
+      console.log('here');
+      setShowAndroidDatePicker(true);
+    } else if (Platform.OS === 'ios' && datePickerRef.current) {
+      datePickerRef.current.open();
+    }
+  };
   //--
 
   return (
@@ -159,25 +175,54 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
         }}
         render={({ field: { onChange, value } }) => (
           <>
-            <DatePickerModal
-              locale="en"
-              mode="single"
-              date={value}
-              visible={showDatePicker}
-              onDismiss={() => { setShowDatePicker(false); }}
-              onConfirm={() => { setShowDatePicker(false); }}
-              onChange={({ date }) => { setShowDatePicker(false); onChange(date); }}
-            />
-            <Pressable onPress={() => { setShowDatePicker(true); }}>
-              <View pointerEvents="none">
-                <TextInput
-                  label="Birthdate"
-                  style={styles.input}
-                  value={value && format(value, 'yyyy-MM-dd')}
-                  error={errors.dob && true}
+            {Platform.OS === 'ios' ? (
+              <DatepickerIOS
+                id="profile-form-datepicker"
+                ref={datePickerRef}
+                value={value}
+                onChange={onChange}
+              />
+            ) : null}
+            {Platform.OS === 'android' && showAndroidDatePicker ? (
+              <DateTimePicker
+                testID="profile-form-datepicker"
+                value={value}
+                mode="date"
+                onChange={(_e: unknown, d?: Date) => {
+                  setShowAndroidDatePicker(false);
+                  if (d) onChange(d);
+                }}
+                style={{ width: Dimensions.get('window').width * 0.9 }}
+              />
+            ) : null}
+            {Platform.OS === 'web'
+              ? (
+                <DatePicker
+                  selected={value}
+                  onChange={onChange}
+                  customInput={(
+                    <View style={{ justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}>
+                      <TextInput
+                        label="Birthdate"
+                        style={styles.input}
+                        value={value && format(value, 'yyyy-MM-dd')}
+                        error={errors.dob && true}
+                      />
+                    </View>
+                  )}
                 />
-              </View>
-            </Pressable>
+              ) : (
+                <Pressable onPress={toggleDatepicker}>
+                  <View pointerEvents="none">
+                    <TextInput
+                      label="Birthdate"
+                      style={styles.input}
+                      value={value && format(value, 'yyyy-MM-dd')}
+                      error={errors.dob && true}
+                    />
+                  </View>
+                </Pressable>
+              )}
             <HelperText type="error">{errors.dob?.message}</HelperText>
           </>
         )}
@@ -216,7 +261,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                   onBlur={onBlur}
                   onChangeText={(v) => onChange(v)}
                   error={errors.height && true}
-                  keyboardType="numeric"
+                  keyboardType="decimal-pad"
                   returnKeyType="done"
                   selectTextOnFocus
                 />
@@ -243,7 +288,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                   onBlur={onBlur}
                   onChangeText={(v) => onChange(v)}
                   error={errors.weight && true}
-                  keyboardType="numeric"
+                  keyboardType="decimal-pad"
                   returnKeyType="done"
                   selectTextOnFocus
                 />

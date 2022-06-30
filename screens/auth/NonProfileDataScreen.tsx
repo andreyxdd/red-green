@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
+import { Text } from 'react-native-paper';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import useDataStore, { IDataStore } from '../../hooks/useDataStore';
@@ -22,6 +23,12 @@ function NonProfileDataScreen() {
       keyboardDismissMode="on-drag"
       keyboardShouldPersistTaps="handled"
     >
+      <Text style={{
+        width: '90%', paddingVertical: 4, marginBottom: 14, alignSelf: 'center',
+      }}
+      >
+        Let&apos;s setup your profile:
+      </Text>
       {user ? (
         <ProfileForm uid={user.uid} />
       ) : null}

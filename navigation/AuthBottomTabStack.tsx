@@ -31,8 +31,8 @@ function BottomTabStack() {
           tabBarLabel: ({ focused, color }) => (
             <Text style={{
               color: focused && sign ? colors[sign].primary : color,
-              fontSize: Platform.OS === 'ios' || Platform.OS === 'android' ? 10 : undefined,
-              marginLeft: Platform.OS !== 'ios' && Platform.OS !== 'android' ? 20 : undefined,
+              fontSize: Platform.OS !== 'web' ? 10 : undefined,
+              marginLeft: Platform.OS === 'web' ? 20 : undefined,
             }}
             >
               Today
@@ -53,8 +53,8 @@ function BottomTabStack() {
           tabBarLabel: ({ focused, color }) => (
             <Text style={{
               color: focused && sign ? colors[sign].primary : color,
-              fontSize: Platform.OS === 'ios' || Platform.OS === 'android' ? 10 : undefined,
-              marginLeft: Platform.OS !== 'ios' && Platform.OS !== 'android' ? 20 : undefined,
+              fontSize: Platform.OS !== 'web' ? 10 : undefined,
+              marginLeft: Platform.OS === 'web' ? 20 : undefined,
             }}
             >
               Weigh In
@@ -77,8 +77,8 @@ function BottomTabStack() {
           tabBarLabel: ({ focused, color }) => (
             <Text style={{
               color: focused && sign ? colors[sign].primary : color,
-              fontSize: Platform.OS === 'ios' || Platform.OS === 'android' ? 10 : undefined,
-              marginLeft: Platform.OS !== 'ios' && Platform.OS !== 'android' ? 20 : undefined,
+              fontSize: Platform.OS !== 'web' ? 10 : undefined,
+              marginLeft: Platform.OS === 'web' ? 20 : undefined,
             }}
             >
               Plan

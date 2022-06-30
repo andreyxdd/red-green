@@ -11,7 +11,7 @@ import HistoryPlot from '../../../components/PlanTab/HistoryPlot';
 import { View, Text } from '../../../components/Themed';
 import { PLAN_VIEWS, SIGNS } from '../../../types/enums';
 import Toggle from '../../../components/Toggle';
-import { colors } from '../../../styles/base';
+import colors from '../../../styles/colors';
 import { getRelativeChange } from '../../../utils/calculate';
 
 const styles = StyleSheet.create({
@@ -119,9 +119,10 @@ export default function PlanScreen() {
                     } else {
                       color = SIGNS.YELLOW;
                     }
+
                     return (
                       <View style={{
-                        backgroundColor: colors[color],
+                        backgroundColor: colors[color].secondary,
                         borderColor: '#ccc',
                         borderWidth: 1,
                         borderRadius: 4,
@@ -131,19 +132,19 @@ export default function PlanScreen() {
                         flex: 4,
                       }}
                       >
-                        <View style={{ flexDirection: 'row', backgroundColor: colors[color] }}>
-                          <View style={{ flex: 1, backgroundColor: colors[color] }}>
+                        <View style={{ flexDirection: 'row', backgroundColor: colors[color].secondary }}>
+                          <View style={{ flex: 1, backgroundColor: colors[color].secondary }}>
                             <Text style={styles.label}>Weigh-in:</Text>
                           </View>
-                          <View style={{ flex: 3, backgroundColor: colors[color] }}>
+                          <View style={{ flex: 3, backgroundColor: colors[color].secondary }}>
                             <Text style={styles.text}>{item.weightIn}</Text>
                           </View>
                         </View>
-                        <View style={{ flexDirection: 'row', backgroundColor: colors[color] }}>
-                          <View style={{ flex: 1, backgroundColor: colors[color] }}>
+                        <View style={{ flexDirection: 'row', backgroundColor: colors[color].secondary }}>
+                          <View style={{ flex: 1, backgroundColor: colors[color].secondary }}>
                             <Text style={styles.label}>When:</Text>
                           </View>
-                          <View style={{ flex: 3, backgroundColor: colors[color] }}>
+                          <View style={{ flex: 3, backgroundColor: colors[color].secondary }}>
                             <Text style={styles.text}>{format(item.date, 'PPPP')}</Text>
                           </View>
                         </View>
@@ -153,7 +154,6 @@ export default function PlanScreen() {
                   keyExtractor={(item) => item.id}
                 />
               )}
-
           </View>
         ) : (
           <View style={[styles.container, { width: '80%', alignSelf: 'center' }]}>

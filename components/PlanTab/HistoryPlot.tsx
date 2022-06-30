@@ -6,11 +6,13 @@ import { format } from 'date-fns';
 import { dimensions } from '../../styles/base';
 import { IHistoryItem, IPlan } from '../../types/data';
 import { getRelativeChange } from '../../utils/calculate';
+import colors from '../../styles/colors';
+import { SIGNS } from '../../types/enums';
 
 const chartConfig = {
-  backgroundGradientFrom: '#F0F0F0',
-  backgroundGradientTo: '#F0F0F0',
-  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+  backgroundGradientFrom: '#ffffff',
+  backgroundGradientTo: '#fff',
+  color: (opacity = 1) => `rgba(63, 143, 244, ${opacity})`,
   strokeWidth: 2, // optional, default 3
   barPercentage: 0.5,
   propsForVerticalLabels: {
@@ -31,12 +33,21 @@ function HistoryPlot({ history, plan }: IHistoryPlot) {
         datasets: [
           {
             data: history.map((item: IHistoryItem) => item.weightIn),
-            color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional
-            strokeWidth: 4, // optional
+            color: (opacity = 1) => `rgb(98, 0, 238, ${opacity})`,
+            strokeWidth: 3,
           },
           {
             data: new Array(history.length).fill(plan.goalWeight),
-            strokeWidth: 4, // optional
+            color: (opacity = 1) => `rgb(190, 190, 190, ${opacity})`, // optional
+            strokeWidth: 2, // optional
+          },
+          {
+            data: [plan.goalWeight - plan.goalWeight / 30], // min
+            withDots: false,
+          },
+          {
+            data: [plan.goalWeight + plan.goalWeight / 30], // max
+            withDots: false,
           },
         ],
         legend: ['Weigh-ins', 'Goal Weight'],
@@ -64,11 +75,11 @@ function HistoryPlot({ history, plan }: IHistoryPlot) {
           }
 
           if (relativeChange > 2.0) {
-            return 'red';
+            return colors[SIGNS.RED].secondary;
           } if (relativeChange < 0.0) {
-            return 'green';
+            return colors[SIGNS.GREEN].secondary;
           }
-          return 'yellow';
+          return colors[SIGNS.YELLOW].secondary;
         }}
       />
     );

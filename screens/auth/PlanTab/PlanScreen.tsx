@@ -2,17 +2,18 @@ import {
   StyleSheet, ScrollView, FlatList,
 } from 'react-native';
 import shallow from 'zustand/shallow';
-import { differenceInDays, format } from 'date-fns';
+import { differenceInDays } from 'date-fns';
 import React from 'react';
 import { Subheading } from 'react-native-paper';
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
 import PopupPlanMenu from '../../../components/PlanTab/PopupPlanMenu';
 import HistoryPlot from '../../../components/PlanTab/HistoryPlot';
 import { View, Text } from '../../../components/Themed';
-import { PLAN_VIEWS, SIGNS } from '../../../types/enums';
+import { PLAN_VIEWS, SIGNS, UNITS } from '../../../types/enums';
 import Toggle from '../../../components/Toggle';
-import colors from '../../../styles/colors';
+// import colors from '../../../styles/colors';
 import { getRelativeChange } from '../../../utils/calculate';
+import BreakdownCard from '../../../components/PlanTab/BreakdownCard';
 
 const styles = StyleSheet.create({
   container: {
@@ -42,7 +43,10 @@ const styles = StyleSheet.create({
 });
 
 export default function PlanScreen() {
-  const [plan, history] = useDataStore((state: IDataStore) => [state.plan, state.history], shallow);
+  const [plan, history, profileData] = useDataStore(
+    (state: IDataStore) => [state.plan, state.history, state.profileData],
+    shallow,
+  );
   const [planView, setPlanView] = React.useState<PLAN_VIEWS>(PLAN_VIEWS.HISTORY);
 
   return (
@@ -81,7 +85,12 @@ export default function PlanScreen() {
             }}
             >
               <View style={{ flex: 2 }}>
-                <Text style={styles.label}>Goal Weight:</Text>
+                <Text style={styles.label}>
+                  Goal Weight,
+                  {' '}
+                  {profileData?.units === UNITS.IMPERIAL ? 'lbs' : 'kg'}
+                  :
+                </Text>
               </View>
               <View style={{ flex: 2 }}>
                 <Text style={styles.text}>{plan.goalWeight.toFixed(1)}</Text>
@@ -94,6 +103,7 @@ export default function PlanScreen() {
                 second: { field: PLAN_VIEWS.BREAKDOWN, text: 'BREAKDOWN' },
               }}
               setSelection={setPlanView}
+              style={{ marginVertical: 6 }}
             />
             {planView === PLAN_VIEWS.HISTORY
               ? (
@@ -111,44 +121,23 @@ export default function PlanScreen() {
                   renderItem={({ item }) => {
                     const relativeChange = getRelativeChange(plan.goalWeight, item.weightIn);
 
-                    let color;
+                    let sign;
                     if (relativeChange > 2.0) {
-                      color = SIGNS.RED;
+                      sign = SIGNS.RED;
                     } else if (relativeChange < 0.0) {
-                      color = SIGNS.GREEN;
+                      sign = SIGNS.GREEN;
                     } else {
-                      color = SIGNS.YELLOW;
+                      sign = SIGNS.YELLOW;
                     }
 
                     return (
-                      <View style={{
-                        backgroundColor: colors[color].secondary,
-                        borderColor: '#ccc',
-                        borderWidth: 1,
-                        borderRadius: 4,
-                        padding: 20,
-                        marginVertical: 6,
-                        marginHorizontal: 16,
-                        flex: 4,
-                      }}
-                      >
-                        <View style={{ flexDirection: 'row', backgroundColor: colors[color].secondary }}>
-                          <View style={{ flex: 1, backgroundColor: colors[color].secondary }}>
-                            <Text style={styles.label}>Weigh-in:</Text>
-                          </View>
-                          <View style={{ flex: 3, backgroundColor: colors[color].secondary }}>
-                            <Text style={styles.text}>{item.weightIn}</Text>
-                          </View>
-                        </View>
-                        <View style={{ flexDirection: 'row', backgroundColor: colors[color].secondary }}>
-                          <View style={{ flex: 1, backgroundColor: colors[color].secondary }}>
-                            <Text style={styles.label}>When:</Text>
-                          </View>
-                          <View style={{ flex: 3, backgroundColor: colors[color].secondary }}>
-                            <Text style={styles.text}>{format(item.date, 'PPPP')}</Text>
-                          </View>
-                        </View>
-                      </View>
+                      <BreakdownCard
+                        date={item.date}
+                        sign={sign}
+                        weighIn={item.weightIn}
+                        goalWeight={plan.goalWeight}
+                        units={profileData?.units === UNITS.IMPERIAL ? 'lbs' : 'kg'}
+                      />
                     );
                   }}
                   keyExtractor={(item) => item.id}

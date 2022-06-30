@@ -1,19 +1,19 @@
 import React from 'react';
 import {
-  StyleSheet, View, Pressable, Alert, Platform, Keyboard, Dimensions,
+  StyleSheet, View, Alert,
 } from 'react-native';
 import {
   TextInput, Button, HelperText, Switch, Text, ActivityIndicator,
 } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
-
-import { format } from 'date-fns';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
-import RBSheet from 'react-native-raw-bottom-sheet';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import DatepickerIOS from '../DatepickerIOS';
+
+// import { format } from 'date-fns';
+// import DateTimePicker from '@react-native-community/datetimepicker';
+// import RBSheet from 'react-native-raw-bottom-sheet';
+// import DatePicker from 'react-datepicker';
+// import 'react-datepicker/dist/react-datepicker.css';
+import Datepicker from '../Datepicker/Datepicker';
 import { IProfileData } from '../../types/data';
 import parseStringNumbers from '../../utils/parseStringNumbers';
 import { writeProfileData } from '../../firebase/writes';
@@ -22,7 +22,6 @@ import Toggle from '../Toggle';
 import {
   CMtoFT, FTtoCM, KGtoLBS, LBStoKG,
 } from '../../utils/calculate';
-// import useDataStore, { IDataStore } from '../../hooks/useDataStore';
 
 const REGEX = {
   personalName: /^[a-z ,.'-]+$/i,
@@ -122,17 +121,16 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
   };
 
   // handling datepickers
-  const datePickerRef = React.useRef<RBSheet>(null);
+  /* const datePickerRef = React.useRef<RBSheet>(null);
   const [showAndroidDatePicker, setShowAndroidDatePicker] = React.useState(false);
   const toggleDatepicker = () => {
     Keyboard.dismiss();
-    if (Platform.OS === 'android' || Platform.OS === 'web') {
-      console.log('here');
+    if (Platform.OS === 'android') {
       setShowAndroidDatePicker(true);
     } else if (Platform.OS === 'ios' && datePickerRef.current) {
       datePickerRef.current.open();
     }
-  };
+  }; */
   //--
 
   return (
@@ -175,54 +173,15 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
         }}
         render={({ field: { onChange, value } }) => (
           <>
-            {Platform.OS === 'ios' ? (
-              <DatepickerIOS
-                id="profile-form-datepicker"
-                ref={datePickerRef}
-                value={value}
-                onChange={onChange}
-              />
-            ) : null}
-            {Platform.OS === 'android' && showAndroidDatePicker ? (
-              <DateTimePicker
-                testID="profile-form-datepicker"
-                value={value}
-                mode="date"
-                onChange={(_e: unknown, d?: Date) => {
-                  setShowAndroidDatePicker(false);
-                  if (d) onChange(d);
-                }}
-                style={{ width: Dimensions.get('window').width * 0.9 }}
-              />
-            ) : null}
-            {Platform.OS === 'web'
-              ? (
-                <DatePicker
-                  selected={value}
-                  onChange={onChange}
-                  customInput={(
-                    <View style={{ justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}>
-                      <TextInput
-                        label="Birthdate"
-                        style={styles.input}
-                        value={value && format(value, 'yyyy-MM-dd')}
-                        error={errors.dob && true}
-                      />
-                    </View>
-                  )}
-                />
-              ) : (
-                <Pressable onPress={toggleDatepicker}>
-                  <View pointerEvents="none">
-                    <TextInput
-                      label="Birthdate"
-                      style={styles.input}
-                      value={value && format(value, 'yyyy-MM-dd')}
-                      error={errors.dob && true}
-                    />
-                  </View>
-                </Pressable>
-              )}
+            <Datepicker
+              id="profile-form-datepicker"
+              label="Birthdate"
+              style={styles.input}
+              value={value}
+              onChange={onChange}
+              error={!!errors.dob}
+              dateFormat="yyyy-MM-dd"
+            />
             <HelperText type="error">{errors.dob?.message}</HelperText>
           </>
         )}

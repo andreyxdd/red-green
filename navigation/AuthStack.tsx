@@ -44,7 +44,6 @@ function AuthStack() {
         options={({ navigation }) => ({
           title: 'Create Plan',
           headerTitleAlign: 'center',
-          headerTransparent: true,
           animation: 'slide_from_bottom',
           headerLeft: () => <View style={{ marginLeft: 50 }} />,
           headerRight: () => (
@@ -58,7 +57,6 @@ function AuthStack() {
         options={({ navigation }) => ({
           title: 'Manual Weigh-In',
           headerTitleAlign: 'center',
-          headerTransparent: true,
           animation: 'slide_from_bottom',
           headerLeft: () => <View style={{ marginLeft: 50 }} />,
           headerRight: () => (
@@ -72,7 +70,6 @@ function AuthStack() {
         options={({ navigation }) => ({
           title: 'Edit Profile',
           headerTitleAlign: 'center',
-          headerTransparent: true,
           headerLeft: () => (
             <GoBack onPress={() => navigation.goBack()} />
           ),
@@ -84,7 +81,6 @@ function AuthStack() {
         options={({ navigation }) => ({
           title: 'Edit Plan',
           headerTitleAlign: 'center',
-          headerTransparent: true,
           headerLeft: () => (
             <GoBack onPress={() => navigation.navigate('TabThree')} />
           ),

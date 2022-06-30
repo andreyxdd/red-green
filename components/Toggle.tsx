@@ -1,20 +1,12 @@
 import React from 'react';
 import {
-  StyleSheet, View, Text, TouchableOpacity, Keyboard,
+  StyleSheet, View, Pressable, Keyboard, ViewStyle,
 } from 'react-native';
+import { useTheme, Caption } from 'react-native-paper';
 import { PLANS, PLAN_VIEWS, UNITS } from '../types/enums';
 
 const styles = StyleSheet.create({
-  rowContainer: {
-    flexDirection: 'row',
-    paddingVertical: 12,
-  },
-  text: {
-    color: 'grey',
-    fontWeight: '600',
-    fontSize: 18,
-    textAlign: 'center',
-  },
+  text: { textAlign: 'center' },
 });
 
 type selectionTypes = PLANS | PLAN_VIEWS | UNITS;
@@ -28,17 +20,21 @@ interface IOptions<T extends selectionTypes> {
   first: IOption<T>;
   second: IOption<T>;
 }
-
-interface IToggle<T extends selectionTypes>{
+export interface IToggle<T extends selectionTypes>{
   selection: T;
   options: IOptions<T>;
-  setSelection: React.Dispatch<React.SetStateAction<T>>;
+  setSelection: React.Dispatch<React.SetStateAction<T>> | ((val: T) => void);
+  style?: ViewStyle;
 }
 
-function Toggle<T extends selectionTypes>({ selection, options, setSelection }:IToggle<T>) {
+function Toggle<T extends selectionTypes>({
+  selection, options, setSelection, style,
+}: IToggle<T>) {
+  const { colors } = useTheme();
+
   return (
-    <View style={styles.rowContainer}>
-      <TouchableOpacity
+    <View style={[{ flexDirection: 'row' }, style]}>
+      <Pressable
         onPress={() => {
           Keyboard.dismiss();
           setSelection(options.first.field);
@@ -47,13 +43,13 @@ function Toggle<T extends selectionTypes>({ selection, options, setSelection }:I
       >
         <View style={{
           borderBottomWidth: selection === options.first.field ? 2 : 0,
-          borderColor: selection === options.first.field ? '#003F5E' : 'transparent',
+          borderColor: selection === options.first.field ? colors.primary : 'transparent',
         }}
         >
-          <Text style={styles.text}>{options.first.text}</Text>
+          <Caption style={styles.text}>{options.first.text}</Caption>
         </View>
-      </TouchableOpacity>
-      <TouchableOpacity
+      </Pressable>
+      <Pressable
         onPress={() => {
           Keyboard.dismiss();
           setSelection(options.second.field);
@@ -62,12 +58,12 @@ function Toggle<T extends selectionTypes>({ selection, options, setSelection }:I
       >
         <View style={{
           borderBottomWidth: selection === options.second.field ? 2 : 0,
-          borderColor: selection === options.second.field ? '#003F5E' : 'transparent',
+          borderColor: selection === options.second.field ? colors.primary : 'transparent',
         }}
         >
-          <Text style={styles.text}>{options.second.text}</Text>
+          <Caption style={styles.text}>{options.second.text}</Caption>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }

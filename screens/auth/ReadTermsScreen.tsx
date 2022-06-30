@@ -60,10 +60,9 @@ function ReadTerms() {
       locations={[0, 1]}
     >
       <ScrollView
-        style={[styles.nestedScrollView, { marginBottom: 10 }]}
+        style={[styles.nestedScrollView, { marginVertical: 10 }]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.headingText}>Terms & Conditions</Text>
         <View style={tailwind('my-3')}>
           <Text style={[tailwind('text-2xl font-medium text-text my-3'), styles.sectionTitleText]}>Welcome to Red Green Life Design Ltd.</Text>
           <Text style={[tailwind('text-text leading-5'), styles.text, styles.lightParagraph, styles.paragraph]}>

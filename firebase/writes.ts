@@ -36,7 +36,7 @@ export const writeProfileData = (
     {
       name: profileData.name,
       dob: Timestamp.fromDate(dob),
-      units: 'METRIC',
+      units: profileData.units,
       height: profileData.height,
       weight: profileData.weight,
     },

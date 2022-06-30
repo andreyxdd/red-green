@@ -9,6 +9,7 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.0)',
+    paddingVertical: 20,
   },
 });
 
@@ -17,7 +18,7 @@ function NonProfileDataScreen() {
 
   return (
     <KeyboardAwareScrollView
-      contentContainerStyle={[styles.container, { flex: 1 }]}
+      contentContainerStyle={styles.container}
       keyboardDismissMode="on-drag"
       keyboardShouldPersistTaps="handled"
     >

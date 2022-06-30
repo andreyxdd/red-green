@@ -3,7 +3,7 @@ import {
   StyleSheet, View, Pressable, Alert,
 } from 'react-native';
 import {
-  TextInput, Button, HelperText, Switch, Text,
+  TextInput, Button, HelperText, Switch, Text, ActivityIndicator,
 } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 
@@ -13,6 +13,12 @@ import { useNavigation } from '@react-navigation/native';
 import { IProfileData } from '../../types/data';
 import parseStringNumbers from '../../utils/parseStringNumbers';
 import { writeProfileData } from '../../firebase/writes';
+import { UNITS } from '../../types/enums';
+import Toggle from '../Toggle';
+import {
+  CMtoFT, FTtoCM, KGtoLBS, LBStoKG,
+} from '../../utils/calculate';
+// import useDataStore, { IDataStore } from '../../hooks/useDataStore';
 
 const REGEX = {
   personalName: /^[a-z ,.'-]+$/i,
@@ -54,13 +60,39 @@ interface FormData extends IProfileData {
 
 function ProfileForm({ initialValues, uid }: IProfileForm) {
   const navigation = useNavigation();
-  const { control, handleSubmit, formState: { errors, isValid, isDirty } } = useForm<FormData>({
+  const {
+    control,
+    handleSubmit, formState: { errors, isValid, isDirty }, watch, setValue,
+  } = useForm<FormData>({
     mode: 'onChange',
     defaultValues: { ...initialValues, termsAccepted: false } || {},
   });
 
+  const imperialUnitsWatcher = watch('units') === UNITS.IMPERIAL;
+  const weightWatcher = watch('weight');
+  const heightWatcher = watch('height');
+  const [unitsLoading, setUnitsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    setUnitsLoading(true);
+    if (heightWatcher && weightWatcher) {
+      if (imperialUnitsWatcher) {
+        setValue('height', CMtoFT(heightWatcher));
+        setValue('weight', KGtoLBS(weightWatcher));
+      } else if (initialValues) {
+        setValue('height', initialValues.height);
+        setValue('weight', initialValues.weight);
+      } else {
+        setValue('height', FTtoCM(heightWatcher));
+        setValue('weight', LBStoKG(weightWatcher));
+      }
+    }
+    setUnitsLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imperialUnitsWatcher]);
+
   const onSubmit = ({
-    name, dob, height, weight,
+    name, dob, units, height, weight,
   }: FormData) => {
     if (isValid) {
       try {
@@ -70,8 +102,9 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
         const newProfileData = {
           name,
           dob,
-          height: newHeight,
-          weight: newWeight,
+          units,
+          height: units === UNITS.IMPERIAL ? FTtoCM(newHeight) : newHeight,
+          weight: units === UNITS.IMPERIAL ? LBStoKG(newWeight) : newWeight,
         };
 
         writeProfileData(uid, newProfileData as IProfileData);
@@ -149,29 +182,22 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
           </>
         )}
       />
-      {/* <Controller
+      <Controller
         control={control}
         name="units"
         defaultValue={UNITS.METRIC}
-        rules={{
-          required: { message: ERROR_MESSAGES.REQUIRED, value: true },
-        }}
-         render={({ field: { onChange, onBlur, value } }) => (
-          <>
-            <TextInput
-              value={value}
-              label="Email"
-              style={styles.input}
-              onBlur={onBlur}
-              textContentType="emailAddress"
-              autoCapitalize="none"
-              onChangeText={(v) => onChange(v)}
-              error={errors.email && true}
-            />
-            <HelperText type="error">{errors.email?.message}</HelperText>
-          </>
+        render={({ field: { onChange, value } }) => (
+          <Toggle
+            selection={value}
+            options={{
+              first: { field: UNITS.METRIC, text: 'Metric (cm, kg)' },
+              second: { field: UNITS.IMPERIAL, text: 'Imperial (ft, lbs)' },
+            }}
+            setSelection={onChange}
+            style={{ marginBottom: 14, width: '90%', alignSelf: 'center' }}
+          />
         )}
-      /> */}
+      />
       <Controller
         control={control}
         name="height"
@@ -181,17 +207,20 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
         }}
         render={({ field: { onChange, onBlur, value } }) => (
           <>
-            <TextInput
-              value={value.toString()}
-              label="Height"
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={(v) => onChange(v)}
-              error={errors.height && true}
-              keyboardType="numeric"
-              returnKeyType="done"
-              selectTextOnFocus
-            />
+            {unitsLoading ? <ActivityIndicator animating size="small" />
+              : (
+                <TextInput
+                  value={value.toString()}
+                  label={`Height, ${imperialUnitsWatcher ? 'ft' : 'cm'}`}
+                  style={styles.input}
+                  onBlur={onBlur}
+                  onChangeText={(v) => onChange(v)}
+                  error={errors.height && true}
+                  keyboardType="numeric"
+                  returnKeyType="done"
+                  selectTextOnFocus
+                />
+              )}
             <HelperText type="error">{errors.height?.message}</HelperText>
           </>
         )}
@@ -205,17 +234,20 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
         }}
         render={({ field: { onChange, onBlur, value } }) => (
           <>
-            <TextInput
-              value={value.toString()}
-              label="Weight"
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={(v) => onChange(v)}
-              error={errors.weight && true}
-              keyboardType="numeric"
-              returnKeyType="done"
-              selectTextOnFocus
-            />
+            {unitsLoading ? <ActivityIndicator animating size="small" />
+              : (
+                <TextInput
+                  value={value.toString()}
+                  label={`Weight, ${imperialUnitsWatcher ? 'lbs' : 'kg'}`}
+                  style={styles.input}
+                  onBlur={onBlur}
+                  onChangeText={(v) => onChange(v)}
+                  error={errors.weight && true}
+                  keyboardType="numeric"
+                  returnKeyType="done"
+                  selectTextOnFocus
+                />
+              )}
             <HelperText type="error">{errors.weight?.message}</HelperText>
           </>
         )}

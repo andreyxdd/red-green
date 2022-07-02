@@ -31,3 +31,7 @@ export function KGtoLBS(input: number) {
   const out = input * 2.205;
   return Math.round((out + Number.EPSILON) * 100) / 100;
 }
+
+export function range(size:number, startAt = 0):ReadonlyArray<number> {
+  return [...Array(size).keys()].map((i) => i + startAt);
+}

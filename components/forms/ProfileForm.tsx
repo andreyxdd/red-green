@@ -13,7 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 // import RBSheet from 'react-native-raw-bottom-sheet';
 // import DatePicker from 'react-datepicker';
 // import 'react-datepicker/dist/react-datepicker.css';
-import Datepicker from '../Datepicker/Datepicker';
+import Datepicker from '../Pickers/Datepickers/Datepicker';
 import { IProfileData } from '../../types/data';
 import parseStringNumbers from '../../utils/parseStringNumbers';
 import { writeProfileData } from '../../firebase/writes';

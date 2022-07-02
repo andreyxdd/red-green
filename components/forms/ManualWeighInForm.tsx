@@ -1,5 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, Alert } from 'react-native';
+import {
+  StyleSheet, View, Alert, Platform,
+} from 'react-native';
 import { TextInput, Button, HelperText } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
@@ -7,6 +9,7 @@ import { updateUserLastHistoryItem, updateUserWeight } from '../../firebase/upda
 import { writeUserLastHistoryItem } from '../../firebase/writes';
 import { MANUAL_WEIGHIN } from '../../types/enums';
 import parseStringNumbers from '../../utils/parseStringNumbers';
+import Weightpickers from '../Pickers/Weightpickers';
 
 interface FormData {
   weighIn: number;
@@ -68,7 +71,7 @@ function ManualWeighInForm({
           navigation.goBack();
         }
       } catch (error) {
-        Alert.alert('Error', 'Incorrect weigh-in value provided');
+        Alert.alert('Error', 'Something went wrong');
       }
     }
   };
@@ -84,17 +87,27 @@ function ManualWeighInForm({
         }}
         render={({ field: { onBlur, onChange, value } }) => (
           <>
-            <TextInput
-              value={value.toString()}
-              label="Weigh-In" // todo: units
-              style={styles.input}
-              onBlur={onBlur}
-              keyboardType="numeric"
-              returnKeyType="done"
-              onChangeText={(v) => onChange(v)}
-              error={errors.weighIn && true}
-              selectTextOnFocus
-            />
+            {Platform.OS === 'web'
+              ? (
+                <TextInput
+                  value={value.toString()}
+                  label="Weigh-In" // todo: units
+                  style={styles.input}
+                  onBlur={onBlur}
+                  keyboardType="decimal-pad"
+                  returnKeyType="done"
+                  onChangeText={(v) => onChange(v)}
+                  error={errors.weighIn && true}
+                  selectTextOnFocus
+                />
+              ) : (
+                <Weightpickers
+                  handleChange={onChange}
+                  value={value}
+                  label="Weigh-In"
+                  error={!!errors.weighIn}
+                />
+              )}
             <HelperText type="error">{errors.weighIn?.message}</HelperText>
           </>
         )}

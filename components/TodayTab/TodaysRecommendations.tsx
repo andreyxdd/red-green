@@ -1,15 +1,11 @@
 import React from 'react';
-import {
-  StyleSheet, View, ScrollView, Platform,
-} from 'react-native';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import { Headline, Subheading } from 'react-native-paper';
-import { FontAwesome } from '@expo/vector-icons';
 import { SIGNS } from '../../types/enums';
-import TraficLightIcon from '../TraficLightIcon';
+import TrafficLightIcon from '../TrafficLightIcon';
 import GreenDay from './GreenDay';
 import YellowDay from './YellowDay';
 import RedDay from './RedDay';
-import colors from '../../styles/colors';
 
 const styles = StyleSheet.create({
   container: {
@@ -51,17 +47,7 @@ function TodaysRecommendations({ sign }:ITodaysRecommendations) {
           marginVertical: 12,
         }}
       >
-        {Platform.OS === 'web'
-          ? (
-            <FontAwesome
-              name="circle"
-              size={28}
-              color={sign && colors[sign].primary}
-            />
-          )
-          : (
-            <TraficLightIcon sign={sign} />
-          )}
+        <TrafficLightIcon sign={sign} />
         <Headline
           style={{ marginVertical: 12, marginLeft: 20 }}
         >

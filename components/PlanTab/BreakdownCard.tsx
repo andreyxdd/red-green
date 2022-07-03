@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { Card, Text } from 'react-native-paper';
 import { SIGNS } from '../../types/enums';
 import colors from '../../styles/colors';
-import TraficLightIcon from '../TraficLightIcon';
+import TrafficLightIcon from '../TrafficLightIcon';
 
 const styles = StyleSheet.create({
   column: {
@@ -35,7 +35,7 @@ function BreakdownCard({
       <Card.Content>
         <View style={[styles.row, { marginLeft: 32 }]}>
           <View style={styles.column}>
-            <TraficLightIcon sign={sign} />
+            <TrafficLightIcon sign={sign} />
           </View>
           <View style={styles.column}>
             <View style={styles.row}>

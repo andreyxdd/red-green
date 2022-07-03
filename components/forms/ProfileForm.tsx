@@ -110,24 +110,13 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
 
         writeProfileData(uid, newProfileData as IProfileData);
         if (initialValues) navigation.navigate('UserMenu');
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         Alert.alert('Error', error.message);
       }
     }
   };
-
-  // handling datepickers
-  /* const datePickerRef = React.useRef<RBSheet>(null);
-  const [showAndroidDatePicker, setShowAndroidDatePicker] = React.useState(false);
-  const toggleDatepicker = () => {
-    Keyboard.dismiss();
-    if (Platform.OS === 'android') {
-      setShowAndroidDatePicker(true);
-    } else if (Platform.OS === 'ios' && datePickerRef.current) {
-      datePickerRef.current.open();
-    }
-  }; */
-  //--
 
   return (
     <View style={styles.container}>

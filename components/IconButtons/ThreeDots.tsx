@@ -16,7 +16,7 @@ function ThreeDots({ onPress }:IThreeDots) {
     >
       <Entypo
         name="dots-three-vertical"
-        size={30}
+        size={24}
         color="grey"
         style={{ marginRight: 15 }}
       />

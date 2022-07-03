@@ -1,12 +1,17 @@
 import {
   Menu, MenuOptions, MenuOption, MenuTrigger, withMenuContext, renderers,
 } from 'react-native-popup-menu';
-import { Alert, View } from 'react-native';
+import { Alert, View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Text } from 'react-native-paper';
 import ThreeDots from '../IconButtons/ThreeDots';
+import Divider from '../Divider';
 
 const { SlideInMenu } = renderers;
+
+const styles = StyleSheet.create({
+  menuOption: { paddingVertical: 12, paddingLeft: 6 },
+});
 
 export default function PopupPlanMenu() {
   const navigation = useNavigation();
@@ -17,10 +22,11 @@ export default function PopupPlanMenu() {
         <MenuTrigger />
         <MenuOptions>
           <MenuOption onSelect={() => { navigation.navigate('EditPlan'); }}>
-            <Text>Edit</Text>
+            <Text style={styles.menuOption}>Edit</Text>
           </MenuOption>
+          <Divider width={1} />
           <MenuOption onSelect={() => Alert.alert('Delete')}>
-            <Text style={{ color: 'red' }}>Delete</Text>
+            <Text style={[styles.menuOption, { color: 'red' }]}>Delete</Text>
           </MenuOption>
         </MenuOptions>
       </Menu>

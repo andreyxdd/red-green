@@ -1,10 +1,13 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import {
+  View, ViewStyle, StyleSheet, StyleProp,
+} from 'react-native';
 import { Subheading } from 'react-native-paper';
 
 export interface IDivider{
   children?: React.ReactNode;
-  containerStyle?: any;
+  width?: number;
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
 const styles = StyleSheet.create({
@@ -13,10 +16,10 @@ const styles = StyleSheet.create({
   text: { width: 50, textAlign: 'center' },
 });
 
-function Divider({ children, containerStyle }: IDivider) {
+function Divider({ children, containerStyle, width }: IDivider) {
   return (
-    <View style={[styles.container, containerStyle]}>
-      <View style={styles.divider} />
+    <View style={[styles.container, { height: width }, containerStyle]}>
+      <View style={[styles.divider, { height: width }]} />
       {children
         ? (
           <>

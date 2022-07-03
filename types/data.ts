@@ -9,9 +9,9 @@ export type IHistoryItem = {
 export type IPlan = {
   id: string;
   type: PLANS;
-  startDate: Date;
-  endDate: Date;
   goalWeight: number;
+  goalDate: Date;
+  startWeight?: number;
   active: boolean;
 }
 

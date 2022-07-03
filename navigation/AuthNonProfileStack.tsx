@@ -1,6 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Alert } from 'react-native';
+import { Alert, View } from 'react-native';
 
 import { auth } from '../firebase/firebase';
 
@@ -8,6 +8,7 @@ import ReadTermsScreen from '../screens/auth/ReadTermsScreen';
 import NonProfileDataScreen from '../screens/auth/NonProfileDataScreen';
 
 import GoBack from '../components/IconButtons/GoBack';
+import Close from '../components/IconButtons/Close';
 
 import { AuthNonProfileStackList } from '../types/navigation';
 
@@ -36,8 +37,10 @@ function AuthNonProfileStack() {
         options={({ navigation }) => ({
           title: 'Terms & Conditions',
           headerTitleAlign: 'center',
-          headerLeft: () => (
-            <GoBack onPress={() => navigation.goBack()} />
+          animation: 'slide_from_bottom',
+          headerLeft: () => <View style={{ marginLeft: 50 }} />,
+          headerRight: () => (
+            <Close onPress={() => navigation.goBack()} />
           ),
         })}
       />

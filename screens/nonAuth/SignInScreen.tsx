@@ -4,19 +4,25 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { signInWithCredential, updateEmail } from 'firebase/auth';
 import { AppleAuthenticationButton, AppleAuthenticationButtonType, AppleAuthenticationButtonStyle } from 'expo-apple-authentication';
 import { Button } from 'react-native-paper';
+import { verticalScale } from 'react-native-size-matters';
 
 import { FontAwesome } from '@expo/vector-icons';
 import { auth } from '../../firebase/firebase';
 import useAppleAuthentication from '../../hooks/useAppleAuthentification';
 import useGoogleAuthentication from '../../hooks/useGoogleAuthentification';
 import Divider from '../../components/Divider';
-import SignInForm from '../../components/forms/SignInForm';
+import SignInForm from '../../components/Forms/SignInForm';
 import { NonAuthStackScreenProps } from '../../types/navigation';
 import colors from '../../styles/colors';
 
 const styles = StyleSheet.create({
   container: { justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.0)' },
-  button: { width: '80%', paddingVertical: 4, marginVertical: 4 },
+  button: {
+    width: '80%',
+    paddingVertical: 4,
+    marginVertical: 4,
+    alignItems: 'center',
+  },
 });
 
 function SignInScreen({ navigation: { navigate } }: NonAuthStackScreenProps<'SignIn'>) {
@@ -61,7 +67,7 @@ function SignInScreen({ navigation: { navigate } }: NonAuthStackScreenProps<'Sig
           disabled={!googleAuthLoading}
           style={[styles.button, { backgroundColor: colors.google }]}
         >
-          <FontAwesome name="google" size={16} color="white" />
+          <FontAwesome name="google" size={verticalScale(12)} color="white" />
           {' '}
           Continue with Google
         </Button>

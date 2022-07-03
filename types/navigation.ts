@@ -1,6 +1,7 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { IPlan } from './data';
 import { MANUAL_WEIGHIN } from './enums';
 
 declare global {
@@ -32,7 +33,7 @@ export type AuthStackList = {
   UserMenu: undefined;
   EditProfile: undefined;
   CreatePlan: undefined;
-  EditPlan: undefined;
+  EditPlan: {plan: IPlan};
   ReadTerms: undefined;
 };
 

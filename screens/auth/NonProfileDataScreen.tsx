@@ -4,7 +4,7 @@ import { Text } from 'react-native-paper';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import useDataStore, { IDataStore } from '../../hooks/useDataStore';
-import ProfileForm from '../../components/forms/ProfileForm';
+import ProfileForm from '../../components/Forms/ProfileForm';
 
 const styles = StyleSheet.create({
   container: {

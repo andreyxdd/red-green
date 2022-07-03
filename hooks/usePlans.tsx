@@ -26,9 +26,9 @@ const usePlans = () => {
       const userPlans = result.map((doc) => ({
         id: doc.id,
         type: doc.data().type,
-        startDate: doc.data().startDate.toDate(),
-        endDate: doc.data().endDate.toDate(),
+        goalDate: doc.data().endDate.toDate(),
         goalWeight: doc.data().goalWeight,
+        startWeight: doc.data().goalWeight,
         active: doc.data().active,
       }));
 

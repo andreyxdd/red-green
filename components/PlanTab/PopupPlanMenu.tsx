@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Text } from 'react-native-paper';
 import ThreeDots from '../IconButtons/ThreeDots';
 import Divider from '../Divider';
+import useDataStore, { IDataStore } from '../../hooks/useDataStore';
 
 const { SlideInMenu } = renderers;
 
@@ -15,17 +16,24 @@ const styles = StyleSheet.create({
 
 export default function PopupPlanMenu() {
   const navigation = useNavigation();
+  const plan = useDataStore((state: IDataStore) => state.plan);
 
   return (
     <View>
       <Menu name="plan-menu" renderer={SlideInMenu}>
         <MenuTrigger />
         <MenuOptions>
-          <MenuOption onSelect={() => { navigation.navigate('EditPlan'); }}>
+          <MenuOption
+            onSelect={() => { if (plan) navigation.navigate('EditPlan', { plan }); }}
+            disabled={!plan}
+          >
             <Text style={styles.menuOption}>Edit</Text>
           </MenuOption>
           <Divider width={1} />
-          <MenuOption onSelect={() => Alert.alert('Delete')}>
+          <MenuOption
+            onSelect={() => Alert.alert('Delete')}
+            disabled={!plan}
+          >
             <Text style={[styles.menuOption, { color: 'red' }]}>Delete</Text>
           </MenuOption>
         </MenuOptions>

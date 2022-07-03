@@ -5,11 +5,12 @@ import { Button } from 'react-native-paper';
 import { signInWithCredential, updateEmail } from 'firebase/auth';
 import { AppleAuthenticationButton, AppleAuthenticationButtonType, AppleAuthenticationButtonStyle } from 'expo-apple-authentication';
 import { FontAwesome } from '@expo/vector-icons';
+import { verticalScale } from 'react-native-size-matters';
 import { auth } from '../../firebase/firebase';
 import useAppleAuthentication from '../../hooks/useAppleAuthentification';
 import useGoogleAuthentication from '../../hooks/useGoogleAuthentification';
 import Divider from '../../components/Divider';
-import SignUpForm from '../../components/forms/SignUpForm';
+import SignUpForm from '../../components/Forms/SignUpForm';
 import colors from '../../styles/colors';
 
 const styles = StyleSheet.create({
@@ -17,7 +18,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.0)',
   },
-  button: { width: '80%', paddingVertical: 4, marginVertical: 4 },
+  button: {
+    width: '80%',
+    paddingVertical: 4,
+    marginVertical: 4,
+    alignItems: 'center',
+  },
 });
 
 function SignUpScreen() {
@@ -62,7 +68,7 @@ function SignUpScreen() {
           disabled={!googleAuthLoading}
           style={[styles.button, { backgroundColor: colors.google }]}
         >
-          <FontAwesome name="google" size={16} color="white" />
+          <FontAwesome name="google" size={verticalScale(12)} color="white" />
           {' '}
           Sign Up with Google
         </Button>

@@ -180,7 +180,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
             selection={value}
             options={{
               first: { field: UNITS.METRIC, text: 'Metric (cm, kg)' },
-              second: { field: UNITS.IMPERIAL, text: 'Imperial (ft, lbs)' },
+              second: { field: UNITS.IMPERIAL, text: 'Imperial (ft/in, lbs)' },
             }}
             setSelection={onChange}
             style={{ marginBottom: 14, width: '90%', alignSelf: 'center' }}
@@ -264,16 +264,18 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
             name="termsAccepted"
             rules={{ required: { value: true, message: ERROR_MESSAGES.TERMS } }}
             render={({ field: { onChange, value } }) => (
-              <Switch
-                style={{ marginLeft: 10 }}
-                value={value}
-                onValueChange={(v) => onChange(v)}
-              />
+              <>
+                <Switch
+                  style={{ marginLeft: 10 }}
+                  value={value}
+                  onValueChange={(v) => onChange(v)}
+                />
+                <HelperText type="error">{errors.termsAccepted?.message}</HelperText>
+              </>
             )}
           />
         </View>
       ) : null}
-      <HelperText type="error">{errors.termsAccepted?.message}</HelperText>
       <Button
         mode="contained"
         onPress={handleSubmit(onSubmit)}

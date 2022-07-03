@@ -82,7 +82,7 @@ function AuthStack() {
           title: 'Edit Plan',
           headerTitleAlign: 'center',
           headerLeft: () => (
-            <GoBack onPress={() => navigation.navigate('TabThree')} />
+            <GoBack onPress={() => navigation.goBack()} />
           ),
         })}
       />

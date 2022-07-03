@@ -74,7 +74,8 @@ export default function PlanScreen() {
               </View>
               <View style={{ flex: 2 }}>
                 <Text style={styles.text}>
-                  {differenceInDays(plan.endDate, plan.startDate)}
+                  {differenceInDays(plan.goalDate, new Date())}
+                  {/* plan.startDate) */}
                   {' '}
                   days
                 </Text>

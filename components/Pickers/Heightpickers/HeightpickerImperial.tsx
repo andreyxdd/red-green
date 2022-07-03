@@ -9,11 +9,11 @@ import { verticalScale } from 'react-native-size-matters';
 import { range } from '../../../utils/calculate';
 import { IWeightpicker, styles } from './index';
 
-const WHOLE_MIN_KG = 40;
-const WHOLE_OPTIONS = 100;
-const DECIMAL_OPTIONS = 10;
+const WHOLE_MIN_FT = 2;
+const WHOLE_OPTIONS = 7;
+const DECIMAL_OPTIONS = 11;
 
-function WeightpickerMetric({
+function HeightPickerImperial({
   handleChange, value, label, style, error,
 }: IWeightpicker) {
   const pickerRef = React.useRef<RBSheet>(null);
@@ -67,7 +67,7 @@ function WeightpickerMetric({
             style={styles.picker}
             onValueChange={handleWholePartChange}
           >
-            {range(WHOLE_OPTIONS, WHOLE_MIN_KG).map((v:number) => (
+            {range(WHOLE_OPTIONS, WHOLE_MIN_FT).map((v:number) => (
               <Picker.Item
                 key={uuidv4()}
                 label={v.toString()}
@@ -95,4 +95,4 @@ function WeightpickerMetric({
   );
 }
 
-export default WeightpickerMetric;
+export default HeightPickerImperial;

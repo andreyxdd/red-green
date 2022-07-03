@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  StyleSheet, View, Alert,
+  StyleSheet, View, Alert, Platform,
 } from 'react-native';
 import {
   TextInput, Button, HelperText, Switch, Text, ActivityIndicator,
@@ -8,11 +8,6 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
 
-// import { format } from 'date-fns';
-// import DateTimePicker from '@react-native-community/datetimepicker';
-// import RBSheet from 'react-native-raw-bottom-sheet';
-// import DatePicker from 'react-datepicker';
-// import 'react-datepicker/dist/react-datepicker.css';
 import Datepicker from '../Pickers/Datepickers/Datepicker';
 import { IProfileData } from '../../types/data';
 import parseStringNumbers from '../../utils/parseStringNumbers';
@@ -22,6 +17,8 @@ import Toggle from '../Toggle';
 import {
   CMtoFT, FTtoCM, KGtoLBS, LBStoKG,
 } from '../../utils/calculate';
+import Heightpickers from '../Pickers/Heightpickers';
+import Weightpickers from '../Pickers/Weightpickers';
 
 const REGEX = {
   personalName: /^[a-z ,.'-]+$/i,
@@ -213,17 +210,30 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
           <>
             {unitsLoading ? <ActivityIndicator animating size="small" />
               : (
-                <TextInput
-                  value={value.toString()}
-                  label={`Height, ${imperialUnitsWatcher ? 'ft' : 'cm'}`}
-                  style={styles.input}
-                  onBlur={onBlur}
-                  onChangeText={(v) => onChange(v)}
-                  error={errors.height && true}
-                  keyboardType="decimal-pad"
-                  returnKeyType="done"
-                  selectTextOnFocus
-                />
+                // eslint-disable-next-line react/jsx-no-useless-fragment
+                <>
+                  {Platform.OS === 'web' ? (
+                    <TextInput
+                      value={value.toString()}
+                      label={`Height, ${imperialUnitsWatcher ? 'ft/in' : 'cm'}`}
+                      style={styles.input}
+                      onBlur={onBlur}
+                      onChangeText={(v) => onChange(v)}
+                      error={errors.height && true}
+                      keyboardType="decimal-pad"
+                      returnKeyType="done"
+                      selectTextOnFocus
+                    />
+                  ) : (
+                    <Heightpickers
+                      handleChange={onChange}
+                      value={value}
+                      style={styles.input}
+                      label="Height"
+                      error={!!errors.height}
+                    />
+                  )}
+                </>
               )}
             <HelperText type="error">{errors.height?.message}</HelperText>
           </>
@@ -240,17 +250,32 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
           <>
             {unitsLoading ? <ActivityIndicator animating size="small" />
               : (
-                <TextInput
-                  value={value.toString()}
-                  label={`Weight, ${imperialUnitsWatcher ? 'lbs' : 'kg'}`}
-                  style={styles.input}
-                  onBlur={onBlur}
-                  onChangeText={(v) => onChange(v)}
-                  error={errors.weight && true}
-                  keyboardType="decimal-pad"
-                  returnKeyType="done"
-                  selectTextOnFocus
-                />
+                // eslint-disable-next-line react/jsx-no-useless-fragment
+                <>
+                  {Platform.OS === 'web'
+                    ? (
+                      <TextInput
+                        value={value.toString()}
+                        label={`Weight, ${imperialUnitsWatcher ? 'lbs' : 'kg'}`}
+                        style={styles.input}
+                        onBlur={onBlur}
+                        onChangeText={(v) => onChange(v)}
+                        error={errors.weight && true}
+                        keyboardType="decimal-pad"
+                        returnKeyType="done"
+                        selectTextOnFocus
+                      />
+                    )
+                    : (
+                      <Weightpickers
+                        handleChange={onChange}
+                        value={value}
+                        style={styles.input}
+                        label="Weight"
+                        error={!!errors.weight}
+                      />
+                    )}
+                </>
               )}
             <HelperText type="error">{errors.weight?.message}</HelperText>
           </>

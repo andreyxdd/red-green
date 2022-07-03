@@ -104,6 +104,7 @@ function ManualWeighInForm({
                 <Weightpickers
                   handleChange={onChange}
                   value={value}
+                  style={styles.input}
                   label="Weigh-In"
                   error={!!errors.weighIn}
                 />

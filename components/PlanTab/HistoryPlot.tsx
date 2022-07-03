@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { Subheading } from 'react-native-paper';
 import { LineChart } from 'react-native-chart-kit';
 import { format } from 'date-fns';
-import { dimensions } from '../../styles/base';
+import { fullHeight, fullWidth } from '../../styles/theme';
 import { IHistoryItem, IPlan } from '../../types/data';
 import { getRelativeChange } from '../../utils/calculate';
 import colors from '../../styles/colors';
@@ -60,8 +60,8 @@ function HistoryPlot({ history, plan }: IHistoryPlot) {
     return (
       <LineChart
         data={data}
-        width={dimensions.fullWidth}
-        height={dimensions.fullHeight / 1.5}
+        width={fullWidth}
+        height={fullHeight / 1.5}
         chartConfig={chartConfig}
         bezier
         verticalLabelRotation={-75}

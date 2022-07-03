@@ -1,14 +1,13 @@
 import {
-  StyleSheet, ScrollView, FlatList,
+  StyleSheet, ScrollView, FlatList, View,
 } from 'react-native';
 import shallow from 'zustand/shallow';
 import { differenceInDays } from 'date-fns';
 import React from 'react';
-import { Subheading } from 'react-native-paper';
+import { Subheading, Text } from 'react-native-paper';
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
 import PopupPlanMenu from '../../../components/PlanTab/PopupPlanMenu';
 import HistoryPlot from '../../../components/PlanTab/HistoryPlot';
-import { View, Text } from '../../../components/Themed';
 import { PLAN_VIEWS, SIGNS, UNITS } from '../../../types/enums';
 import Toggle from '../../../components/Toggle';
 // import colors from '../../../styles/colors';

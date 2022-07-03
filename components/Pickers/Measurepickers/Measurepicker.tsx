@@ -1,5 +1,7 @@
 import React from 'react';
-import { Keyboard, Pressable, View } from 'react-native';
+import {
+  Keyboard, Pressable, View, StyleSheet, Platform, Dimensions,
+} from 'react-native';
 import { TextInput } from 'react-native-paper';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
@@ -7,15 +9,31 @@ import { Picker } from '@react-native-picker/picker';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { verticalScale } from 'react-native-size-matters';
 import { range } from '../../../utils/calculate';
-import { IWeightpicker, styles } from './index';
+import { IMeasurepicker } from './index';
 
-const WHOLE_MIN_KG = 40;
-const WHOLE_OPTIONS = 100;
-const DECIMAL_OPTIONS = 10;
+export const styles = StyleSheet.create({
+  picker: {
+    marginTop: 0,
+    height: Platform.OS === 'ios' ? 'auto' : 100,
+    width: Dimensions.get('window').width * 0.3,
+  },
+  BSRowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+});
 
-function WeightpickerMetric({
+export interface IMeasurepickerMobile extends IMeasurepicker{
+  wholeMinValue: number;
+  numOfWholePartOptions: number;
+  numOfDecimalOptions?: number;
+}
+
+function MeasurepickerMobile({
   handleChange, value, label, style, error,
-}: IWeightpicker) {
+  wholeMinValue, numOfWholePartOptions, numOfDecimalOptions,
+}: IMeasurepickerMobile) {
   const pickerRef = React.useRef<RBSheet>(null);
   const handleToggle = () => {
     Keyboard.dismiss();
@@ -31,11 +49,11 @@ function WeightpickerMetric({
   }, [value]);
 
   const handleWholePartChange = (v: number) => {
-    handleChange(Number(`${v}.${decimalPart}`));
+    handleChange(`${v}.${decimalPart}`);
   };
 
   const handleDecimalPartChange = (v: number) => {
-    handleChange(Number(`${wholePart}.${v}`));
+    handleChange(`${wholePart}.${v}`);
   };
 
   return (
@@ -52,7 +70,7 @@ function WeightpickerMetric({
       </Pressable>
       <RBSheet
         ref={pickerRef}
-        height={verticalScale(200)}
+        height={verticalScale(220)}
         openDuration={250}
         customStyles={{
           container: {
@@ -62,12 +80,13 @@ function WeightpickerMetric({
         }}
       >
         <View style={styles.BSRowContainer}>
+          {/* numOfWholePartOptions && wholeMinValue ? ( */}
           <Picker
             selectedValue={wholePart}
             style={styles.picker}
             onValueChange={handleWholePartChange}
           >
-            {range(WHOLE_OPTIONS, WHOLE_MIN_KG).map((v:number) => (
+            {range(numOfWholePartOptions, wholeMinValue).map((v: number) => (
               <Picker.Item
                 key={uuidv4()}
                 label={v.toString()}
@@ -75,19 +94,22 @@ function WeightpickerMetric({
               />
             ))}
           </Picker>
-          <Picker
-            selectedValue={decimalPart}
-            style={styles.picker}
-            onValueChange={handleDecimalPartChange}
-          >
-            {range(DECIMAL_OPTIONS).map((v:number) => (
-              <Picker.Item
-                key={uuidv4()}
-                label={v.toString()}
-                value={v}
-              />
-            ))}
-          </Picker>
+          {/* ) : null */}
+          {numOfDecimalOptions ? (
+            <Picker
+              selectedValue={decimalPart}
+              style={styles.picker}
+              onValueChange={handleDecimalPartChange}
+            >
+              {range(numOfDecimalOptions).map((v: number) => (
+                <Picker.Item
+                  key={uuidv4()}
+                  label={v.toString()}
+                  value={v}
+                />
+              ))}
+            </Picker>
+          ) : null}
         </View>
       </RBSheet>
     </>
@@ -95,4 +117,4 @@ function WeightpickerMetric({
   );
 }
 
-export default WeightpickerMetric;
+export default MeasurepickerMobile;

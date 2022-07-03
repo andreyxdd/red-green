@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
 
 export default function ManualWeighInScreen({ route }: AuthStackScreenProps<'ManualWeighIn'>) {
   const {
-    screenType, currentWeighIn, uid, planId, historyId,
+    screenType, currentWeighIn, uid, planId, historyId, isImperialUnits,
   } = route.params;
 
   return (
@@ -31,6 +31,7 @@ export default function ManualWeighInScreen({ route }: AuthStackScreenProps<'Man
         uid={uid}
         planId={planId}
         historyId={historyId}
+        isImperialUnits={isImperialUnits}
       />
     </KeyboardAwareScrollView>
   );

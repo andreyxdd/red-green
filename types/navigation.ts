@@ -27,6 +27,7 @@ export type AuthStackList = {
     uid: string,
     planId: string,
     historyId: string,
+    isImperialUnits: boolean;
   };
   UserMenu: undefined;
   EditProfile: undefined;

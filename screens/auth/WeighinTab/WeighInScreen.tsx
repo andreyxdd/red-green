@@ -7,7 +7,7 @@ import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
 import useInterfaceStore, { IInterfaceStore } from '../../../hooks/useInterfaceStore';
 import colors from '../../../styles/colors';
 
-import { MANUAL_WEIGHIN, SIGNS } from '../../../types/enums';
+import { MANUAL_WEIGHIN, SIGNS, UNITS } from '../../../types/enums';
 import { AuthBottomTabProps } from '../../../types/navigation';
 import { getRelativeChange } from '../../../utils/calculate';
 
@@ -121,6 +121,7 @@ function WeighInScreen({ navigation: { navigate } }: AuthBottomTabProps<'WeighIn
                 uid: user ? user.uid : '',
                 planId: plan.id,
                 historyId: history[0].id,
+                isImperialUnits: profileData?.units === UNITS.IMPERIAL,
               });
             }}
           >
@@ -148,6 +149,7 @@ function WeighInScreen({ navigation: { navigate } }: AuthBottomTabProps<'WeighIn
                   uid: user ? user.uid : '',
                   planId: plan.id,
                   historyId: history[0].id,
+                  isImperialUnits: profileData?.units === UNITS.IMPERIAL,
                 });
               }}
             >

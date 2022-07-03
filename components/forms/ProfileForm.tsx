@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet, View, Alert, Platform,
-} from 'react-native';
+import { StyleSheet, View, Alert } from 'react-native';
 import {
   TextInput, Button, HelperText, Switch, Text, ActivityIndicator,
 } from 'react-native-paper';
@@ -17,17 +15,18 @@ import Toggle from '../Toggle';
 import {
   CMtoFT, FTtoCM, KGtoLBS, LBStoKG,
 } from '../../utils/calculate';
-import Heightpickers from '../Pickers/Heightpickers';
-import Weightpickers from '../Pickers/Weightpickers';
+import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
 
 const REGEX = {
   personalName: /^[a-z ,.'-]+$/i,
+  measureValue: /^\d*\.?\d{1}$/,
 };
 
 const ERROR_MESSAGES = {
   REQUIRED: 'This Field Is Required',
   NAME: 'Not a Valid Name',
   TERMS: 'Terms Must Be Accepted To Continue',
+  INVALID_VALUE: 'Not a Valid Value',
 };
 
 const styles = StyleSheet.create({
@@ -205,39 +204,30 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
         defaultValue={initialValues ? initialValues.height : 0.0}
         rules={{
           required: { message: ERROR_MESSAGES.REQUIRED, value: true },
+          pattern: {
+            message: ERROR_MESSAGES.INVALID_VALUE,
+            value: REGEX.measureValue,
+          },
         }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <>
-            {unitsLoading ? <ActivityIndicator animating size="small" />
-              : (
-                // eslint-disable-next-line react/jsx-no-useless-fragment
-                <>
-                  {Platform.OS === 'web' ? (
-                    <TextInput
-                      value={value.toString()}
-                      label={`Height, ${imperialUnitsWatcher ? 'ft/in' : 'cm'}`}
-                      style={styles.input}
-                      onBlur={onBlur}
-                      onChangeText={(v) => onChange(v)}
-                      error={errors.height && true}
-                      keyboardType="decimal-pad"
-                      returnKeyType="done"
-                      selectTextOnFocus
-                    />
-                  ) : (
-                    <Heightpickers
-                      handleChange={onChange}
-                      value={value}
-                      style={styles.input}
-                      label="Height"
-                      error={!!errors.height}
-                    />
-                  )}
-                </>
-              )}
-            <HelperText type="error">{errors.height?.message}</HelperText>
-          </>
-        )}
+        render={({ field: { onChange, onBlur, value } }) => {
+          if (unitsLoading) return <ActivityIndicator animating size="small" />;
+          return (
+            <>
+              <Measurepicker
+                value={value}
+                label={`Height, ${imperialUnitsWatcher ? 'ft/in' : 'cm'}`}
+                style={styles.input}
+                error={!!errors.height}
+                handleBlur={onBlur}
+                handleChange={onChange}
+                numOfWholePartOptions={imperialUnitsWatcher ? 2 : 80}
+                wholeMinValue={imperialUnitsWatcher ? 7 : 150}
+                numOfDecimalOptions={imperialUnitsWatcher ? 11 : undefined}
+              />
+              <HelperText type="error">{errors.height?.message}</HelperText>
+            </>
+          );
+        }}
       />
       <Controller
         control={control}
@@ -245,41 +235,30 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
         defaultValue={initialValues ? initialValues.weight : 0.0}
         rules={{
           required: { message: ERROR_MESSAGES.REQUIRED, value: true },
+          pattern: {
+            message: ERROR_MESSAGES.INVALID_VALUE,
+            value: REGEX.measureValue,
+          },
         }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <>
-            {unitsLoading ? <ActivityIndicator animating size="small" />
-              : (
-                // eslint-disable-next-line react/jsx-no-useless-fragment
-                <>
-                  {Platform.OS === 'web'
-                    ? (
-                      <TextInput
-                        value={value.toString()}
-                        label={`Weight, ${imperialUnitsWatcher ? 'lbs' : 'kg'}`}
-                        style={styles.input}
-                        onBlur={onBlur}
-                        onChangeText={(v) => onChange(v)}
-                        error={errors.weight && true}
-                        keyboardType="decimal-pad"
-                        returnKeyType="done"
-                        selectTextOnFocus
-                      />
-                    )
-                    : (
-                      <Weightpickers
-                        handleChange={onChange}
-                        value={value}
-                        style={styles.input}
-                        label="Weight"
-                        error={!!errors.weight}
-                      />
-                    )}
-                </>
-              )}
-            <HelperText type="error">{errors.weight?.message}</HelperText>
-          </>
-        )}
+        render={({ field: { onChange, onBlur, value } }) => {
+          if (unitsLoading) return <ActivityIndicator animating size="small" />;
+          return (
+            <>
+              <Measurepicker
+                value={value}
+                label={`Weight, ${imperialUnitsWatcher ? 'lbs' : 'kg'}`}
+                style={styles.input}
+                error={!!errors.weight}
+                handleBlur={onBlur}
+                handleChange={onChange}
+                numOfWholePartOptions={imperialUnitsWatcher ? 320 : 100}
+                wholeMinValue={imperialUnitsWatcher ? 85 : 40}
+                numOfDecimalOptions={imperialUnitsWatcher ? undefined : 10}
+              />
+              <HelperText type="error">{errors.weight?.message}</HelperText>
+            </>
+          );
+        }}
       />
       {!initialValues ? (
         <View style={styles.row}>

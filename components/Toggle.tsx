@@ -30,7 +30,7 @@ export interface IToggle<T extends selectionTypes>{
 function Toggle<T extends selectionTypes>({
   selection, options, setSelection, style,
 }: IToggle<T>) {
-  const { colors } = useTheme();
+  const { colors: paperColors } = useTheme();
 
   return (
     <View style={[{ flexDirection: 'row' }, style]}>
@@ -43,7 +43,7 @@ function Toggle<T extends selectionTypes>({
       >
         <View style={{
           borderBottomWidth: selection === options.first.field ? 2 : 0,
-          borderColor: selection === options.first.field ? colors.primary : 'transparent',
+          borderColor: selection === options.first.field ? paperColors.primary : 'transparent',
         }}
         >
           <Caption style={styles.text}>{options.first.text}</Caption>
@@ -58,7 +58,7 @@ function Toggle<T extends selectionTypes>({
       >
         <View style={{
           borderBottomWidth: selection === options.second.field ? 2 : 0,
-          borderColor: selection === options.second.field ? colors.primary : 'transparent',
+          borderColor: selection === options.second.field ? paperColors.primary : 'transparent',
         }}
         >
           <Caption style={styles.text}>{options.second.text}</Caption>

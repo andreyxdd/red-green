@@ -1,19 +1,21 @@
 import React from 'react';
-import {
-  StyleSheet, View, Alert, Platform,
-} from 'react-native';
-import { TextInput, Button, HelperText } from 'react-native-paper';
+import { StyleSheet, View, Alert } from 'react-native';
+import { Button, HelperText } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
 import { updateUserLastHistoryItem, updateUserWeight } from '../../firebase/updates';
 import { writeUserLastHistoryItem } from '../../firebase/writes';
 import { MANUAL_WEIGHIN } from '../../types/enums';
 import parseStringNumbers from '../../utils/parseStringNumbers';
-import Weightpickers from '../Pickers/Weightpickers';
+import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
 
 interface FormData {
   weighIn: number;
 }
+
+const REGEX = {
+  measureValue: /^\d*\.?\d{1}$/,
+};
 
 const ERROR_MESSAGES = {
   REQUIRED: 'This Field Is Required',
@@ -38,10 +40,11 @@ export type IManualWeighInForm = {
   uid: string;
   planId: string;
   historyId: string;
+  isImperialUnits: boolean;
 }
 
 function ManualWeighInForm({
-  screenType, initialValue, uid, planId, historyId,
+  screenType, initialValue, uid, planId, historyId, isImperialUnits,
 }: IManualWeighInForm) {
   // screen nav object
   const navigation = useNavigation();
@@ -84,31 +87,24 @@ function ManualWeighInForm({
         defaultValue={initialValue || 0.0}
         rules={{
           required: { message: ERROR_MESSAGES.REQUIRED, value: true },
+          pattern: {
+            message: ERROR_MESSAGES.INVALID_VALUE,
+            value: REGEX.measureValue,
+          },
         }}
         render={({ field: { onBlur, onChange, value } }) => (
           <>
-            {Platform.OS === 'web'
-              ? (
-                <TextInput
-                  value={value.toString()}
-                  label="Weigh-In" // todo: units
-                  style={styles.input}
-                  onBlur={onBlur}
-                  keyboardType="decimal-pad"
-                  returnKeyType="done"
-                  onChangeText={(v) => onChange(v)}
-                  error={errors.weighIn && true}
-                  selectTextOnFocus
-                />
-              ) : (
-                <Weightpickers
-                  handleChange={onChange}
-                  value={value}
-                  style={styles.input}
-                  label="Weigh-In"
-                  error={!!errors.weighIn}
-                />
-              )}
+            <Measurepicker
+              value={value}
+              label={`Weigh-In, ${isImperialUnits ? 'lbs' : 'kg'}`}
+              style={styles.input}
+              error={!!errors.weighIn}
+              handleBlur={onBlur}
+              handleChange={onChange}
+              numOfWholePartOptions={isImperialUnits ? 320 : 100}
+              wholeMinValue={isImperialUnits ? 85 : 40}
+              numOfDecimalOptions={isImperialUnits ? undefined : 10}
+            />
             <HelperText type="error">{errors.weighIn?.message}</HelperText>
           </>
         )}
@@ -117,7 +113,7 @@ function ManualWeighInForm({
         mode="contained"
         onPress={handleSubmit(onSubmit)}
         style={styles.button}
-        disabled={!isDirty}
+        disabled={!isValid || !isDirty}
       >
         Submit
       </Button>

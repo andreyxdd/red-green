@@ -12,7 +12,7 @@ import Toggle from '../Toggle';
 import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
 import useDataStore, { IDataStore } from '../../hooks/useDataStore';
 import { REGEX, ERROR_MESSAGES, CONSTANTS } from './index';
-import { getRelativeChange } from '../../utils/calculate';
+import { getRelativeChange, KGtoLBS } from '../../utils/calculate';
 import { writeLosingPlan, writeMaintenancePlan } from '../../firebase/writes';
 import { updateLosingPlan, updateMaintenancePlan } from '../../firebase/updates';
 
@@ -57,7 +57,12 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
   const [isImperialUnits, profileWeight, plan, history] = useDataStore(
     (state: IDataStore) => [
       state.profileData?.units === UNITS.IMPERIAL,
-      state.profileData ? state.profileData.weight : CONSTANTS.WEIGHT.KG.AVG,
+      // eslint-disable-next-line no-nested-ternary
+      state.profileData
+        ? (state.profileData?.units === UNITS.IMPERIAL
+          ? KGtoLBS(state.profileData.weight)
+          : state.profileData.weight)
+        : CONSTANTS.WEIGHT.KG.AVG,
       state.plan,
       state.history,
     ],

@@ -60,10 +60,12 @@ function HistoryPlot({ history, plan, units }: IHistoryPlot) {
         {
           data: [maxDailyGoal + maxDailyGoal / 30], // max
           withDots: false,
+          color: (opacity = 1) => `rgb(98, 0, 238, ${opacity})`,
         },
         {
           data: [minDailyGoal - minDailyGoal / 10], // min
           withDots: false,
+          color: (opacity = 1) => `rgb(98, 0, 238, ${opacity})`,
         },
       ];
       const legend = ['Goal Weight'];

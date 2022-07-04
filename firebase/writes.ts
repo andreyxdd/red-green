@@ -129,3 +129,12 @@ export const writeLosingPlan = async (
 
   await batch.commit();
 };
+
+export const deactivatePlan = (uid: string, planId: string) => {
+  const planRef = doc(db, 'users', uid, 'plans', planId);
+  setDoc(
+    planRef,
+    { active: false },
+    { merge: true },
+  );
+};

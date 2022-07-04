@@ -37,7 +37,7 @@ function PlanScreen() {
 
   return (
     <View style={[styles.container, { flex: 1 }]}>
-      {plan && history && profileData
+      {plan && plan.active && history && profileData
         ? (
           <View style={{ flex: 4 }}>
             <PlanInfo

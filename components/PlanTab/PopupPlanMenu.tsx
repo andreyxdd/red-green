@@ -1,12 +1,14 @@
 import {
   Menu, MenuOptions, MenuOption, MenuTrigger, withMenuContext, renderers,
 } from 'react-native-popup-menu';
-import { Alert, View, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Text } from 'react-native-paper';
+import shallow from 'zustand/shallow';
 import ThreeDots from '../IconButtons/ThreeDots';
 import Divider from '../Divider';
 import useDataStore, { IDataStore } from '../../hooks/useDataStore';
+import { deactivatePlan } from '../../firebase/writes';
 
 const { SlideInMenu } = renderers;
 
@@ -16,7 +18,7 @@ const styles = StyleSheet.create({
 
 export default function PopupPlanMenu() {
   const navigation = useNavigation();
-  const plan = useDataStore((state: IDataStore) => state.plan);
+  const [user, plan] = useDataStore((state: IDataStore) => [state.user, state.plan], shallow);
 
   return (
     <View>
@@ -31,7 +33,27 @@ export default function PopupPlanMenu() {
           </MenuOption>
           <Divider width={1} />
           <MenuOption
-            onSelect={() => Alert.alert('Delete')}
+            onSelect={() => {
+              if (user && plan) deactivatePlan(user.uid, plan.id);
+              /*
+              Alert.alert(
+              'Delete',
+              'Are you sure you want to delete current plan? Data will be lost',
+              [
+                {
+                  text: 'Cancel',
+                  style: 'cancel',
+                },
+                {
+                  text: 'Delete',
+                  onPress: () => {
+                    if (user && plan) deactivatePlan(user.uid, plan.id);
+                  },
+                },
+              ],
+              )
+              */
+            }}
             disabled={!plan}
           >
             <Text style={[styles.menuOption, { color: 'red' }]}>Delete</Text>

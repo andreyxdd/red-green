@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, writeBatch } from 'firebase/firestore';
 import Constants from 'expo-constants';
 
 // App's Firebase configuration
@@ -18,6 +18,9 @@ export const app = initializeApp(firebaseConfig);
 
 // Initialize firebase firestore and get a reference to the service
 export const db = getFirestore(app);
+
+// Initialize firebase firestore and get a reference to the service
+export const batch = writeBatch(db);
 
 // auth functionality
 export const auth = getAuth();

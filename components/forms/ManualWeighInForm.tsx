@@ -3,13 +3,11 @@ import { StyleSheet, View, Alert } from 'react-native';
 import { Button, HelperText } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
-import { updateUserLastHistoryItem, updateUserWeight } from '../../firebase/updates';
-import { writeUserLastHistoryItem } from '../../firebase/writes';
-import { MANUAL_WEIGHIN } from '../../types/enums';
+import { writeUserHistoryItem, writeUserWeight } from '../../firebase/writes';
 import parseStringNumbers from '../../utils/parseStringNumbers';
 import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
 import { REGEX, ERROR_MESSAGES, CONSTANTS } from './index';
-import { LBStoKG } from '../../utils/calculate';
+import { KGtoLBS, LBStoKG } from '../../utils/calculate';
 
 interface FormData {
   weighIn: number;
@@ -29,7 +27,6 @@ const styles = StyleSheet.create({
 });
 
 export type IManualWeighInForm = {
-  screenType: MANUAL_WEIGHIN;
   initialValue?: number;
   uid: string;
   planId: string;
@@ -38,17 +35,27 @@ export type IManualWeighInForm = {
 }
 
 function ManualWeighInForm({
-  screenType, initialValue, uid, planId, historyId, isImperialUnits,
+  initialValue, uid, planId, historyId, isImperialUnits,
 }: IManualWeighInForm) {
   // screen nav object
   const navigation = useNavigation();
 
   // handle form
   const {
-    control, handleSubmit, formState: { errors, isValid, isDirty },
+    control, handleSubmit, formState: {
+      errors, isValid, isDirty,
+    }, setValue, getValues,
   } = useForm<FormData>({
     mode: 'onChange',
   });
+
+  React.useEffect(() => {
+    if (isImperialUnits) {
+      setValue('weighIn', KGtoLBS(getValues('weighIn')));
+    } else {
+      setValue('weighIn', LBStoKG(getValues('weighIn')));
+    }
+  }, [getValues, isImperialUnits, setValue]);
 
   // submit form
   const onSubmit = async ({ weighIn }: FormData) => {
@@ -58,13 +65,9 @@ function ManualWeighInForm({
         const newWeight = isImperialUnits ? LBStoKG(weighInParsed) : weighInParsed;
 
         if (Number.isFinite(newWeight)) {
-          updateUserWeight(uid, newWeight);
+          writeUserWeight(uid, newWeight);
 
-          if (screenType === MANUAL_WEIGHIN.EDIT) {
-            updateUserLastHistoryItem(uid, planId, historyId, newWeight);
-          } else {
-            writeUserLastHistoryItem(uid, planId, newWeight);
-          }
+          writeUserHistoryItem(uid, planId, historyId, newWeight);
 
           navigation.goBack();
         }

@@ -1,13 +1,13 @@
 import React from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { Subheading } from 'react-native-paper';
 import { LineChart } from 'react-native-chart-kit';
 import { format } from 'date-fns';
 import { fullHeight, fullWidth } from '../../styles/theme';
 import { IHistoryItem, IPlan } from '../../types/data';
-import { getRelativeChange } from '../../utils/calculate';
+import { getRelativeChange, KGtoLBS } from '../../utils/calculate';
 import colors from '../../styles/colors';
-import { SIGNS } from '../../types/enums';
+import { SIGNS, UNITS } from '../../types/enums';
 
 const chartConfig = {
   backgroundGradientFrom: '#ffffff',
@@ -18,35 +18,59 @@ const chartConfig = {
   propsForVerticalLabels: {
     fontSize: '8',
   },
+  propsForDots: {
+    r: '12',
+    strokeWidth: '2',
+    stroke: '#fff',
+  },
 };
 
 interface IHistoryPlot{
   history: Array<IHistoryItem>
   plan: IPlan | null;
+  units:UNITS
 }
 
-function HistoryPlot({ history, plan }: IHistoryPlot) {
-  const data = React.useMemo(() => {
+function HistoryPlot({ history, plan, units }: IHistoryPlot) {
+  const plot = React.useMemo(() => {
     if (history.length > 0 && plan) {
+      const dailyGoals = history.map(
+        (item: IHistoryItem) => (units === UNITS.IMPERIAL
+          ? KGtoLBS(item.dailyGoal) : item.dailyGoal),
+      );
+      const maxDailyGoal = Math.max(...dailyGoals);
+      const minDailyGoal = Math.min(...dailyGoals);
+
+      const weignIns: Array<number> = [];
+
+      history.forEach((item: IHistoryItem) => {
+        if (item.weighIn !== undefined) {
+          weignIns.push(
+            units === UNITS.IMPERIAL ? KGtoLBS(item.weighIn) : item.weighIn,
+          );
+        }
+      });
+
       return {
         labels: history.map((item: IHistoryItem) => format(item.date, 'PP')),
         datasets: [
           {
-            data: history.map((item: IHistoryItem) => item.weightIn),
+            data: weignIns,
             color: (opacity = 1) => `rgb(98, 0, 238, ${opacity})`,
             strokeWidth: 3,
           },
           {
-            data: new Array(history.length).fill(plan.goalWeight),
+            data: dailyGoals,
             color: (opacity = 1) => `rgb(190, 190, 190, ${opacity})`, // optional
             strokeWidth: 2, // optional
+            // withDots: false,
           },
           {
-            data: [plan.goalWeight - plan.goalWeight / 30], // min
+            data: [maxDailyGoal + maxDailyGoal / 30], // max
             withDots: false,
           },
           {
-            data: [plan.goalWeight + plan.goalWeight / 30], // max
+            data: [minDailyGoal - minDailyGoal / 10], // min
             withDots: false,
           },
         ],
@@ -54,32 +78,36 @@ function HistoryPlot({ history, plan }: IHistoryPlot) {
       };
     }
     return null;
-  }, [history, plan]);
+  }, [history, plan, units]);
 
-  if (data && plan) {
+  if (plot && plan) {
     return (
       <LineChart
-        data={data}
+        data={plot}
         width={fullWidth}
         height={fullHeight / 1.5}
         chartConfig={chartConfig}
         bezier
-        verticalLabelRotation={-75}
-        xLabelsOffset={35}
-        // hidePointsAtIndex={[...new Array(history.length).keys()].filter((n) => n % 2 !== 0)}
-        getDotColor={(dataPoint) => {
-          const relativeChange = getRelativeChange(plan.goalWeight, dataPoint);
+        verticalLabelRotation={Platform.OS === 'web' ? 0 : -75}
+        xLabelsOffset={Platform.OS === 'web' ? 0 : 35}
+        getDotColor={(dataPoint, dataPointIndex) => {
+          const dailyGoal = plot.datasets[1].data[dataPointIndex];
 
-          if (dataPoint === plan.goalWeight) {
-            return 'transparent';
-          }
+          if (dailyGoal) {
+            const relativeChange = getRelativeChange(dailyGoal, dataPoint);
 
-          if (relativeChange > 2.0) {
-            return colors[SIGNS.RED].secondary;
-          } if (relativeChange < 0.0) {
-            return colors[SIGNS.GREEN].secondary;
+            if (dataPoint === dailyGoal) {
+              return '#D3D3D3';
+            }
+
+            if (relativeChange > 2.0) {
+              return colors[SIGNS.RED].secondary;
+            } if (relativeChange < 0.0) {
+              return colors[SIGNS.GREEN].secondary;
+            }
+            return colors[SIGNS.YELLOW].secondary;
           }
-          return colors[SIGNS.YELLOW].secondary;
+          return '#D3D3D3';
         }}
       />
     );

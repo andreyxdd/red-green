@@ -13,6 +13,7 @@ import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
 import useDataStore, { IDataStore } from '../../hooks/useDataStore';
 import { REGEX, ERROR_MESSAGES, CONSTANTS } from './index';
 import { getRelativeChange } from '../../utils/calculate';
+import { writeLosingPlan, writeMaintenancePlan } from '../../firebase/writes';
 
 const SUB_LOSING_WEIGHT = 5;
 
@@ -62,7 +63,7 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
   // const navigation = useNavigation();
 
   const {
-    control, handleSubmit, formState: { errors, isValid, isDirty }, watch, setValue,
+    control, handleSubmit, formState: { errors, isValid }, watch, setValue,
   } = useForm<FormData>({
     mode: 'onChange',
     defaultValues: initialValues && initialValues,
@@ -70,11 +71,15 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
 
   const isLosingPlanWatcher = watch('planType') === PLANS.LOSING;
 
-  const onSubmit = ({ planType, goalWeight, goalDate }: FormData) => {
+  const onSubmit = async ({ planType, goalWeight, goalDate }: FormData) => {
     if (isValid) {
       try {
-        console.log(uid);
-        console.log({ planType, goalWeight, goalDate });
+        if (planType === PLANS.LOSING) {
+          await writeLosingPlan(uid, goalWeight, goalDate, profileWeight);
+        }
+        if (planType === PLANS.MAINTENANCE) {
+          await writeMaintenancePlan(uid, goalWeight, goalDate);
+        }
       } catch (error) {
         Alert.alert('Error', 'Something went wrong');
       }
@@ -220,7 +225,7 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
         mode="contained"
         onPress={handleSubmit(onSubmit)}
         style={styles.button}
-        disabled={!isValid || !isDirty}
+        disabled={!isValid}
       >
         Submit
       </Button>

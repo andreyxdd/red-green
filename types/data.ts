@@ -3,7 +3,8 @@ import { PLANS, UNITS } from './enums';
 export type IHistoryItem = {
   id: string;
   date: Date;
-  weightIn: number;
+  weighIn: number | undefined;
+  dailyGoal: number;
 }
 
 export type IPlan = {
@@ -11,6 +12,7 @@ export type IPlan = {
   type: PLANS;
   goalWeight: number;
   goalDate: Date;
+  startDate: Date;
   active: boolean;
 }
 

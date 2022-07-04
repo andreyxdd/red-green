@@ -16,7 +16,7 @@ const useHistory = () => {
   const [value, loading, error] = useCollection(
     user && plan && query(
       collection(db, 'users', user.uid, 'plans', plan.id, 'history'),
-      orderBy('date', 'desc'),
+      orderBy('date', 'asc'),
     ),
   );
 
@@ -26,7 +26,8 @@ const useHistory = () => {
       const planHistory: Array<IHistoryItem> = result.map((doc) => ({
         id: doc.id,
         date: doc.data().date.toDate(),
-        weightIn: doc.data().weightIn,
+        weighIn: doc.data().weighIn,
+        dailyGoal: doc.data().dailyGoal,
       }));
 
       setHistory(planHistory);

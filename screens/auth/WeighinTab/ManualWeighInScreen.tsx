@@ -30,7 +30,6 @@ export default function ManualWeighInScreen({ route }: AuthStackScreenProps<'Man
         {screenType === MANUAL_WEIGHIN.EDIT ? 'Edit Weigh-in' : 'Input Weigh-in'}
       </Headline>
       <ManualWeighInForm
-        screenType={screenType}
         initialValue={currentWeighIn}
         uid={uid}
         planId={planId}

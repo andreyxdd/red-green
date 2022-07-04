@@ -2,17 +2,18 @@ import {
   StyleSheet, ScrollView, FlatList, View,
 } from 'react-native';
 import shallow from 'zustand/shallow';
-import { differenceInDays } from 'date-fns';
 import React from 'react';
-import { Subheading, Text } from 'react-native-paper';
+import { Subheading } from 'react-native-paper';
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
 import PopupPlanMenu from '../../../components/PlanTab/PopupPlanMenu';
 import HistoryPlot from '../../../components/PlanTab/HistoryPlot';
-import { PLAN_VIEWS, SIGNS, UNITS } from '../../../types/enums';
+import {
+  PLANS, PLAN_VIEWS, SIGNS, UNITS,
+} from '../../../types/enums';
 import Toggle from '../../../components/Toggle';
-// import colors from '../../../styles/colors';
 import { getRelativeChange } from '../../../utils/calculate';
 import BreakdownCard from '../../../components/PlanTab/BreakdownCard';
+import PlanInfo from '../../../components/PlanTab/PlanInfo';
 
 const styles = StyleSheet.create({
   container: {
@@ -25,23 +26,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  label: {
-    fontWeight: '600',
-    textAlign: 'right',
-    paddingRight: 10,
-  },
-  text: {
-    textAlign: 'left',
-    fontWeight: '300',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
 });
 
-export default function PlanScreen() {
+function PlanScreen() {
   const [plan, history, profileData] = useDataStore(
     (state: IDataStore) => [state.plan, state.history, state.profileData],
     shallow,
@@ -50,52 +37,16 @@ export default function PlanScreen() {
 
   return (
     <View style={[styles.container, { flex: 1 }]}>
-      {plan && history
+      {plan && history && profileData
         ? (
           <View style={{ flex: 4 }}>
-            <View style={{
-              flexDirection: 'row', paddingTop: 10, paddingBottom: 6, borderBottomWidth: 1, borderColor: '#ccc',
-            }}
-            >
-              <View style={{ flex: 2 }}>
-                <Text style={styles.label}>Current plan:</Text>
-              </View>
-              <View style={{ flex: 2 }}>
-                <Text style={styles.text}>{plan.type}</Text>
-              </View>
-            </View>
-            <View style={{
-              flexDirection: 'row', paddingVertical: 6, borderBottomWidth: 1, borderColor: '#ccc',
-            }}
-            >
-              <View style={{ flex: 2 }}>
-                <Text style={styles.label}>Duration:</Text>
-              </View>
-              <View style={{ flex: 2 }}>
-                <Text style={styles.text}>
-                  {differenceInDays(plan.goalDate, new Date())}
-                  {/* plan.startDate) */}
-                  {' '}
-                  days
-                </Text>
-              </View>
-            </View>
-            <View style={{
-              flexDirection: 'row', paddingVertical: 6,
-            }}
-            >
-              <View style={{ flex: 2 }}>
-                <Text style={styles.label}>
-                  Goal Weight,
-                  {' '}
-                  {profileData?.units === UNITS.IMPERIAL ? 'lbs' : 'kg'}
-                  :
-                </Text>
-              </View>
-              <View style={{ flex: 2 }}>
-                <Text style={styles.text}>{plan.goalWeight.toFixed(1)}</Text>
-              </View>
-            </View>
+            <PlanInfo
+              type={plan.type === PLANS.MAINTENANCE ? 'Maintaining Weight' : 'Losing Weight'}
+              endDate={plan.goalDate}
+              startDate={plan.startDate}
+              units={profileData.units}
+              goalWeight={plan.goalWeight}
+            />
             <Toggle
               selection={planView}
               options={{
@@ -112,33 +63,36 @@ export default function PlanScreen() {
                   justifyContent: 'flex-start',
                 }}
                 >
-                  <HistoryPlot history={history.slice().reverse()} plan={plan} />
+                  <HistoryPlot history={history} plan={plan} units={profileData.units} />
                 </ScrollView>
               )
               : (
                 <FlatList
                   data={history}
                   renderItem={({ item }) => {
-                    const relativeChange = getRelativeChange(plan.goalWeight, item.weightIn);
+                    if (item.weighIn) {
+                      const relativeChange = getRelativeChange(item.dailyGoal, item.weighIn);
 
-                    let sign;
-                    if (relativeChange > 2.0) {
-                      sign = SIGNS.RED;
-                    } else if (relativeChange < 0.0) {
-                      sign = SIGNS.GREEN;
-                    } else {
-                      sign = SIGNS.YELLOW;
+                      let sign;
+                      if (relativeChange > 2.0) {
+                        sign = SIGNS.RED;
+                      } else if (relativeChange < 0.0) {
+                        sign = SIGNS.GREEN;
+                      } else {
+                        sign = SIGNS.YELLOW;
+                      }
+
+                      return (
+                        <BreakdownCard
+                          date={item.date}
+                          sign={sign}
+                          weighIn={item.weighIn}
+                          goalWeight={item.dailyGoal}
+                          units={profileData?.units === UNITS.IMPERIAL ? 'lbs' : 'kg'}
+                        />
+                      );
                     }
-
-                    return (
-                      <BreakdownCard
-                        date={item.date}
-                        sign={sign}
-                        weighIn={item.weightIn}
-                        goalWeight={plan.goalWeight}
-                        units={profileData?.units === UNITS.IMPERIAL ? 'lbs' : 'kg'}
-                      />
-                    );
+                    return null;
                   }}
                   keyExtractor={(item) => item.id}
                 />
@@ -155,3 +109,5 @@ export default function PlanScreen() {
     </View>
   );
 }
+
+export default PlanScreen;

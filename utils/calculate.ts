@@ -2,14 +2,13 @@ export function getRelativeChange(a: number, b: number) {
   return ((b - a) / a) * 100;
 }
 
-export function adjustDailyGoal(
-  previousDailyGoalWeight: number,
+export function getDailyGoal(
+  prevDailyGoalWeight: number,
   startWeight: number,
-  planGoalWeight: number,
-  startDate: number,
-  endDate: number,
+  goalWeight: number,
+  duration: number,
 ) {
-  return previousDailyGoalWeight - (startWeight - planGoalWeight) / (endDate - startDate);
+  return prevDailyGoalWeight - (startWeight - goalWeight) / duration;
 }
 
 export function FTtoCM(input: number) {

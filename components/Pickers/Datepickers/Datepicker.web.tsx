@@ -5,7 +5,7 @@ import { View } from 'react-native';
 import { DateInput, IDatepicker } from './index';
 
 function DatepickerWeb({
-  value, label, onChange, style, error, dateFormat,
+  value, label, onChange, style, error, dateFormat, maxDate, minDate,
 }: IDatepicker) {
   return (
     <DatePicker
@@ -22,6 +22,11 @@ function DatepickerWeb({
           />
         </View>
       )}
+      maxDate={maxDate}
+      minDate={minDate}
+      showMonthDropdown
+      showYearDropdown
+      dropdownMode="select"
     />
   );
 }

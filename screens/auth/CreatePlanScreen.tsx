@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import shallow from 'zustand/shallow';
 import useDataStore, { IDataStore } from '../../hooks/useDataStore';
 import PlanForm from '../../components/Forms/PlanForm';
 
@@ -13,7 +14,7 @@ const styles = StyleSheet.create({
 });
 
 function CreatePlanScreen() {
-  const user = useDataStore((state: IDataStore) => state.user);
+  const [user, plan] = useDataStore((state: IDataStore) => [state.user, state.plan], shallow);
 
   return (
     <KeyboardAwareScrollView
@@ -21,7 +22,7 @@ function CreatePlanScreen() {
       keyboardDismissMode="on-drag"
       keyboardShouldPersistTaps="handled"
     >
-      {user ? (
+      {user && !plan ? (
         <PlanForm uid={user.uid} />
       ) : null}
     </KeyboardAwareScrollView>

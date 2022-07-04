@@ -4,20 +4,12 @@ import { TextInput, Button, HelperText } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase/firebase';
+import { ERROR_MESSAGES, REGEX } from './index';
 
 interface FormData {
   email: string;
   password: string;
 }
-
-const ERROR_MESSAGES = {
-  REQUIRED: 'This Field Is Required',
-  INVALID_EMAIL: 'Not a Valid Email',
-};
-
-const REGEX = {
-  email: /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i,
-};
 
 const styles = StyleSheet.create({
   container: { justifyContent: 'center', width: '100%' },
@@ -25,6 +17,7 @@ const styles = StyleSheet.create({
   button: {
     width: '80%', paddingVertical: 4, marginBottom: 14, alignSelf: 'center',
   },
+  helperText: { width: '90%', alignSelf: 'center' },
 });
 
 function SignInForm() {
@@ -44,7 +37,7 @@ function SignInForm() {
       try {
         await signInWithEmailAndPassword(auth, data.email, data.password);
       } catch (error) {
-        Alert.alert('Error', 'Incorrect email or password');
+        Alert.alert('Error', 'Something went wrong. The provided email or password might be incorrect');
       }
     }
   };
@@ -57,10 +50,7 @@ function SignInForm() {
         defaultValue=""
         rules={{
           required: { message: ERROR_MESSAGES.REQUIRED, value: true },
-          pattern: {
-            value: REGEX.email,
-            message: ERROR_MESSAGES.INVALID_EMAIL,
-          },
+          pattern: { value: REGEX.EMAIL, message: ERROR_MESSAGES.EMAIL },
         }}
         render={({ field: { onBlur, onChange, value } }) => (
           <>
@@ -74,7 +64,12 @@ function SignInForm() {
               onChangeText={(v) => onChange(v)}
               error={errors.email && true}
             />
-            <HelperText type="error">{errors.email?.message}</HelperText>
+            <HelperText
+              type="error"
+              style={styles.helperText}
+            >
+              {errors.email?.message}
+            </HelperText>
           </>
         )}
       />
@@ -112,7 +107,12 @@ function SignInForm() {
                 />
               )}
             />
-            <HelperText type="error">{errors.password?.message}</HelperText>
+            <HelperText
+              type="error"
+              style={styles.helperText}
+            >
+              {errors.password?.message}
+            </HelperText>
           </>
         )}
       />

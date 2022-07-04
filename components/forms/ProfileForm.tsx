@@ -5,6 +5,7 @@ import {
 } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
+import { subYears } from 'date-fns';
 
 import Datepicker from '../Pickers/Datepickers/Datepicker';
 import { IProfileData } from '../../types/data';
@@ -16,18 +17,7 @@ import {
   CMtoFT, FTtoCM, KGtoLBS, LBStoKG,
 } from '../../utils/calculate';
 import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
-
-const REGEX = {
-  personalName: /^[a-z ,.'-]+$/i,
-  measureValue: /^\d*\.?\d{1}$/,
-};
-
-const ERROR_MESSAGES = {
-  REQUIRED: 'This Field Is Required',
-  NAME: 'Not a Valid Name',
-  TERMS: 'Terms Must Be Accepted To Continue',
-  INVALID_VALUE: 'Not a Valid Value',
-};
+import { REGEX, ERROR_MESSAGES, CONSTANTS } from './index';
 
 const styles = StyleSheet.create({
   container: {
@@ -38,8 +28,9 @@ const styles = StyleSheet.create({
   },
   input: { marginVertical: 2, width: '90%', alignSelf: 'center' },
   button: {
-    width: '80%', paddingVertical: 4, marginBottom: 14, alignSelf: 'center',
+    width: '80%', paddingVertical: 4, marginTop: 14, alignSelf: 'center',
   },
+  helperText: { width: '90%', alignSelf: 'center' },
   row: {
     alignItems: 'center',
     alignSelf: 'center',
@@ -110,10 +101,8 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
 
         writeProfileData(uid, newProfileData as IProfileData);
         if (initialValues) navigation.navigate('UserMenu');
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        Alert.alert('Error', error.message);
+      } catch (error) {
+        Alert.alert('Error', 'Something went wrong');
       }
     }
   };
@@ -126,7 +115,8 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
         name="name"
         rules={{
           required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-          pattern: { message: ERROR_MESSAGES.NAME, value: REGEX.personalName },
+          pattern: { message: ERROR_MESSAGES.NAME, value: REGEX.NAME },
+          maxLength: { value: CONSTANTS.NAME_MIN_LENGTH, message: ERROR_MESSAGES.NAME_LENGTH },
         }}
         render={({ field: { onChange, onBlur, value } }) => (
           <>
@@ -141,7 +131,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
               selectTextOnFocus
             />
             <HelperText
-              visible={!errors.name}
+              style={styles.helperText}
               type="error"
             >
               {errors.name?.message}
@@ -151,7 +141,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
       />
       <Controller
         control={control}
-        defaultValue={initialValues ? initialValues.dob : new Date()}
+        defaultValue={initialValues ? initialValues.dob : subYears(new Date(), CONSTANTS.MIN_AGE)}
         name="dob"
         rules={{
           required: { value: true, message: ERROR_MESSAGES.REQUIRED },
@@ -166,8 +156,15 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
               onChange={onChange}
               error={!!errors.dob}
               dateFormat="yyyy-MM-dd"
+              maxDate={subYears(new Date(), CONSTANTS.MIN_AGE)}
+              minDate={subYears(new Date(), CONSTANTS.MAX_AGE)}
             />
-            <HelperText type="error">{errors.dob?.message}</HelperText>
+            <HelperText
+              style={styles.helperText}
+              type="error"
+            >
+              {errors.dob?.message}
+            </HelperText>
           </>
         )}
       />
@@ -190,12 +187,22 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
       <Controller
         control={control}
         name="height"
-        defaultValue={initialValues ? initialValues.height : 0.0}
+        defaultValue={initialValues ? initialValues.height : CONSTANTS.HEIGHT.CM.AVG}
         rules={{
           required: { message: ERROR_MESSAGES.REQUIRED, value: true },
           pattern: {
-            message: ERROR_MESSAGES.INVALID_VALUE,
-            value: REGEX.measureValue,
+            message: imperialUnitsWatcher ? ERROR_MESSAGES.INVALID_HEIGHT.FT
+              : ERROR_MESSAGES.INVALID_HEIGHT.CM,
+            value: imperialUnitsWatcher ? REGEX.HEIGHT.FT
+              : REGEX.HEIGHT.CM,
+          },
+          validate: (v) => {
+            if (imperialUnitsWatcher) {
+              return (v > CONSTANTS.HEIGHT.FT.MIN && v < CONSTANTS.HEIGHT.FT.MAX)
+                || ERROR_MESSAGES.INVALID_HEIGHT_RANGE.FT;
+            }
+            return (v > CONSTANTS.HEIGHT.CM.MIN && v < CONSTANTS.HEIGHT.CM.MAX)
+              || ERROR_MESSAGES.INVALID_HEIGHT_RANGE.CM;
           },
         }}
         render={({ field: { onChange, onBlur, value } }) => {
@@ -209,11 +216,22 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                 error={!!errors.height}
                 handleBlur={onBlur}
                 handleChange={onChange}
-                numOfWholePartOptions={imperialUnitsWatcher ? 2 : 80}
-                wholeMinValue={imperialUnitsWatcher ? 7 : 150}
-                numOfDecimalOptions={imperialUnitsWatcher ? 11 : undefined}
+                numOfWholePartOptions={imperialUnitsWatcher
+                  ? CONSTANTS.HEIGHT.FT.MAX - CONSTANTS.HEIGHT.FT.MIN
+                  : CONSTANTS.HEIGHT.CM.MAX - CONSTANTS.HEIGHT.CM.MIN}
+                wholeMinValue={imperialUnitsWatcher
+                  ? CONSTANTS.HEIGHT.FT.MIN
+                  : CONSTANTS.HEIGHT.CM.MIN}
+                numOfDecimalOptions={imperialUnitsWatcher
+                  ? CONSTANTS.HEIGHT.FT.IN
+                  : undefined}
               />
-              <HelperText type="error">{errors.height?.message}</HelperText>
+              <HelperText
+                style={styles.helperText}
+                type="error"
+              >
+                {errors.height?.message}
+              </HelperText>
             </>
           );
         }}
@@ -221,12 +239,24 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
       <Controller
         control={control}
         name="weight"
-        defaultValue={initialValues ? initialValues.weight : 0.0}
+        defaultValue={initialValues ? initialValues.weight : CONSTANTS.WEIGHT.KG.AVG}
         rules={{
           required: { message: ERROR_MESSAGES.REQUIRED, value: true },
           pattern: {
-            message: ERROR_MESSAGES.INVALID_VALUE,
-            value: REGEX.measureValue,
+            message: imperialUnitsWatcher
+              ? ERROR_MESSAGES.INVALID_WEIGHT.LBS
+              : ERROR_MESSAGES.INVALID_WEIGHT.KG,
+            value: imperialUnitsWatcher
+              ? REGEX.WEIGHT.LBS
+              : REGEX.WEIGHT.KG,
+          },
+          validate: (v) => {
+            if (imperialUnitsWatcher) {
+              return (v > CONSTANTS.WEIGHT.LBS.MIN && v < CONSTANTS.WEIGHT.LBS.MAX)
+                || ERROR_MESSAGES.INVALID_WEIGHT_RANGE.LBS;
+            }
+            return (v > CONSTANTS.WEIGHT.KG.MIN && v < CONSTANTS.WEIGHT.KG.MAX)
+              || ERROR_MESSAGES.INVALID_WEIGHT_RANGE.KG;
           },
         }}
         render={({ field: { onChange, onBlur, value } }) => {
@@ -240,41 +270,54 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                 error={!!errors.weight}
                 handleBlur={onBlur}
                 handleChange={onChange}
-                numOfWholePartOptions={imperialUnitsWatcher ? 320 : 100}
-                wholeMinValue={imperialUnitsWatcher ? 85 : 40}
-                numOfDecimalOptions={imperialUnitsWatcher ? undefined : 10}
+                numOfWholePartOptions={imperialUnitsWatcher
+                  ? CONSTANTS.WEIGHT.LBS.MAX - CONSTANTS.WEIGHT.LBS.MIN
+                  : CONSTANTS.WEIGHT.KG.MAX - CONSTANTS.WEIGHT.KG.MIN}
+                wholeMinValue={imperialUnitsWatcher
+                  ? CONSTANTS.WEIGHT.LBS.MIN
+                  : CONSTANTS.WEIGHT.KG.MIN}
+                numOfDecimalOptions={imperialUnitsWatcher
+                  ? undefined
+                  : CONSTANTS.WEIGHT.KG.DECIMAL}
               />
-              <HelperText type="error">{errors.weight?.message}</HelperText>
+              <HelperText
+                style={styles.helperText}
+                type="error"
+              >
+                {errors.weight?.message}
+              </HelperText>
             </>
           );
         }}
       />
       {!initialValues ? (
-        <View style={styles.row}>
-          <Text style={{ marginHorizontal: 4 }}>Accept</Text>
-          <Text
-            style={{ color: '#33A1FF', paddingRight: 10 }}
-            onPress={() => { navigation.navigate('ReadTerms'); }}
-          >
-            terms and conditions
-          </Text>
-          <Controller
-            control={control}
-            defaultValue={false}
-            name="termsAccepted"
-            rules={{ required: { value: true, message: ERROR_MESSAGES.TERMS } }}
-            render={({ field: { onChange, value } }) => (
-              <>
+        <>
+          <View style={styles.row}>
+            <Text style={{ marginHorizontal: 4 }}>Accept</Text>
+            <Text
+              style={{ color: '#33A1FF', paddingLeft: 4, paddingRight: 10 }}
+              onPress={() => { navigation.navigate('ReadTerms'); }}
+            >
+              terms and conditions
+            </Text>
+            <Controller
+              control={control}
+              defaultValue={false}
+              name="termsAccepted"
+              rules={{ required: { value: true, message: ERROR_MESSAGES.TERMS } }}
+              render={({ field: { onChange, value } }) => (
                 <Switch
                   style={{ marginLeft: 10 }}
                   value={value}
                   onValueChange={(v) => onChange(v)}
                 />
-                <HelperText type="error">{errors.termsAccepted?.message}</HelperText>
-              </>
-            )}
-          />
-        </View>
+              )}
+            />
+          </View>
+          <HelperText type="error" style={{ textAlign: 'center' }}>
+            {errors.termsAccepted?.message}
+          </HelperText>
+        </>
       ) : null}
       <Button
         mode="contained"

@@ -10,6 +10,8 @@ export interface ICommon{
   value: Date;
   dateFormat: string;
   error: boolean;
+  maxDate?: Date;
+  minDate?: Date;
 }
 
 export interface IDateInput extends ICommon {

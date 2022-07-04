@@ -4,6 +4,7 @@ import { TextInput, Button, HelperText } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase/firebase';
+import { ERROR_MESSAGES, REGEX, CONSTANTS } from './index';
 
 interface FormData {
   email: string;
@@ -11,24 +12,13 @@ interface FormData {
   password: string;
 }
 
-const ERROR_MESSAGES = {
-  REQUIRED: 'This Field Is Required',
-  INVALID_EMAIL: 'Not a Valid Email',
-  UNEQUAL_EMAILS: "Emails aren't the same",
-};
-
-const PASSWORD_MIN_LENGTH = 6;
-
-const REGEX = {
-  email: /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i,
-};
-
 const styles = StyleSheet.create({
   container: { justifyContent: 'center', width: '100%' },
   input: { marginVertical: 2, width: '90%', alignSelf: 'center' },
   button: {
     width: '80%', paddingVertical: 4, marginBottom: 14, alignSelf: 'center',
   },
+  helperText: { width: '90%', alignSelf: 'center' },
 });
 
 function SignInForm() {
@@ -48,7 +38,7 @@ function SignInForm() {
       try {
         await createUserWithEmailAndPassword(auth, data.email, data.password);
       } catch (error) {
-        Alert.alert('Error', 'Incorrect email or password');
+        Alert.alert('Error', 'Something went wrong');
       }
     }
   };
@@ -61,10 +51,7 @@ function SignInForm() {
         defaultValue=""
         rules={{
           required: { message: ERROR_MESSAGES.REQUIRED, value: true },
-          pattern: {
-            value: REGEX.email,
-            message: ERROR_MESSAGES.INVALID_EMAIL,
-          },
+          pattern: { value: REGEX.EMAIL, message: ERROR_MESSAGES.EMAIL },
         }}
         render={({ field: { onBlur, onChange, value } }) => (
           <>
@@ -78,7 +65,12 @@ function SignInForm() {
               onChangeText={(v) => onChange(v)}
               error={errors.email && true}
             />
-            <HelperText type="error">{errors.email?.message}</HelperText>
+            <HelperText
+              type="error"
+              style={styles.helperText}
+            >
+              {errors.email?.message}
+            </HelperText>
           </>
         )}
       />
@@ -89,8 +81,8 @@ function SignInForm() {
         rules={{
           required: { message: ERROR_MESSAGES.REQUIRED, value: true },
           pattern: {
-            value: REGEX.email,
-            message: ERROR_MESSAGES.INVALID_EMAIL,
+            value: REGEX.EMAIL,
+            message: ERROR_MESSAGES.EMAIL,
           },
           validate: (value) => value === getValues('email') || ERROR_MESSAGES.UNEQUAL_EMAILS,
         }}
@@ -106,7 +98,12 @@ function SignInForm() {
               onChangeText={(v) => onChange(v)}
               error={errors.email && true}
             />
-            <HelperText type="error">{errors.emailRepeat?.message}</HelperText>
+            <HelperText
+              type="error"
+              style={styles.helperText}
+            >
+              {errors.emailRepeat?.message}
+            </HelperText>
           </>
         )}
       />
@@ -117,8 +114,8 @@ function SignInForm() {
         rules={{
           required: { message: ERROR_MESSAGES.REQUIRED, value: true },
           minLength: {
-            value: PASSWORD_MIN_LENGTH,
-            message: 'Password must have at least 6 characters',
+            value: CONSTANTS.PASSWORD_MIN_LENGTH,
+            message: ERROR_MESSAGES.PASSWORD,
           },
         }}
         render={({ field: { onBlur, onChange, value } }) => (
@@ -153,7 +150,12 @@ function SignInForm() {
                 />
               )}
             />
-            <HelperText type="error">{errors.password?.message}</HelperText>
+            <HelperText
+              type="error"
+              style={styles.helperText}
+            >
+              {errors.password?.message}
+            </HelperText>
           </>
         )}
       />

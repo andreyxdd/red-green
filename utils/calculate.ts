@@ -13,23 +13,27 @@ export function adjustDailyGoal(
 }
 
 export function FTtoCM(input: number) {
-  const out = input * 30.48;
-  return Math.round((out + Number.EPSILON) * 100) / 100;
+  const feet = Math.trunc(input);
+  const inches = Number((`${input}`).split('.')[1]);
+  const out = feet * 30.48 + inches * 2.54;
+  return Math.round(out);
 }
 
 export function CMtoFT(input: number) {
-  const out = input / 30.48;
-  return Math.round((out + Number.EPSILON) * 100) / 100;
+  const fullFeet = ((input * 0.393701) / 12);
+  const feet = Math.floor(fullFeet);
+  const inches = Math.round((fullFeet - feet) * 12);
+  return Number(`${feet}.${inches}`);
 }
 
 export function LBStoKG(input: number) {
   const out = input / 2.205;
-  return Math.round((out + Number.EPSILON) * 100) / 100;
+  return Math.round((out + Number.EPSILON) * 10) / 10;
 }
 
 export function KGtoLBS(input: number) {
   const out = input * 2.205;
-  return Math.round((out + Number.EPSILON) * 100) / 100;
+  return Math.round(out);
 }
 
 export function range(size:number, startAt = 0):ReadonlyArray<number> {

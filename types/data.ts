@@ -11,7 +11,6 @@ export type IPlan = {
   type: PLANS;
   goalWeight: number;
   goalDate: Date;
-  startWeight?: number;
   active: boolean;
 }
 

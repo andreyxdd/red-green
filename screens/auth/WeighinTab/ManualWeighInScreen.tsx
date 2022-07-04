@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.0)',
-    width: '100%',
+    paddingVertical: 20,
   },
 });
 
@@ -21,7 +21,11 @@ export default function ManualWeighInScreen({ route }: AuthStackScreenProps<'Man
   } = route.params;
 
   return (
-    <KeyboardAwareScrollView contentContainerStyle={[styles.container, { flex: 1 }]}>
+    <KeyboardAwareScrollView
+      contentContainerStyle={[styles.container]}
+      keyboardDismissMode="on-drag"
+      keyboardShouldPersistTaps="handled"
+    >
       <Headline style={{ width: '100%', marginVertical: 12, textAlign: 'center' }}>
         {screenType === MANUAL_WEIGHIN.EDIT ? 'Edit Weigh-in' : 'Input Weigh-in'}
       </Headline>

@@ -4,7 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { DateInput, IDatepicker } from './index';
 
 function DatepickerAndroid({
-  value, id, label, onChange, style, error, dateFormat,
+  value, id, label, onChange, style, error, dateFormat, maxDate, minDate,
 }: IDatepicker) {
   const [showAndroidDatePicker, setShowAndroidDatePicker] = React.useState(false);
   const toggleDatepicker = () => {
@@ -33,6 +33,8 @@ function DatepickerAndroid({
           }}
           style={{ width: Dimensions.get('window').width * 0.9 }}
           // display="spinner"
+          maximumDate={maxDate}
+          minimumDate={minDate}
         />
       ) : null}
     </>

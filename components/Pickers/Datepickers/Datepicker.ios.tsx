@@ -5,7 +5,7 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import { DateInput, IDatepicker } from './index';
 
 function DatepickerIOS({
-  value, id, label, onChange, style, error, dateFormat,
+  value, id, label, onChange, style, error, dateFormat, maxDate, minDate,
 }: IDatepicker) {
   const datePickerRef = React.useRef<RBSheet>(null);
   const toggleDatepicker = () => {
@@ -47,6 +47,8 @@ function DatepickerIOS({
           }}
           style={{ width: Dimensions.get('window').width * 0.9 }}
           display="spinner"
+          maximumDate={maxDate}
+          minimumDate={minDate}
         />
       </RBSheet>
     </>

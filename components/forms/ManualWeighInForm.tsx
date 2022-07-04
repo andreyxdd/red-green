@@ -8,19 +8,12 @@ import { writeUserLastHistoryItem } from '../../firebase/writes';
 import { MANUAL_WEIGHIN } from '../../types/enums';
 import parseStringNumbers from '../../utils/parseStringNumbers';
 import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
+import { REGEX, ERROR_MESSAGES, CONSTANTS } from './index';
+import { LBStoKG } from '../../utils/calculate';
 
 interface FormData {
   weighIn: number;
 }
-
-const REGEX = {
-  measureValue: /^\d*\.?\d{1}$/,
-};
-
-const ERROR_MESSAGES = {
-  REQUIRED: 'This Field Is Required',
-  INVALID_VALUE: 'Not a Valid Value',
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -32,6 +25,7 @@ const styles = StyleSheet.create({
   button: {
     width: '80%', paddingVertical: 4, marginBottom: 14, alignSelf: 'center',
   },
+  helperText: { width: '90%', alignSelf: 'center' },
 });
 
 export type IManualWeighInForm = {
@@ -60,15 +54,16 @@ function ManualWeighInForm({
   const onSubmit = async ({ weighIn }: FormData) => {
     if (isValid) {
       try {
-        const value = parseStringNumbers(weighIn);
+        const weighInParsed = parseStringNumbers(weighIn);
+        const newWeight = isImperialUnits ? LBStoKG(weighInParsed) : weighInParsed;
 
-        if (Number.isFinite(value)) {
-          updateUserWeight(uid, value);
+        if (Number.isFinite(newWeight)) {
+          updateUserWeight(uid, newWeight);
 
           if (screenType === MANUAL_WEIGHIN.EDIT) {
-            updateUserLastHistoryItem(uid, planId, historyId, value);
+            updateUserLastHistoryItem(uid, planId, historyId, newWeight);
           } else {
-            writeUserLastHistoryItem(uid, planId, value);
+            writeUserLastHistoryItem(uid, planId, newWeight);
           }
 
           navigation.goBack();
@@ -88,8 +83,20 @@ function ManualWeighInForm({
         rules={{
           required: { message: ERROR_MESSAGES.REQUIRED, value: true },
           pattern: {
-            message: ERROR_MESSAGES.INVALID_VALUE,
-            value: REGEX.measureValue,
+            message: isImperialUnits
+              ? ERROR_MESSAGES.INVALID_WEIGHT.LBS
+              : ERROR_MESSAGES.INVALID_WEIGHT.KG,
+            value: isImperialUnits
+              ? REGEX.WEIGHT.LBS
+              : REGEX.WEIGHT.KG,
+          },
+          validate: (v) => {
+            if (isImperialUnits) {
+              return (v > CONSTANTS.WEIGHT.LBS.MIN && v < CONSTANTS.WEIGHT.LBS.MAX)
+                || ERROR_MESSAGES.INVALID_WEIGHT_RANGE.LBS;
+            }
+            return (v > CONSTANTS.WEIGHT.KG.MIN && v < CONSTANTS.WEIGHT.KG.MAX)
+              || ERROR_MESSAGES.INVALID_WEIGHT_RANGE.KG;
           },
         }}
         render={({ field: { onBlur, onChange, value } }) => (
@@ -101,11 +108,20 @@ function ManualWeighInForm({
               error={!!errors.weighIn}
               handleBlur={onBlur}
               handleChange={onChange}
-              numOfWholePartOptions={isImperialUnits ? 320 : 100}
-              wholeMinValue={isImperialUnits ? 85 : 40}
-              numOfDecimalOptions={isImperialUnits ? undefined : 10}
+              numOfWholePartOptions={isImperialUnits
+                ? CONSTANTS.WEIGHT.LBS.MAX - CONSTANTS.WEIGHT.LBS.MIN
+                : CONSTANTS.WEIGHT.KG.MAX - CONSTANTS.WEIGHT.KG.MIN}
+              wholeMinValue={isImperialUnits ? CONSTANTS.WEIGHT.LBS.MIN
+                : CONSTANTS.WEIGHT.KG.MIN}
+              numOfDecimalOptions={isImperialUnits ? undefined
+                : CONSTANTS.WEIGHT.KG.DECIMAL}
             />
-            <HelperText type="error">{errors.weighIn?.message}</HelperText>
+            <HelperText
+              style={styles.helperText}
+              type="error"
+            >
+              {errors.weighIn?.message}
+            </HelperText>
           </>
         )}
       />

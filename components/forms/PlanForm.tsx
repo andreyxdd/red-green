@@ -5,23 +5,16 @@ import { useForm, Controller } from 'react-hook-form';
 // import { useNavigation } from '@react-navigation/native';
 
 import shallow from 'zustand/shallow';
+import { addDays } from 'date-fns';
 import Datepicker from '../Pickers/Datepickers/Datepicker';
 import { PLANS, UNITS } from '../../types/enums';
 import Toggle from '../Toggle';
 import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
 import useDataStore, { IDataStore } from '../../hooks/useDataStore';
+import { REGEX, ERROR_MESSAGES, CONSTANTS } from './index';
+import { getRelativeChange } from '../../utils/calculate';
 
-const REGEX = {
-  personalName: /^[a-z ,.'-]+$/i,
-  measureValue: /^\d*\.?\d{1}$/,
-};
-
-const ERROR_MESSAGES = {
-  REQUIRED: 'This Field Is Required',
-  NAME: 'Not a Valid Name',
-  TERMS: 'Terms Must Be Accepted To Continue',
-  INVALID_VALUE: 'Not a Valid Value',
-};
+const SUB_LOSING_WEIGHT = 5;
 
 const styles = StyleSheet.create({
   container: {
@@ -30,23 +23,27 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.0)',
     width: '100%',
   },
-  input: { marginVertical: 2, width: '90%', alignSelf: 'center' },
+  input: {
+    marginVertical: 2, width: '90%', alignSelf: 'center',
+  },
   button: {
     width: '80%', paddingVertical: 4, marginBottom: 14, alignSelf: 'center',
   },
+  toggle: { marginBottom: 14, width: '90%', alignSelf: 'center' },
   row: {
     alignItems: 'center',
     alignSelf: 'center',
     flexDirection: 'row',
     marginVertical: 10,
   },
+  helperText: { width: '90%', alignSelf: 'center' },
 });
 
 export interface FormData{
   planType: PLANS;
   goalWeight: number;
   goalDate: Date;
-  startWeight?: number;
+  // startWeight?: number;
 }
 
 export interface IPlanForm {
@@ -56,14 +53,16 @@ export interface IPlanForm {
 
 function PlanForm({ initialValues, uid }: IPlanForm) {
   const [isImperialUnits, profileWeight] = useDataStore(
-    (state: IDataStore) => [state.profileData?.units === UNITS.IMPERIAL, state.profileData?.weight],
+    (state: IDataStore) => [
+      state.profileData?.units === UNITS.IMPERIAL,
+      state.profileData ? state.profileData.weight : CONSTANTS.WEIGHT.KG.AVG],
     shallow,
   );
 
   // const navigation = useNavigation();
 
   const {
-    control, handleSubmit, formState: { errors, isValid, isDirty }, watch,
+    control, handleSubmit, formState: { errors, isValid, isDirty }, watch, setValue,
   } = useForm<FormData>({
     mode: 'onChange',
     defaultValues: initialValues && initialValues,
@@ -71,16 +70,20 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
 
   const isLosingPlanWatcher = watch('planType') === PLANS.LOSING;
 
-  const onSubmit = ({ goalWeight, goalDate, startWeight }: FormData) => {
+  const onSubmit = ({ planType, goalWeight, goalDate }: FormData) => {
     if (isValid) {
       try {
         console.log(uid);
-        console.log({ goalWeight, goalDate, startWeight });
-      } catch (error: any) {
-        Alert.alert('Error', error.message);
+        console.log({ planType, goalWeight, goalDate });
+      } catch (error) {
+        Alert.alert('Error', 'Something went wrong');
       }
     }
   };
+
+  React.useEffect(() => {
+    setValue('goalWeight', isLosingPlanWatcher ? profileWeight - SUB_LOSING_WEIGHT : profileWeight);
+  }, [isLosingPlanWatcher, profileWeight, setValue]);
 
   return (
     <View style={styles.container}>
@@ -97,20 +100,31 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
                 second: { field: PLANS.LOSING, text: 'Losing Weight' },
               }}
               setSelection={onChange}
-              style={{ marginBottom: 14, width: '90%', alignSelf: 'center' }}
+              style={styles.toggle}
             />
           )}
         />
       )}
       <Controller
         control={control}
+        defaultValue={initialValues ? initialValues.goalWeight : profileWeight}
         name="goalWeight"
-        defaultValue={initialValues ? initialValues.goalWeight : 0.0}
         rules={{
           required: { message: ERROR_MESSAGES.REQUIRED, value: true },
           pattern: {
-            message: ERROR_MESSAGES.INVALID_VALUE,
-            value: REGEX.measureValue,
+            message: isImperialUnits
+              ? ERROR_MESSAGES.INVALID_WEIGHT.LBS
+              : ERROR_MESSAGES.INVALID_WEIGHT.KG,
+            value: isImperialUnits
+              ? REGEX.WEIGHT.LBS
+              : REGEX.WEIGHT.KG,
+          },
+          validate: (v) => {
+            const relativeChange = getRelativeChange(profileWeight, v);
+            if (!isLosingPlanWatcher) { // MAINTENANCE
+              return Math.abs(relativeChange) < 2.0 || ERROR_MESSAGES.MAINTENANCE_GOAL_WEIGHT;
+            }
+            return relativeChange < 0.0 || ERROR_MESSAGES.LOSING_GOAL_WEIGHT;
           },
         }}
         render={({ field: { onChange, onBlur, value } }) => (
@@ -122,17 +136,28 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
               error={!!errors.goalWeight}
               handleBlur={onBlur}
               handleChange={onChange}
-              numOfWholePartOptions={isImperialUnits ? 320 : 100}
-              wholeMinValue={isImperialUnits ? 85 : 40}
-              numOfDecimalOptions={isImperialUnits ? undefined : 10}
+              numOfWholePartOptions={isImperialUnits
+                ? CONSTANTS.WEIGHT.LBS.MAX - CONSTANTS.WEIGHT.LBS.MIN
+                : CONSTANTS.WEIGHT.KG.MAX - CONSTANTS.WEIGHT.KG.MIN}
+              wholeMinValue={isImperialUnits
+                ? CONSTANTS.WEIGHT.LBS.MIN
+                : CONSTANTS.WEIGHT.KG.MIN}
+              numOfDecimalOptions={isImperialUnits
+                ? undefined
+                : CONSTANTS.WEIGHT.KG.DECIMAL}
             />
-            <HelperText type="error">{errors.goalWeight?.message}</HelperText>
+            <HelperText
+              type="error"
+              style={styles.helperText}
+            >
+              {errors.goalWeight?.message}
+            </HelperText>
           </>
         )}
       />
       <Controller
         control={control}
-        defaultValue={initialValues ? initialValues.goalDate : new Date()}
+        defaultValue={addDays(new Date(), CONSTANTS.MIN_PLAN_LENGTH)}
         name="goalDate"
         rules={{
           required: { value: true, message: ERROR_MESSAGES.REQUIRED },
@@ -147,12 +172,19 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
               onChange={onChange}
               error={!!errors.goalDate}
               dateFormat="yyyy-MM-dd"
+              maxDate={addDays(new Date(), CONSTANTS.MAX_PLAN_LENGTH)}
+              minDate={addDays(new Date(), CONSTANTS.MIN_PLAN_LENGTH)}
             />
-            <HelperText type="error">{errors.goalDate?.message}</HelperText>
+            <HelperText
+              type="error"
+              style={styles.helperText}
+            >
+              {errors.goalDate?.message}
+            </HelperText>
           </>
         )}
       />
-      {isLosingPlanWatcher && !initialValues
+      {/* isLosingPlanWatcher && !initialValues
         ? (
           <Controller
             control={control}
@@ -183,7 +215,7 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
             )}
           />
         )
-        : null}
+            : null */}
       <Button
         mode="contained"
         onPress={handleSubmit(onSubmit)}

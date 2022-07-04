@@ -84,7 +84,7 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
   const onSubmit = async ({ planType, goalWeight, goalDate }: FormData) => {
     if (isValid) {
       const newGoalWeight = parseStringNumbers(goalWeight);
-      const goalWeighValue = isImperialUnits ? LBStoKG(newGoalWeight) : goalWeight;
+      const goalWeighValue = isImperialUnits ? LBStoKG(newGoalWeight) : newGoalWeight;
       try {
         if (!initialValues) {
           if (planType === PLANS.LOSING) {

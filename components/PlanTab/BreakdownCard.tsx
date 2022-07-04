@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { format } from 'date-fns';
 import { Card, Text } from 'react-native-paper';
-import { SIGNS, UNITS } from '../../types/enums';
+import { SIGNS } from '../../types/enums';
 import colors from '../../styles/colors';
 import TrafficLightIcon from '../TrafficLightIcon';
 import { KGtoLBS } from '../../utils/calculate';
@@ -50,7 +50,7 @@ function BreakdownCard({
                 :
               </Text>
               <Text style={{ fontWeight: '200', marginRight: 4 }}>
-                {(units === UNITS.IMPERIAL ? KGtoLBS(goalWeight) : goalWeight).toFixed(1)}
+                {units === 'lbs' ? KGtoLBS(goalWeight) : goalWeight.toFixed(1)}
               </Text>
             </View>
             <View style={styles.row}>
@@ -61,7 +61,7 @@ function BreakdownCard({
                 :
               </Text>
               <Text style={{ marginRight: 4 }}>
-                {units === UNITS.IMPERIAL ? KGtoLBS(weighIn) : weighIn}
+                {units === 'lbs' ? KGtoLBS(weighIn) : weighIn.toFixed(1)}
               </Text>
             </View>
           </View>

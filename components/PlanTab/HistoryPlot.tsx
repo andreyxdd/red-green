@@ -42,7 +42,6 @@ function HistoryPlot({ history, plan, units }: IHistoryPlot) {
       const minDailyGoal = Math.min(...dailyGoals);
 
       const weignIns: Array<number> = [];
-
       history.forEach((item: IHistoryItem) => {
         if (item.weighIn !== undefined) {
           weignIns.push(
@@ -51,30 +50,39 @@ function HistoryPlot({ history, plan, units }: IHistoryPlot) {
         }
       });
 
-      return {
-        labels: history.map((item: IHistoryItem) => format(item.date, 'PP')),
-        datasets: [
+      const datasets = [
+        {
+          data: dailyGoals,
+          color: (opacity = 1) => `rgb(190, 190, 190, ${opacity})`, // optional
+          strokeWidth: 2, // optional
+          // withDots: false,
+        },
+        {
+          data: [maxDailyGoal + maxDailyGoal / 30], // max
+          withDots: false,
+        },
+        {
+          data: [minDailyGoal - minDailyGoal / 10], // min
+          withDots: false,
+        },
+      ];
+      const legend = ['Goal Weight'];
+
+      if (weignIns.length > 0) {
+        datasets.push(
           {
             data: weignIns,
             color: (opacity = 1) => `rgb(98, 0, 238, ${opacity})`,
             strokeWidth: 3,
           },
-          {
-            data: dailyGoals,
-            color: (opacity = 1) => `rgb(190, 190, 190, ${opacity})`, // optional
-            strokeWidth: 2, // optional
-            // withDots: false,
-          },
-          {
-            data: [maxDailyGoal + maxDailyGoal / 30], // max
-            withDots: false,
-          },
-          {
-            data: [minDailyGoal - minDailyGoal / 10], // min
-            withDots: false,
-          },
-        ],
-        legend: ['Weigh-ins', 'Goal Weight'],
+        );
+        legend.push('Weigh-ins');
+      }
+
+      return {
+        labels: history.map((item: IHistoryItem) => format(item.date, 'PP')),
+        datasets,
+        legend,
       };
     }
     return null;
@@ -91,7 +99,7 @@ function HistoryPlot({ history, plan, units }: IHistoryPlot) {
         verticalLabelRotation={Platform.OS === 'web' ? 0 : -75}
         xLabelsOffset={Platform.OS === 'web' ? 0 : 35}
         getDotColor={(dataPoint, dataPointIndex) => {
-          const dailyGoal = plot.datasets[1].data[dataPointIndex];
+          const dailyGoal = plot.datasets[0].data[dataPointIndex];
 
           if (dailyGoal) {
             const relativeChange = getRelativeChange(dailyGoal, dataPoint);

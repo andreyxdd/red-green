@@ -23,7 +23,6 @@ export const writeUserHistoryItem = (
   weighIn: number,
 ) => {
   const historyItemRef = doc(db, 'users', uid, 'plans', planId, 'history', historyItemId);
-
   setDoc(
     historyItemRef,
     { weighIn },
@@ -58,9 +57,10 @@ export const writeMaintenancePlan = async (
 ) => {
   const planRef = collection(db, 'users', uid, 'plans');
   const startDate = new Date(new Date().setHours(0, 0, 0, 0));
+  const endDate = new Date(goalDate.setHours(0, 0, 0, 0));
 
   const planDates = eachDayOfInterval(
-    { start: startDate, end: goalDate },
+    { start: startDate, end: endDate },
   );
 
   const res = await addDoc(
@@ -69,7 +69,7 @@ export const writeMaintenancePlan = async (
       active: true,
       type: PLANS.MAINTENANCE,
       startDate: Timestamp.fromDate(startDate),
-      goalDate: Timestamp.fromDate(goalDate),
+      goalDate: Timestamp.fromDate(endDate),
       goalWeight: Number(goalWeight),
     },
   );
@@ -95,9 +95,10 @@ export const writeLosingPlan = async (
 ) => {
   const planRef = collection(db, 'users', uid, 'plans');
   const startDate = new Date(new Date().setHours(0, 0, 0, 0));
+  const endDate = new Date(goalDate.setHours(0, 0, 0, 0));
 
   const planDates = eachDayOfInterval(
-    { start: startDate, end: goalDate },
+    { start: startDate, end: endDate },
   );
   const duration = planDates.length;
 
@@ -107,7 +108,7 @@ export const writeLosingPlan = async (
       active: true,
       type: PLANS.LOSING,
       startDate: Timestamp.fromDate(startDate),
-      goalDate: Timestamp.fromDate(goalDate),
+      goalDate: Timestamp.fromDate(endDate),
       goalWeight: Number(goalWeight),
     },
   );
@@ -130,7 +131,7 @@ export const writeLosingPlan = async (
   await batch.commit();
 };
 
-export const deactivatePlan = (uid: string, planId: string) => {
+export const writePlanStatus = (uid: string, planId: string) => {
   const planRef = doc(db, 'users', uid, 'plans', planId);
   setDoc(
     planRef,

@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, Alert } from 'react-native';
 import { Button, HelperText } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
-// import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 import shallow from 'zustand/shallow';
 import { addDays } from 'date-fns';
@@ -14,6 +14,7 @@ import useDataStore, { IDataStore } from '../../hooks/useDataStore';
 import { REGEX, ERROR_MESSAGES, CONSTANTS } from './index';
 import { getRelativeChange } from '../../utils/calculate';
 import { writeLosingPlan, writeMaintenancePlan } from '../../firebase/writes';
+import { updateLosingPlan, updateMaintenancePlan } from '../../firebase/updates';
 
 const SUB_LOSING_WEIGHT = 5;
 
@@ -53,17 +54,20 @@ export interface IPlanForm {
 }
 
 function PlanForm({ initialValues, uid }: IPlanForm) {
-  const [isImperialUnits, profileWeight] = useDataStore(
+  const [isImperialUnits, profileWeight, plan, history] = useDataStore(
     (state: IDataStore) => [
       state.profileData?.units === UNITS.IMPERIAL,
-      state.profileData ? state.profileData.weight : CONSTANTS.WEIGHT.KG.AVG],
+      state.profileData ? state.profileData.weight : CONSTANTS.WEIGHT.KG.AVG,
+      state.plan,
+      state.history,
+    ],
     shallow,
   );
 
-  // const navigation = useNavigation();
+  const navigation = useNavigation();
 
   const {
-    control, handleSubmit, formState: { errors, isValid }, watch, setValue,
+    control, handleSubmit, formState: { errors, isValid, isDirty }, watch, setValue,
   } = useForm<FormData>({
     mode: 'onChange',
     defaultValues: initialValues && initialValues,
@@ -74,12 +78,36 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
   const onSubmit = async ({ planType, goalWeight, goalDate }: FormData) => {
     if (isValid) {
       try {
-        if (planType === PLANS.LOSING) {
-          await writeLosingPlan(uid, goalWeight, goalDate, profileWeight);
+        if (!initialValues) {
+          if (planType === PLANS.LOSING) {
+            await writeLosingPlan(uid, goalWeight, goalDate, profileWeight);
+          }
+          if (planType === PLANS.MAINTENANCE) {
+            await writeMaintenancePlan(uid, goalWeight, goalDate);
+          }
+        } else {
+          if (plan?.type === PLANS.LOSING) {
+            await updateLosingPlan(
+              uid,
+              plan.id,
+              history,
+              plan.startDate,
+              goalWeight,
+              plan.goalDate,
+              profileWeight,
+            );
+          }
+          if (plan?.type === PLANS.MAINTENANCE) {
+            await updateMaintenancePlan(
+              uid,
+              plan.id,
+              history,
+              goalWeight,
+              plan.goalDate,
+            );
+          }
         }
-        if (planType === PLANS.MAINTENANCE) {
-          await writeMaintenancePlan(uid, goalWeight, goalDate);
-        }
+        navigation.goBack();
       } catch (error) {
         Alert.alert('Error', 'Something went wrong');
       }
@@ -225,7 +253,7 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
         mode="contained"
         onPress={handleSubmit(onSubmit)}
         style={styles.button}
-        disabled={!isValid}
+        disabled={!isValid || !isDirty}
       >
         Submit
       </Button>

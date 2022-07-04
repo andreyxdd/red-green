@@ -44,18 +44,24 @@ function ManualWeighInForm({
   const {
     control, handleSubmit, formState: {
       errors, isValid, isDirty,
-    }, setValue, getValues,
+    }, setValue, watch,
   } = useForm<FormData>({
     mode: 'onChange',
   });
 
+  const weighInWatcher = watch('weighIn');
   React.useEffect(() => {
-    if (isImperialUnits) {
-      setValue('weighIn', KGtoLBS(getValues('weighIn')));
-    } else {
-      setValue('weighIn', LBStoKG(getValues('weighIn')));
+    if (weighInWatcher) {
+      if (isImperialUnits) {
+        setValue('weighIn', KGtoLBS(weighInWatcher));
+      } else if (initialValue) {
+        setValue('weighIn', initialValue);
+      } else {
+        setValue('weighIn', LBStoKG(weighInWatcher));
+      }
     }
-  }, [getValues, isImperialUnits, setValue]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isImperialUnits]);
 
   // submit form
   const onSubmit = async ({ weighIn }: FormData) => {

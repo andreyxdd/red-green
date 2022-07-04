@@ -1,14 +1,17 @@
 import {
   Menu, MenuOptions, MenuOption, MenuTrigger, withMenuContext, renderers,
 } from 'react-native-popup-menu';
-import { View, StyleSheet } from 'react-native';
+import {
+  Alert, Platform, View, StyleSheet,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Text } from 'react-native-paper';
 import shallow from 'zustand/shallow';
 import ThreeDots from '../IconButtons/ThreeDots';
 import Divider from '../Divider';
 import useDataStore, { IDataStore } from '../../hooks/useDataStore';
-import { deactivatePlan } from '../../firebase/writes';
+import { writePlanStatus as deactivatePlan } from '../../firebase/writes';
+import { deleteHistoryByIds, deletePlan } from '../../firebase/deletes';
 
 const { SlideInMenu } = renderers;
 
@@ -18,7 +21,10 @@ const styles = StyleSheet.create({
 
 export default function PopupPlanMenu() {
   const navigation = useNavigation();
-  const [user, plan] = useDataStore((state: IDataStore) => [state.user, state.plan], shallow);
+  const [user, plan, history] = useDataStore(
+    (state: IDataStore) => [state.user, state.plan, state.history],
+    shallow,
+  );
 
   return (
     <View>
@@ -29,34 +35,47 @@ export default function PopupPlanMenu() {
             onSelect={() => { if (plan) navigation.navigate('EditPlan', { plan }); }}
             disabled={!plan}
           >
-            <Text style={styles.menuOption}>Edit</Text>
+            <Text style={styles.menuOption}>Edit Plan</Text>
           </MenuOption>
           <Divider width={1} />
           <MenuOption
             onSelect={() => {
               if (user && plan) deactivatePlan(user.uid, plan.id);
-              /*
-              Alert.alert(
-              'Delete',
-              'Are you sure you want to delete current plan? Data will be lost',
-              [
-                {
-                  text: 'Cancel',
-                  style: 'cancel',
-                },
-                {
-                  text: 'Delete',
-                  onPress: () => {
-                    if (user && plan) deactivatePlan(user.uid, plan.id);
-                  },
-                },
-              ],
-              )
-              */
             }}
+            disabled
+          >
+            <Text style={[styles.menuOption, { fontWeight: '200' }]}>Deactivate Plan</Text>
+          </MenuOption>
+          <Divider width={1} />
+          <MenuOption
+            onSelect={Platform.OS === 'web'
+              ? async () => {
+                if (user && plan) {
+                  await deleteHistoryByIds(user.uid, plan.id, history);
+                  await deletePlan(user.uid, plan.id);
+                }
+              }
+              : () => {
+                Alert.alert(
+                  'Delete',
+                  'Are you sure you want to delete current plan? Data will be lost',
+                  [
+                    {
+                      text: 'Cancel',
+                      style: 'cancel',
+                    },
+                    {
+                      text: 'Delete',
+                      onPress: async () => {
+                        if (user && plan) deleteHistoryByIds(user.uid, plan.id, history);
+                      },
+                    },
+                  ],
+                );
+              }}
             disabled={!plan}
           >
-            <Text style={[styles.menuOption, { color: 'red' }]}>Delete</Text>
+            <Text style={[styles.menuOption, { color: 'red' }]}>Delete Plan</Text>
           </MenuOption>
         </MenuOptions>
       </Menu>

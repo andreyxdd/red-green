@@ -107,6 +107,50 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
     }
   };
 
+  const heightFieldRules = React.useMemo(
+    () => ({
+      required: { message: ERROR_MESSAGES.REQUIRED, value: true },
+      pattern: {
+        message: imperialUnitsWatcher ? ERROR_MESSAGES.INVALID_HEIGHT.FT
+          : ERROR_MESSAGES.INVALID_HEIGHT.CM,
+        value: imperialUnitsWatcher ? REGEX.HEIGHT.FT
+          : REGEX.HEIGHT.CM,
+      },
+      validate: (v: any) => {
+        if (imperialUnitsWatcher) {
+          return (Number(v) > CONSTANTS.HEIGHT.FT.MIN && Number(v) < CONSTANTS.HEIGHT.FT.MAX)
+                || ERROR_MESSAGES.INVALID_HEIGHT_RANGE.FT;
+        }
+        return (Number(v) > CONSTANTS.HEIGHT.CM.MIN && Number(v) < CONSTANTS.HEIGHT.CM.MAX)
+              || ERROR_MESSAGES.INVALID_HEIGHT_RANGE.CM;
+      },
+    }),
+    [imperialUnitsWatcher],
+  );
+
+  const weightFieldRules = React.useMemo(
+    () => ({
+      required: { message: ERROR_MESSAGES.REQUIRED, value: true },
+      pattern: {
+        message: imperialUnitsWatcher
+          ? ERROR_MESSAGES.INVALID_WEIGHT.LBS
+          : ERROR_MESSAGES.INVALID_WEIGHT.KG,
+        value: imperialUnitsWatcher
+          ? REGEX.WEIGHT.LBS
+          : REGEX.WEIGHT.KG,
+      },
+      validate: (v: any) => {
+        if (imperialUnitsWatcher) {
+          return (Number(v) > CONSTANTS.WEIGHT.LBS.MIN && Number(v) < CONSTANTS.WEIGHT.LBS.MAX)
+                || ERROR_MESSAGES.INVALID_WEIGHT_RANGE.LBS;
+        }
+        return (Number(v) > CONSTANTS.WEIGHT.KG.MIN && Number(v) < CONSTANTS.WEIGHT.KG.MAX)
+              || ERROR_MESSAGES.INVALID_WEIGHT_RANGE.KG;
+      },
+    }),
+    [imperialUnitsWatcher],
+  );
+
   return (
     <View style={styles.container}>
       <Controller
@@ -188,23 +232,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
         control={control}
         name="height"
         defaultValue={initialValues ? initialValues.height : CONSTANTS.HEIGHT.CM.AVG}
-        rules={{
-          required: { message: ERROR_MESSAGES.REQUIRED, value: true },
-          pattern: {
-            message: imperialUnitsWatcher ? ERROR_MESSAGES.INVALID_HEIGHT.FT
-              : ERROR_MESSAGES.INVALID_HEIGHT.CM,
-            value: imperialUnitsWatcher ? REGEX.HEIGHT.FT
-              : REGEX.HEIGHT.CM,
-          },
-          validate: (v) => {
-            if (imperialUnitsWatcher) {
-              return (v > CONSTANTS.HEIGHT.FT.MIN && v < CONSTANTS.HEIGHT.FT.MAX)
-                || ERROR_MESSAGES.INVALID_HEIGHT_RANGE.FT;
-            }
-            return (v > CONSTANTS.HEIGHT.CM.MIN && v < CONSTANTS.HEIGHT.CM.MAX)
-              || ERROR_MESSAGES.INVALID_HEIGHT_RANGE.CM;
-          },
-        }}
+        rules={heightFieldRules}
         render={({ field: { onChange, onBlur, value } }) => {
           if (unitsLoading) return <ActivityIndicator animating size="small" />;
           return (
@@ -240,25 +268,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
         control={control}
         name="weight"
         defaultValue={initialValues ? initialValues.weight : CONSTANTS.WEIGHT.KG.AVG}
-        rules={{
-          required: { message: ERROR_MESSAGES.REQUIRED, value: true },
-          pattern: {
-            message: imperialUnitsWatcher
-              ? ERROR_MESSAGES.INVALID_WEIGHT.LBS
-              : ERROR_MESSAGES.INVALID_WEIGHT.KG,
-            value: imperialUnitsWatcher
-              ? REGEX.WEIGHT.LBS
-              : REGEX.WEIGHT.KG,
-          },
-          validate: (v) => {
-            if (imperialUnitsWatcher) {
-              return (v > CONSTANTS.WEIGHT.LBS.MIN && v < CONSTANTS.WEIGHT.LBS.MAX)
-                || ERROR_MESSAGES.INVALID_WEIGHT_RANGE.LBS;
-            }
-            return (v > CONSTANTS.WEIGHT.KG.MIN && v < CONSTANTS.WEIGHT.KG.MAX)
-              || ERROR_MESSAGES.INVALID_WEIGHT_RANGE.KG;
-          },
-        }}
+        rules={weightFieldRules}
         render={({ field: { onChange, onBlur, value } }) => {
           if (unitsLoading) return <ActivityIndicator animating size="small" />;
           return (

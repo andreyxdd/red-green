@@ -83,31 +83,34 @@ function ManualWeighInForm({
     }
   };
 
+  const weighInFieldRules = React.useMemo(() => ({
+    required: { message: ERROR_MESSAGES.REQUIRED, value: true },
+    pattern: {
+      message: isImperialUnits
+        ? ERROR_MESSAGES.INVALID_WEIGHT.LBS
+        : ERROR_MESSAGES.INVALID_WEIGHT.KG,
+      value: isImperialUnits
+        ? REGEX.WEIGHT.LBS
+        : REGEX.WEIGHT.KG,
+    },
+    validate: (v: any) => {
+      if (isImperialUnits) {
+        return (Number(v) > CONSTANTS.WEIGHT.LBS.MIN && Number(v) < CONSTANTS.WEIGHT.LBS.MAX)
+                || ERROR_MESSAGES.INVALID_WEIGHT_RANGE.LBS;
+      }
+      return (Number(v) > CONSTANTS.WEIGHT.KG.MIN && Number(v) < CONSTANTS.WEIGHT.KG.MAX)
+              || ERROR_MESSAGES.INVALID_WEIGHT_RANGE.KG;
+    },
+
+  }), [isImperialUnits]);
+
   return (
     <View style={styles.container}>
       <Controller
         control={control}
         name="weighIn"
         defaultValue={initialValue || 0.0}
-        rules={{
-          required: { message: ERROR_MESSAGES.REQUIRED, value: true },
-          pattern: {
-            message: isImperialUnits
-              ? ERROR_MESSAGES.INVALID_WEIGHT.LBS
-              : ERROR_MESSAGES.INVALID_WEIGHT.KG,
-            value: isImperialUnits
-              ? REGEX.WEIGHT.LBS
-              : REGEX.WEIGHT.KG,
-          },
-          validate: (v) => {
-            if (isImperialUnits) {
-              return (v > CONSTANTS.WEIGHT.LBS.MIN && v < CONSTANTS.WEIGHT.LBS.MAX)
-                || ERROR_MESSAGES.INVALID_WEIGHT_RANGE.LBS;
-            }
-            return (v > CONSTANTS.WEIGHT.KG.MIN && v < CONSTANTS.WEIGHT.KG.MAX)
-              || ERROR_MESSAGES.INVALID_WEIGHT_RANGE.KG;
-          },
-        }}
+        rules={weighInFieldRules}
         render={({ field: { onBlur, onChange, value } }) => (
           <>
             <Measurepicker

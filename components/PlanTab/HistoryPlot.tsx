@@ -19,7 +19,7 @@ const chartConfig = {
     fontSize: '8',
   },
   propsForDots: {
-    r: '12',
+    r: Platform.OS === 'web' ? '12' : '6',
     strokeWidth: '2',
     stroke: '#fff',
   },

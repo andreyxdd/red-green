@@ -118,6 +118,28 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
     setValue('goalWeight', isLosingPlanWatcher ? profileWeight - SUB_LOSING_WEIGHT : profileWeight);
   }, [isLosingPlanWatcher, profileWeight, setValue]);
 
+  const goalWeightFieldRules = React.useMemo(
+    () => ({
+      required: { message: ERROR_MESSAGES.REQUIRED, value: true },
+      pattern: {
+        message: isImperialUnits
+          ? ERROR_MESSAGES.INVALID_WEIGHT.LBS
+          : ERROR_MESSAGES.INVALID_WEIGHT.KG,
+        value: isImperialUnits
+          ? REGEX.WEIGHT.LBS
+          : REGEX.WEIGHT.KG,
+      },
+      validate: (v: any) => {
+        const relativeChange = getRelativeChange(profileWeight, Number(v));
+        if (!isLosingPlanWatcher) { // MAINTENANCE
+          return Math.abs(relativeChange) < 2.0 || ERROR_MESSAGES.MAINTENANCE_GOAL_WEIGHT;
+        }
+        return relativeChange < 0.0 || ERROR_MESSAGES.LOSING_GOAL_WEIGHT;
+      },
+    }),
+    [isLosingPlanWatcher, isImperialUnits, profileWeight],
+  );
+
   return (
     <View style={styles.container}>
       {initialValues ? null : (
@@ -142,24 +164,7 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
         control={control}
         defaultValue={initialValues ? initialValues.goalWeight : profileWeight}
         name="goalWeight"
-        rules={{
-          required: { message: ERROR_MESSAGES.REQUIRED, value: true },
-          pattern: {
-            message: isImperialUnits
-              ? ERROR_MESSAGES.INVALID_WEIGHT.LBS
-              : ERROR_MESSAGES.INVALID_WEIGHT.KG,
-            value: isImperialUnits
-              ? REGEX.WEIGHT.LBS
-              : REGEX.WEIGHT.KG,
-          },
-          validate: (v) => {
-            const relativeChange = getRelativeChange(profileWeight, v);
-            if (!isLosingPlanWatcher) { // MAINTENANCE
-              return Math.abs(relativeChange) < 2.0 || ERROR_MESSAGES.MAINTENANCE_GOAL_WEIGHT;
-            }
-            return relativeChange < 0.0 || ERROR_MESSAGES.LOSING_GOAL_WEIGHT;
-          },
-        }}
+        rules={goalWeightFieldRules}
         render={({ field: { onChange, onBlur, value } }) => (
           <>
             <Measurepicker

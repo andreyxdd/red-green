@@ -4,7 +4,7 @@ export const CONSTANTS = {
   MAX_AGE: 100,
   MIN_AGE: 18,
   HEIGHT: {
-    FT: { MIN: 2, MAX: 7, IN: 11 },
+    FT: { MIN: 2, MAX: 7, IN: 12 },
     CM: { MIN: 80, MAX: 230, AVG: 165 },
   },
   WEIGHT: {
@@ -22,6 +22,8 @@ export const REGEX = {
   NAME: /^[a-z ,.'-]+$/i,
   HEIGHT: { FT: /^\d*\.?\d{2}$/, CM: /^[1-9]\d+$/ },
   WEIGHT: { LBS: /^\d+$/, KG: /^\d*\.?\d{1}$/ },
+  // HEIGHT: { FT: /^\d+(\.\d+)?$/, CM: /^\d+(\.\d+)?$/ },
+  // WEIGHT: { LBS: /^\d+(\.\d+)?$/, KG: /^\d+(\.\d+)?$/ },
 };
 
 export const ERROR_MESSAGES = {

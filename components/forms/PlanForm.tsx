@@ -12,9 +12,10 @@ import Toggle from '../Toggle';
 import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
 import useDataStore, { IDataStore } from '../../hooks/useDataStore';
 import { REGEX, ERROR_MESSAGES, CONSTANTS } from './index';
-import { getRelativeChange, KGtoLBS } from '../../utils/calculate';
+import { getRelativeChange, KGtoLBS, LBStoKG } from '../../utils/calculate';
 import { writeLosingPlan, writeMaintenancePlan } from '../../firebase/writes';
 import { updateLosingPlan, updateMaintenancePlan } from '../../firebase/updates';
+import parseStringNumbers from '../../utils/parseStringNumbers';
 
 const SUB_LOSING_WEIGHT = 5;
 
@@ -82,13 +83,15 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
 
   const onSubmit = async ({ planType, goalWeight, goalDate }: FormData) => {
     if (isValid) {
+      const newGoalWeight = parseStringNumbers(goalWeight);
+      const goalWeighValue = isImperialUnits ? LBStoKG(newGoalWeight) : goalWeight;
       try {
         if (!initialValues) {
           if (planType === PLANS.LOSING) {
-            await writeLosingPlan(uid, goalWeight, goalDate, profileWeight);
+            await writeLosingPlan(uid, goalWeighValue, goalDate, profileWeight);
           }
           if (planType === PLANS.MAINTENANCE) {
-            await writeMaintenancePlan(uid, goalWeight, goalDate);
+            await writeMaintenancePlan(uid, goalWeighValue, goalDate);
           }
         } else {
           if (plan?.type === PLANS.LOSING) {
@@ -97,7 +100,7 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
               plan.id,
               history,
               plan.startDate,
-              goalWeight,
+              goalWeighValue,
               plan.goalDate,
               profileWeight,
             );
@@ -107,7 +110,7 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
               uid,
               plan.id,
               history,
-              goalWeight,
+              goalWeighValue,
               plan.goalDate,
             );
           }

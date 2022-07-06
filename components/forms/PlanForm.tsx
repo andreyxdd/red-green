@@ -63,7 +63,7 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
         ? (state.profileData?.units === UNITS.IMPERIAL
           ? KGtoLBS(state.profileData.weight)
           : state.profileData.weight)
-        : CONSTANTS.WEIGHT.KG.AVG,
+        : 0.0,
       state.plan,
       state.history,
     ],
@@ -85,10 +85,13 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
     if (isValid) {
       const newGoalWeight = parseStringNumbers(goalWeight);
       const goalWeighValue = isImperialUnits ? LBStoKG(newGoalWeight) : newGoalWeight;
+      const startWeight = isImperialUnits ? LBStoKG(profileWeight) : profileWeight;
       try {
         if (!initialValues) {
           if (planType === PLANS.LOSING) {
-            await writeLosingPlan(uid, goalWeighValue, goalDate, profileWeight);
+            console.log('goalWeighValue', goalWeighValue);
+            console.log('startWeight', startWeight);
+            await writeLosingPlan(uid, goalWeighValue, goalDate, startWeight);
           }
           if (planType === PLANS.MAINTENANCE) {
             await writeMaintenancePlan(uid, goalWeighValue, goalDate);
@@ -102,7 +105,7 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
               plan.startDate,
               goalWeighValue,
               plan.goalDate,
-              profileWeight,
+              startWeight,
             );
           }
           if (plan?.type === PLANS.MAINTENANCE) {

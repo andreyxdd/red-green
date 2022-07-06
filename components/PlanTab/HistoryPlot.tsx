@@ -54,8 +54,8 @@ function HistoryPlot({ history, plan, units }: IHistoryPlot) {
         {
           data: dailyGoals,
           color: (opacity = 1) => `rgb(190, 190, 190, ${opacity})`, // optional
-          strokeWidth: 2, // optional
-          // withDots: false,
+          strokeWidth: 6, // optional
+          withDots: false,
         },
         {
           data: [maxDailyGoal + maxDailyGoal / 30], // max
@@ -76,6 +76,7 @@ function HistoryPlot({ history, plan, units }: IHistoryPlot) {
             data: weignIns,
             color: (opacity = 1) => `rgb(98, 0, 238, ${opacity})`,
             strokeWidth: 3,
+            withDots: true,
           },
         );
         legend.push('Weigh-ins');
@@ -106,13 +107,13 @@ function HistoryPlot({ history, plan, units }: IHistoryPlot) {
           if (dailyGoal) {
             const relativeChange = getRelativeChange(dailyGoal, dataPoint);
 
-            if (dataPoint === dailyGoal) {
-              return '#D3D3D3';
-            }
+            // if (dataPoint === dailyGoal) {
+            //  return '#D3D3D3';
+            // }
 
             if (relativeChange > 2.0) {
               return colors[SIGNS.RED].secondary;
-            } if (relativeChange < 0.0) {
+            } if (relativeChange <= 0.0) {
               return colors[SIGNS.GREEN].secondary;
             }
             return colors[SIGNS.YELLOW].secondary;

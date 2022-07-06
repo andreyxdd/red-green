@@ -22,7 +22,7 @@ function CreatePlanScreen() {
       keyboardDismissMode="on-drag"
       keyboardShouldPersistTaps="handled"
     >
-      {user && !plan ? (
+      {user && (!plan || !plan.active) ? (
         <PlanForm uid={user.uid} />
       ) : null}
     </KeyboardAwareScrollView>

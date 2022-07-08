@@ -7,14 +7,14 @@ import WeighInScreen from '../screens/auth/WeighinTab/WeighInScreen';
 import PlanScreen from '../screens/auth/PlanTab/PlanScreen';
 import { AuthBottomTabList, AuthBottomTabProps } from '../types/navigation';
 import { MenuContextOpenner } from '../components/PlanTab/PopupPlanMenu';
-import useInterfaceStore, { IInterfaceStore } from '../hooks/useInterfaceStore';
+import useDataStore, { IDataStore } from '../hooks/useDataStore';
 import colors from '../styles/colors';
 import Profile from '../components/IconButtons/Profile';
 
 const BottomTab = createBottomTabNavigator<AuthBottomTabList>();
 
 function BottomTabStack() {
-  const sign = useInterfaceStore((state: IInterfaceStore) => state.sign);
+  const sign = useDataStore((state:IDataStore) => state.todayHistoryItem?.sign);
   const { colors: paperColors } = useTheme();
 
   return (

@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
 
 export default function ManualWeighInScreen({ route }: AuthStackScreenProps<'ManualWeighIn'>) {
   const {
-    screenType, currentWeighIn, uid, planId, historyId, isImperialUnits,
+    screenType, currentWeighIn, uid, planId, historyId, isImperialUnits, profileWeight,
   } = route.params;
 
   return (
@@ -30,11 +30,16 @@ export default function ManualWeighInScreen({ route }: AuthStackScreenProps<'Man
         {screenType === MANUAL_WEIGHIN.EDIT ? 'Edit Weigh-in' : 'Input Weigh-in'}
       </Headline>
       <ManualWeighInForm
-        initialValue={currentWeighIn}
+        initialValues={
+          currentWeighIn
+            ? { weighInOne: currentWeighIn.kg, weighInTwo: currentWeighIn.kgFraction }
+            : undefined
+        }
         uid={uid}
         planId={planId}
         historyId={historyId}
         isImperialUnits={isImperialUnits}
+        profileWeight={profileWeight}
       />
     </KeyboardAwareScrollView>
   );

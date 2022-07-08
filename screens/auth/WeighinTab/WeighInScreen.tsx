@@ -36,9 +36,10 @@ function WeighInScreen() {
   if (user && plan && profile && todayHistoryItem) {
     return (
       <View style={[styles.container, { flex: 1 }]}>
-        {profile ? <Greeting name={profile.name} /> : null}
+        <Greeting name={profile.name} />
         {(
-          history.length > 0 && todayHistoryItem && todayHistoryItem.weighIn
+          history.length > 0 && todayHistoryItem
+          && todayHistoryItem.weighIn && todayHistoryItem.sign
         ) ? (
           <WeighInView
             currentWeighIn={todayHistoryItem.weighIn}
@@ -47,6 +48,7 @@ function WeighInScreen() {
             planId={plan.id}
             historyId={todayHistoryItem.id}
             isImperialUnits={profile.units === UNITS.IMPERIAL}
+            profileWeight={profile.weight}
           />
           ) : (
             <NoWeighInView
@@ -54,6 +56,7 @@ function WeighInScreen() {
               planId={plan.id}
               historyId={todayHistoryItem.id}
               isImperialUnits={profile.units === UNITS.IMPERIAL}
+              profileWeight={profile.weight}
             />
           )}
       </View>

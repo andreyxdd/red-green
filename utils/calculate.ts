@@ -14,13 +14,3 @@ export function getDailyGoal(
 ) {
   return prevDailyGoalWeight - (startWeight - goalWeight) / duration;
 }
-
-export function LBStoKG(input: number) {
-  const out = input / 2.205;
-  return Math.round((out + Number.EPSILON) * 10) / 10;
-}
-
-export function KGtoLBS(input: number) {
-  const out = input * 2.205;
-  return Math.round(out);
-}

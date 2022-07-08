@@ -1,6 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { View, StyleSheet } from 'react-native';
 import { Button, Subheading } from 'react-native-paper';
+import { IWeight } from '../../types/data';
 import { MANUAL_WEIGHIN } from '../../types/enums';
 
 const styles = StyleSheet.create({
@@ -17,10 +18,11 @@ interface IWeighInView{
   planId: string;
   historyId: string;
   isImperialUnits: boolean;
+  profileWeight: IWeight;
 }
 
 function WeighInView({
-  uid, planId, historyId, isImperialUnits,
+  uid, planId, historyId, isImperialUnits, profileWeight,
 }: IWeighInView) {
   const { navigate } = useNavigation();
   return (
@@ -45,6 +47,7 @@ function WeighInView({
             planId,
             historyId,
             isImperialUnits,
+            profileWeight,
           });
         }}
       >

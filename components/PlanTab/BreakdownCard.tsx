@@ -5,7 +5,8 @@ import { Card, Text } from 'react-native-paper';
 import { SIGNS } from '../../types/enums';
 import colors from '../../styles/colors';
 import TrafficLightIcon from '../TrafficLightIcon';
-import { KGtoLBS } from '../../utils/calculate';
+import { KGtoLBS } from '../../utils/conversions';
+import { IWeight } from '../../types/data';
 
 const styles = StyleSheet.create({
   column: {
@@ -21,16 +22,32 @@ const styles = StyleSheet.create({
 });
 
 interface IBreakdownCard{
-  goalWeight: number;
-  weighIn: number;
+  goalWeight: IWeight;
+  weighIn: IWeight;
   date: Date;
   sign: SIGNS;
-  units: string;
+  isImperialUnits: boolean;
 }
 
 function BreakdownCard({
-  goalWeight, weighIn, date, sign, units,
+  goalWeight, weighIn, date, sign, isImperialUnits,
 }: IBreakdownCard) {
+  const currenGoaltWeightValue = React.useMemo(() => {
+    if (isImperialUnits) {
+      const weight = KGtoLBS(goalWeight.kg, goalWeight.kgFraction);
+      return weight.lbs + weight.lbsFraction / 10;
+    }
+    return goalWeight.kg + goalWeight.kgFraction / 10;
+  }, [isImperialUnits, goalWeight]);
+
+  const currenWeighInValue = React.useMemo(() => {
+    if (isImperialUnits) {
+      const weight = KGtoLBS(weighIn.kg, weighIn.kgFraction);
+      return weight.lbs + weight.lbsFraction / 10;
+    }
+    return weighIn.kg + weighIn.kgFraction / 10;
+  }, [isImperialUnits, weighIn]);
+
   return (
     <Card style={{ marginVertical: 4 }}>
       <Card.Content>
@@ -46,22 +63,24 @@ function BreakdownCard({
               <Text style={{ fontWeight: '200', marginRight: 4 }}>
                 Daily Goal Weight,
                 {' '}
-                {units}
+                {isImperialUnits ? 'lbs' : 'kg'}
                 :
               </Text>
               <Text style={{ fontWeight: '200', marginRight: 4 }}>
-                {units === 'lbs' ? KGtoLBS(goalWeight) : goalWeight.toFixed(1)}
+                {' '}
+                {currenGoaltWeightValue}
               </Text>
             </View>
             <View style={styles.row}>
               <Text style={{ marginRight: 4 }}>
                 Achieved Weight,
                 {' '}
-                {units}
+                {isImperialUnits ? 'lbs' : 'kg'}
                 :
               </Text>
               <Text style={{ marginRight: 4 }}>
-                {units === 'lbs' ? KGtoLBS(weighIn) : weighIn.toFixed(1)}
+                {' '}
+                {currenWeighInValue}
               </Text>
             </View>
           </View>

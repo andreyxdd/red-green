@@ -15,7 +15,7 @@ import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
 import { ERROR_MESSAGES, CONSTANTS } from './settings';
 import { getRelativeChange } from '../../utils/calculate';
 import { KGtoLBS, LBStoKG } from '../../utils/conversions';
-import { IProfile } from '../../types/data';
+import { IProfile, IGeneralWeight } from '../../types/data';
 import { writeLosingPlan, writeMaintenancePlan } from '../../firebase/writes';
 
 // const SUB_LOSING_WEIGHT = 5;
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   helperText: { width: '90%', alignSelf: 'center' },
 });
 
-const YUPschema = (currentWeight: IWeight) => yup.object().shape({
+const YUPschema = (currentWeight: IGeneralWeight) => yup.object().shape({
   plan: yup
     .mixed<PLANS>()
     .oneOf(Object.values(PLANS))
@@ -113,11 +113,6 @@ export interface IPlanForm {
   uid: string;
 }
 
-interface IWeight {
-  whole: number;
-  fraction: number;
-}
-
 interface FormData {
   plan: PLANS;
   goalWeightOne: number;
@@ -130,7 +125,7 @@ function PlanForm({ initialValues, profile, uid }: IPlanForm) {
 
   const data = React.useMemo(() => {
     if (profile.units === UNITS.IMPERIAL) {
-      const { lbs, lbsFraction } = KGtoLBS(profile.weight.kg, profile.weight.fraction);
+      const { lbs, lbsFraction } = KGtoLBS(profile.weight.kg, profile.weight.kgFraction);
       const profileWeight = { whole: lbs, fraction: lbsFraction };
       return {
         isImperialUnits: true,
@@ -139,7 +134,7 @@ function PlanForm({ initialValues, profile, uid }: IPlanForm) {
       };
     }
 
-    const profileWeight = { whole: profile.weight.kg, fraction: profile.weight.fraction };
+    const profileWeight = { whole: profile.weight.kg, fraction: profile.weight.kgFraction };
     return {
       isImperialUnits: false,
       profileWeight,
@@ -152,7 +147,7 @@ function PlanForm({ initialValues, profile, uid }: IPlanForm) {
   } = useForm<FormData>({
     mode: 'all',
     resolver: yupResolver(data.schema),
-    defaultValues: data.schema.getDefault(),
+    defaultValues: initialValues || data.schema.getDefault(),
   });
 
   const onSubmit = async ({
@@ -161,7 +156,7 @@ function PlanForm({ initialValues, profile, uid }: IPlanForm) {
     if (isValid) {
       const goalWeight = data.isImperialUnits
         ? LBStoKG(goalWeightOne, goalWeightTwo)
-        : { kg: goalWeightTwo, kgFraction: goalWeightTwo };
+        : { kg: goalWeightOne, kgFraction: goalWeightTwo };
 
       const startWeight = data.isImperialUnits
         ? LBStoKG(data.profileWeight.whole, data.profileWeight.fraction)

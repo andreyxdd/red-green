@@ -3,15 +3,14 @@ import { StyleSheet, View, Alert } from 'react-native';
 import { Button, HelperText } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
 import { writeUserHistoryItem, writeUserWeight } from '../../firebase/writes';
-import parseStringNumbers from '../../utils/parseStringNumbers';
 import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
 import { ERROR_MESSAGES, CONSTANTS } from './settings';
-import { KGtoLBS, LBStoKG } from '../../utils/calculate';
-
-interface FormData {
-  weighIn: number;
-}
+import { KGtoLBS, LBStoKG } from '../../utils/conversions';
+import { IWeight, IGeneralWeight } from '../../types/data';
 
 const styles = StyleSheet.create({
   container: {
@@ -19,124 +18,164 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.0)',
     width: '100%',
   },
+  rowContainer: {
+    flexDirection: 'row', width: '90%', alignSelf: 'center', marginVertical: 2,
+  },
   input: { marginVertical: 2, width: '90%', alignSelf: 'center' },
+  rowInput: { flex: 1 },
   button: {
     width: '80%', paddingVertical: 4, marginBottom: 14, alignSelf: 'center',
   },
   helperText: { width: '90%', alignSelf: 'center' },
 });
 
+const YUPschema = (defaultWeighIn: IGeneralWeight, isImperialUnits: boolean) => yup.object().shape({
+  weighInOne: yup
+    .number()
+    .typeError(ERROR_MESSAGES.NONNUMBER)
+    .required(ERROR_MESSAGES.REQUIRED)
+    .min(
+      isImperialUnits
+        ? CONSTANTS.WEIGHT.LBS.MIN : CONSTANTS.WEIGHT.KG.MIN,
+      isImperialUnits
+        ? ERROR_MESSAGES.INVALID_WEIGHT_RANGE.LBS : ERROR_MESSAGES.INVALID_WEIGHT_RANGE.KG,
+    )
+    .max(
+      isImperialUnits
+        ? CONSTANTS.WEIGHT.LBS.MAX : CONSTANTS.WEIGHT.KG.MAX,
+      isImperialUnits
+        ? ERROR_MESSAGES.INVALID_WEIGHT_RANGE.LBS : ERROR_MESSAGES.INVALID_WEIGHT_RANGE.KG,
+    )
+    .default(defaultWeighIn.whole),
+  weighInTwo: yup
+    .number()
+    .typeError(ERROR_MESSAGES.NONNUMBER)
+    .required(ERROR_MESSAGES.REQUIRED)
+    .min(CONSTANTS.WEIGHT.FRACTION.MIN, ERROR_MESSAGES.INVALID_WEIGHT_RANGE.FRACTION)
+    .max(CONSTANTS.WEIGHT.FRACTION.MAX, ERROR_MESSAGES.INVALID_WEIGHT_RANGE.FRACTION)
+    .default(defaultWeighIn.fraction),
+});
+
+interface FormData {
+  weighInOne: number;
+  weighInTwo: number;
+}
+
 export type IManualWeighInForm = {
-  initialValue?: number;
+  initialValues?: FormData;
   uid: string;
   planId: string;
   historyId: string;
   isImperialUnits: boolean;
+  profileWeight: IWeight;
 }
 
 function ManualWeighInForm({
-  initialValue, uid, planId, historyId, isImperialUnits,
+  initialValues, uid, planId, historyId, isImperialUnits, profileWeight,
 }: IManualWeighInForm) {
+  const data = React.useMemo(() => {
+    if (isImperialUnits) {
+      const { lbs, lbsFraction } = KGtoLBS(profileWeight.kg, profileWeight.kgFraction);
+      const defaultWeighIn = { whole: lbs, fraction: lbsFraction };
+      return { defaultWeighIn, isImperialUnits: true };
+    }
+
+    const defaultWeighIn = { whole: profileWeight.kg, fraction: profileWeight.kgFraction };
+    return { defaultWeighIn, isImperialUnits: false };
+  }, [profileWeight, isImperialUnits]);
+
   // screen nav object
   const navigation = useNavigation();
 
   // handle form
   const {
-    control, handleSubmit, formState: {
-      errors, isValid, isDirty,
-    }, setValue, watch,
+    control, handleSubmit, formState: { errors, isValid }, setValue,
   } = useForm<FormData>({
-    mode: 'onChange',
+    mode: 'all',
+    resolver: yupResolver(YUPschema(data.defaultWeighIn, data.isImperialUnits)),
+    defaultValues: initialValues
+      || YUPschema(data.defaultWeighIn, data.isImperialUnits).getDefault(),
   });
 
-  const weighInWatcher = watch('weighIn');
   React.useEffect(() => {
-    if (weighInWatcher) {
-      if (isImperialUnits) {
-        setValue('weighIn', KGtoLBS(weighInWatcher));
-      } else if (initialValue) {
-        setValue('weighIn', initialValue);
-      } else {
-        setValue('weighIn', LBStoKG(weighInWatcher));
-      }
+    if (isImperialUnits) {
+      const { lbs, lbsFraction } = KGtoLBS(profileWeight.kg, profileWeight.kgFraction);
+      const defaultWeighIn = { whole: lbs, fraction: lbsFraction };
+      setValue('weighInOne', defaultWeighIn.whole, { shouldValidate: true });
+      setValue('weighInTwo', defaultWeighIn.fraction, { shouldValidate: true });
+      return;
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isImperialUnits]);
+
+    const defaultWeighIn = { whole: profileWeight.kg, fraction: profileWeight.kgFraction };
+    setValue('weighInOne', defaultWeighIn.whole, { shouldValidate: true });
+    setValue('weighInTwo', defaultWeighIn.fraction, { shouldValidate: true });
+  }, [profileWeight, isImperialUnits, setValue]);
 
   // submit form
-  const onSubmit = async ({ weighIn }: FormData) => {
+  const onSubmit = async ({ weighInOne, weighInTwo }: FormData) => {
     if (isValid) {
       try {
-        const weighInParsed = parseStringNumbers(weighIn);
-        const newWeight = isImperialUnits ? LBStoKG(weighInParsed) : weighInParsed;
+        const newWeighInKG = isImperialUnits
+          ? LBStoKG(weighInOne, weighInTwo)
+          : { kg: weighInOne, kgFraction: weighInTwo };
 
-        if (Number.isFinite(newWeight)) {
-          writeUserWeight(uid, newWeight);
+        writeUserWeight(uid, newWeighInKG);
 
-          writeUserHistoryItem(uid, planId, historyId, newWeight);
+        await writeUserHistoryItem(uid, planId, historyId, newWeighInKG);
 
-          navigation.goBack();
-        }
+        navigation.goBack();
       } catch (error) {
-        Alert.alert('Error', 'Something went wrong');
+        Alert.alert('Error', 'Weighin was not submitted, something went wrong');
       }
     }
   };
 
-  const weighInFieldRules = React.useMemo(() => ({
-    required: { message: ERROR_MESSAGES.REQUIRED, value: true },
-    /* pattern: {
-      message: isImperialUnits
-        ? ERROR_MESSAGES.INVALID_WEIGHT.LBS
-        : ERROR_MESSAGES.INVALID_WEIGHT.KG,
-      value: isImperialUnits
-        ? REGEX.WEIGHT.LBS
-        : REGEX.WEIGHT.KG,
-    }, */
-    validate: (v: any) => {
-      if (isImperialUnits) {
-        return (Number(v) > CONSTANTS.WEIGHT.LBS.MIN && Number(v) < CONSTANTS.WEIGHT.LBS.MAX)
-                || ERROR_MESSAGES.INVALID_WEIGHT_RANGE.LBS;
-      }
-      return (Number(v) > CONSTANTS.WEIGHT.KG.MIN && Number(v) < CONSTANTS.WEIGHT.KG.MAX)
-              || ERROR_MESSAGES.INVALID_WEIGHT_RANGE.KG;
-    },
-
-  }), [isImperialUnits]);
-
   return (
     <View style={styles.container}>
-      <Controller
-        control={control}
-        name="weighIn"
-        defaultValue={initialValue || 0.0}
-        rules={weighInFieldRules}
-        render={({ field: { onBlur, onChange, value } }) => (
-          <>
-            <Measurepicker
-              value={value}
-              label={`Weigh-In, ${isImperialUnits ? 'lbs' : 'kg'}`}
-              style={styles.input}
-              error={!!errors.weighIn}
-              handleBlur={onBlur}
-              handleChange={onChange}
-              min={1}
-              max={102}
-            />
-            <HelperText
-              style={styles.helperText}
-              type="error"
-            >
-              {errors.weighIn?.message}
-            </HelperText>
-          </>
-        )}
-      />
+      <View style={styles.rowContainer}>
+        <Controller
+          control={control}
+          name="weighInOne"
+          render={({ field: { onBlur, onChange, value } }) => (
+            <View style={[styles.rowInput, { marginRight: 6 }]}>
+              <Measurepicker
+                value={value}
+                label={`Weigh-In, ${isImperialUnits ? 'lbs' : 'kg'}`}
+                error={!!errors.weighInOne}
+                handleBlur={onBlur}
+                handleChange={onChange}
+                min={isImperialUnits ? CONSTANTS.WEIGHT.LBS.MIN : CONSTANTS.WEIGHT.KG.MIN}
+                max={isImperialUnits ? CONSTANTS.WEIGHT.LBS.MAX : CONSTANTS.WEIGHT.KG.MAX}
+              />
+            </View>
+          )}
+        />
+        <Controller
+          control={control}
+          name="weighInTwo"
+          render={({ field: { onBlur, onChange, value } }) => (
+            <View style={[styles.rowInput, { marginRight: 6 }]}>
+              <Measurepicker
+                value={value}
+                label="Weigh-In, decimal"
+                error={!!errors.weighInTwo}
+                handleBlur={onBlur}
+                handleChange={onChange}
+                min={isImperialUnits ? CONSTANTS.WEIGHT.LBS.MIN : CONSTANTS.WEIGHT.KG.MIN}
+                max={isImperialUnits ? CONSTANTS.WEIGHT.LBS.MAX : CONSTANTS.WEIGHT.KG.MAX}
+              />
+            </View>
+          )}
+        />
+      </View>
+      <HelperText type="error" style={styles.helperText}>
+        {errors.weighInOne?.message || errors.weighInTwo?.message}
+      </HelperText>
       <Button
         mode="contained"
         onPress={handleSubmit(onSubmit)}
         style={styles.button}
-        disabled={!isValid || !isDirty}
+        disabled={!isValid}
       >
         Submit
       </Button>

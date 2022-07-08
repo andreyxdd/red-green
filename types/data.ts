@@ -1,34 +1,40 @@
 import { PLANS, SIGNS, UNITS } from './enums';
 
-export type IHistoryItem = {
-  id: string;
-  date: Date;
-  weighIn: number | undefined;
-  dailyGoal: number;
-  sign: SIGNS;
+export type IWeight = {
+  kg: number;
+  kgFraction: number;
 }
 
-export type IPlan = {
-  id: string;
-  type: PLANS;
-  goalWeight: number;
-  goalDate: Date;
-  startDate: Date;
-  active: boolean;
+export type IGeneralWeight = { // can be both imperial and metric
+  whole: number; fraction: number;
 }
 
-export type IProfileData = {
-  name: string;
-  dob: Date;
-  units: UNITS;
-  height: number;
-  weight: number;
+export type IHeight = {
+  cm: number;
+  mm: number;
 }
 
 export type IProfile = {
   name: string;
   dob: Date;
   units: UNITS;
-  height: {cm: number, mm: number};
-  weight: {kg: number, fraction: number};
+  height: IHeight;
+  weight: IWeight;
+}
+
+export type IPlan = {
+  id: string;
+  active: boolean;
+  type: PLANS;
+  goalWeight: IWeight;
+  goalDate: Date;
+  startDate: Date;
+}
+
+export type IHistoryItem = {
+  id: string;
+  sign: SIGNS | undefined;
+  date: Date;
+  weighIn: IWeight | undefined;
+  dailyGoal: IWeight;
 }

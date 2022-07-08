@@ -139,7 +139,7 @@ interface FormData extends IProfile {
 function initToDefault(init: IProfile, initialUnits: UNITS): FormData {
   if (initialUnits === UNITS.IMPERIAL) {
     const { feet, inches } = CMandMMtoFTandIN(init.height.cm, init.height.mm);
-    const { lbs, lbsFraction } = KGtoLBS(init.weight.kg, init.weight.fraction);
+    const { lbs, lbsFraction } = KGtoLBS(init.weight.kg, init.weight.kgFraction);
     return {
       ...init,
       termsAccepted: true,
@@ -155,7 +155,7 @@ function initToDefault(init: IProfile, initialUnits: UNITS): FormData {
     heightOne: init.height.cm,
     heightTwo: init.height.mm,
     weightOne: init.weight.kg,
-    weightTwo: init.weight.fraction,
+    weightTwo: init.weight.kgFraction,
   };
 }
 
@@ -250,7 +250,6 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
   const onSubmit = ({
     name, dob, units, heightOne, heightTwo, weightOne, weightTwo,
   }: FormData) => {
-    console.log(errors);
     if (isValid) {
       try {
         const { cm, mm } = imperialUnitsWatcher
@@ -265,7 +264,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
           dob,
           units,
           height: { cm, mm },
-          weight: { kg, fraction: kgFraction },
+          weight: { kg, kgFraction },
         };
 
         writeProfileData(uid, newProfile as IProfile);

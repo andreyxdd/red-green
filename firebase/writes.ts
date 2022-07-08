@@ -1,13 +1,14 @@
 import {
-  Timestamp, setDoc, doc, collection, addDoc,
+  Timestamp, setDoc, doc, collection, addDoc, getDoc,
 } from 'firebase/firestore';
 import { eachDayOfInterval } from 'date-fns';
-import { getDailyGoal } from '../utils/calculate';
+import { getDailyGoal, getRelativeChange } from '../utils/calculate';
 import { db, batch } from './firebase';
-import { IProfile } from '../types/data';
-import { PLANS } from '../types/enums';
+import { IProfile, IWeight } from '../types/data';
+import { PLANS, SIGNS } from '../types/enums';
+import { getWeightInterface } from '../utils/conversions';
 
-export const writeUserWeight = (uid: string, newWeight: number) => {
+export const writeUserWeight = (uid: string, newWeight: IWeight) => {
   const userRef = doc(db, 'users', uid);
   setDoc(
     userRef,
@@ -16,16 +17,40 @@ export const writeUserWeight = (uid: string, newWeight: number) => {
   );
 };
 
-export const writeUserHistoryItem = (
+export const writeUserHistoryItem = async (
   uid: string,
   planId: string,
   historyItemId: string,
-  weighIn: number,
+  weighIn: IWeight,
 ) => {
   const historyItemRef = doc(db, 'users', uid, 'plans', planId, 'history', historyItemId);
+
+  const docSnap = await getDoc(historyItemRef);
+
+  let sign;
+  if (docSnap.exists()) {
+    const { dailyGoal } = docSnap.data();
+
+    const relativeChange = getRelativeChange(
+      dailyGoal.kg + dailyGoal.kgFraction / 10,
+      weighIn.kg + weighIn.kgFraction / 10,
+    );
+
+    if (relativeChange > 2.0) {
+      sign = SIGNS.RED;
+    } else if (relativeChange < 0.0) {
+      sign = SIGNS.GREEN;
+    } else {
+      sign = SIGNS.YELLOW;
+    }
+  } else {
+    // doc.data() will be undefined in this case
+    console.log('No history item found!');
+  }
+
   setDoc(
     historyItemRef,
-    { weighIn },
+    { weighIn, sign },
     { merge: true },
   );
 };
@@ -70,7 +95,7 @@ export const writeMaintenancePlan = async (
       type: PLANS.MAINTENANCE,
       startDate: Timestamp.fromDate(startDate),
       goalDate: Timestamp.fromDate(endDate),
-      goalWeight: goalWeight.kg + goalWeight.kgFraction / 10,
+      goalWeight,
     },
   );
 
@@ -109,7 +134,7 @@ export const writeLosingPlan = async (
       type: PLANS.LOSING,
       startDate: Timestamp.fromDate(startDate),
       goalDate: Timestamp.fromDate(endDate),
-      goalWeight: goalWeight.kg + goalWeight.kgFraction / 10,
+      goalWeight,
     },
   );
 
@@ -124,7 +149,8 @@ export const writeLosingPlan = async (
       Number(goalWeight.kg + goalWeight.kgFraction / 10),
       duration,
     );
-    batch.set(newDocRef, { dailyGoal, date });
+    const [kg, kgFraction] = getWeightInterface(dailyGoal);
+    batch.set(newDocRef, { dailyGoal: { kg, kgFraction }, date });
     prevDailyGoal = dailyGoal;
   });
 

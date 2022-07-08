@@ -1,8 +1,10 @@
 import { differenceInDays } from 'date-fns';
+import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
+import { IWeight } from '../../types/data';
 import { UNITS } from '../../types/enums';
-import { KGtoLBS } from '../../utils/calculate';
+import { KGtoLBS } from '../../utils/conversions';
 
 const styles = StyleSheet.create({
   label: {
@@ -29,12 +31,20 @@ interface IPlanInformation{
   endDate: Date;
   startDate: Date;
   units: UNITS;
-  goalWeight: number;
+  goalWeight: IWeight;
 }
 
 function PlanInfo({
   type, endDate, startDate, units, goalWeight,
 }: IPlanInformation) {
+  const currenGoaltWeightValue = React.useMemo(() => {
+    if (units === UNITS.IMPERIAL) {
+      const weight = KGtoLBS(goalWeight.kg, goalWeight.kgFraction);
+      return weight.lbs + weight.lbsFraction / 10;
+    }
+    return goalWeight.kg + goalWeight.kgFraction / 10;
+  }, [units, goalWeight]);
+
   return (
     <>
       <View style={[styles.item, { paddingVertical: 0, paddingTop: 10, paddingBottom: 6 }]}>
@@ -80,7 +90,7 @@ function PlanInfo({
         </View>
         <View style={{ flex: 2 }}>
           <Text style={styles.text}>
-            {units === UNITS.IMPERIAL ? KGtoLBS(goalWeight) : goalWeight}
+            {currenGoaltWeightValue}
           </Text>
         </View>
       </View>

@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import { Subheading } from 'react-native-paper';
-import useInterfaceStore, { IInterfaceStore } from '../../../hooks/useInterfaceStore';
+import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
 import TodaysRecommendations from '../../../components/TodayTab/TodaysRecommendations';
 
 const styles = StyleSheet.create({
@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
 });
 
 function TodayScreen() {
-  const sign = useInterfaceStore((state:IInterfaceStore) => state.sign);
+  const sign = useDataStore((state:IDataStore) => state.todayHistoryItem?.sign);
 
   return (
     <View style={[styles.container, { flex: 1 }]}>

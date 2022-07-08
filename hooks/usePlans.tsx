@@ -23,14 +23,20 @@ const usePlans = () => {
   React.useEffect(() => {
     const result = value?.docs;
     if (result) {
-      const userPlans = result.map((doc) => ({
-        id: doc.id,
-        type: doc.data().type,
-        goalDate: doc.data().goalDate.toDate(),
-        goalWeight: doc.data().goalWeight,
-        startDate: doc.data().startDate.toDate(),
-        active: doc.data().active,
-      }));
+      const userPlans = result.map((doc) => {
+        const {
+          active, type, goalWeight, goalDate, startDate,
+        } = doc.data();
+
+        return ({
+          id: doc.id,
+          active,
+          type,
+          goalWeight,
+          goalDate: goalDate.toDate(),
+          startDate: startDate.toDate(),
+        });
+      });
 
       setPlans(userPlans);
       setPlan(userPlans[0]);

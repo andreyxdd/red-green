@@ -7,11 +7,8 @@ import { Subheading } from 'react-native-paper';
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
 import PopupPlanMenu from '../../../components/PlanTab/PopupPlanMenu';
 import HistoryPlot from '../../../components/PlanTab/HistoryPlot';
-import {
-  PLANS, PLAN_VIEWS, SIGNS, UNITS,
-} from '../../../types/enums';
+import { PLANS, PLAN_VIEWS, UNITS } from '../../../types/enums';
 import Toggle from '../../../components/Toggle';
-import { getRelativeChange } from '../../../utils/calculate';
 import BreakdownCard from '../../../components/PlanTab/BreakdownCard';
 import PlanInfo from '../../../components/PlanTab/PlanInfo';
 
@@ -70,25 +67,14 @@ function PlanScreen() {
                 <FlatList
                   data={history}
                   renderItem={({ item }) => {
-                    if (item.weighIn) {
-                      const relativeChange = getRelativeChange(item.dailyGoal, item.weighIn);
-
-                      let sign;
-                      if (relativeChange > 2.0) {
-                        sign = SIGNS.RED;
-                      } else if (relativeChange < 0.0) {
-                        sign = SIGNS.GREEN;
-                      } else {
-                        sign = SIGNS.YELLOW;
-                      }
-
+                    if (item.weighIn && item.sign) {
                       return (
                         <BreakdownCard
                           date={item.date}
-                          sign={sign}
+                          sign={item.sign}
                           weighIn={item.weighIn}
                           goalWeight={item.dailyGoal}
-                          units={profileData?.units === UNITS.IMPERIAL ? 'lbs' : 'kg'}
+                          isImperialUnits={profileData?.units === UNITS.IMPERIAL}
                         />
                       );
                     }

@@ -1,10 +1,12 @@
 import { useNavigation } from '@react-navigation/native';
+import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, Subheading, Headline } from 'react-native-paper';
 import colors from '../../styles/colors';
 import { fullHeight } from '../../styles/theme';
+import { IWeight } from '../../types/data';
 import { MANUAL_WEIGHIN, SIGNS } from '../../types/enums';
-import { KGtoLBS } from '../../utils/calculate';
+import { KGtoLBS } from '../../utils/conversions';
 
 const styles = StyleSheet.create({
   container: {
@@ -17,17 +19,26 @@ const styles = StyleSheet.create({
 
 interface IWeighInView{
   sign: SIGNS;
-  currentWeighIn: number;
+  currentWeighIn: IWeight;
   uid: string;
   planId: string;
   historyId: string;
   isImperialUnits: boolean;
+  profileWeight: IWeight;
 }
 
 function WeighInView({
-  sign, currentWeighIn, uid, planId, historyId, isImperialUnits,
+  sign, currentWeighIn, uid, planId, historyId, isImperialUnits, profileWeight,
 }: IWeighInView) {
   const { navigate } = useNavigation();
+  const currentWeighInValue = React.useMemo(() => {
+    if (isImperialUnits) {
+      const weight = KGtoLBS(currentWeighIn.kg, currentWeighIn.kgFraction);
+      return weight.lbs + weight.lbsFraction / 10;
+    }
+    return currentWeighIn.kg + currentWeighIn.kgFraction;
+  }, [isImperialUnits, currentWeighIn]);
+
   return (
     <View style={[styles.container, { width: '80%', alignSelf: 'center' }]}>
       <Subheading style={styles.text}>
@@ -46,7 +57,7 @@ function WeighInView({
       }}
       >
         <Headline style={{ textAlign: 'center', fontWeight: '300' }}>
-          {isImperialUnits ? KGtoLBS(currentWeighIn) : currentWeighIn}
+          {currentWeighInValue}
           {' '}
           {isImperialUnits ? 'lbs' : 'kg'}
         </Headline>
@@ -62,6 +73,7 @@ function WeighInView({
             planId,
             historyId,
             isImperialUnits,
+            profileWeight,
           });
         }}
       >

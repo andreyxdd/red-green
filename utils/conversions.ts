@@ -6,6 +6,14 @@ function getFirstDigitAfterComma(num: number) {
   return Number.isNaN(res) ? 0 : res;
 }
 
+export function getWeightInterface(weight: number) {
+  return [Math.floor(weight), getFirstDigitAfterComma(weight)];
+}
+
+export function getWeightValue(whole: number, fraction: number) {
+  return whole + fraction / 10;
+}
+
 export function FTandINtoCMandMM(feet: number, inches: number) {
   const cmANDmm = feet * 30.48 + inches * 2.54;
   const cm = Math.floor(cmANDmm);

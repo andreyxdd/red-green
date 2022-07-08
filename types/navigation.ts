@@ -1,7 +1,7 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { IPlan } from './data';
+import { IPlan, IWeight } from './data';
 import { MANUAL_WEIGHIN } from './enums';
 
 declare global {
@@ -24,7 +24,8 @@ export type AuthStackList = {
   Root: NavigatorScreenParams<AuthBottomTabList> | undefined;
   ManualWeighIn: {
     screenType: MANUAL_WEIGHIN,
-    currentWeighIn?: number,
+    currentWeighIn?: IWeight,
+    profileWeight: IWeight,
     uid: string,
     planId: string,
     historyId: string,

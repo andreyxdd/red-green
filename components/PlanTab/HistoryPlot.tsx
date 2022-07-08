@@ -5,9 +5,9 @@ import { LineChart } from 'react-native-chart-kit';
 import { format } from 'date-fns';
 import { fullHeight, fullWidth } from '../../styles/theme';
 import { IHistoryItem, IPlan } from '../../types/data';
-import { getRelativeChange, KGtoLBS } from '../../utils/calculate';
+import { KGtoLBS } from '../../utils/conversions';
 import colors from '../../styles/colors';
-import { SIGNS, UNITS } from '../../types/enums';
+import { UNITS } from '../../types/enums';
 
 const chartConfig = {
   backgroundGradientFrom: '#ffffff',
@@ -35,8 +35,13 @@ function HistoryPlot({ history, plan, units }: IHistoryPlot) {
   const plot = React.useMemo(() => {
     if (history.length > 0 && plan) {
       const dailyGoals = history.map(
-        (item: IHistoryItem) => (units === UNITS.IMPERIAL
-          ? KGtoLBS(item.dailyGoal) : item.dailyGoal),
+        (item: IHistoryItem) => {
+          if (units === UNITS.IMPERIAL) {
+            const weight = KGtoLBS(item.dailyGoal.kg, item.dailyGoal.kgFraction);
+            return weight.lbs + weight.lbsFraction / 10;
+          }
+          return item.dailyGoal.kg + item.dailyGoal.kgFraction / 10;
+        },
       );
       const maxDailyGoal = Math.max(...dailyGoals);
       const minDailyGoal = Math.min(...dailyGoals);
@@ -44,9 +49,12 @@ function HistoryPlot({ history, plan, units }: IHistoryPlot) {
       const weignIns: Array<number> = [];
       history.forEach((item: IHistoryItem) => {
         if (item.weighIn !== undefined) {
-          weignIns.push(
-            units === UNITS.IMPERIAL ? KGtoLBS(item.weighIn) : item.weighIn,
-          );
+          if (units === UNITS.IMPERIAL) {
+            const weight = KGtoLBS(item.weighIn.kg, item.weighIn.kgFraction);
+            weignIns.push(weight.lbs + weight.lbsFraction / 10);
+          } else {
+            weignIns.push(item.weighIn.kg + item.weighIn.kgFraction / 10);
+          }
         }
       });
 
@@ -102,22 +110,10 @@ function HistoryPlot({ history, plan, units }: IHistoryPlot) {
         verticalLabelRotation={Platform.OS === 'web' ? 0 : -75}
         xLabelsOffset={Platform.OS === 'web' ? 0 : 35}
         getDotColor={(dataPoint, dataPointIndex) => {
-          const dailyGoal = plot.datasets[0].data[dataPointIndex];
+          const historyItem = history[dataPointIndex];
 
-          if (dailyGoal) {
-            const relativeChange = getRelativeChange(dailyGoal, dataPoint);
+          if (historyItem.sign) return colors[historyItem.sign].secondary;
 
-            // if (dataPoint === dailyGoal) {
-            //  return '#D3D3D3';
-            // }
-
-            if (relativeChange > 2.0) {
-              return colors[SIGNS.RED].secondary;
-            } if (relativeChange <= 0.0) {
-              return colors[SIGNS.GREEN].secondary;
-            }
-            return colors[SIGNS.YELLOW].secondary;
-          }
           return '#D3D3D3';
         }}
       />

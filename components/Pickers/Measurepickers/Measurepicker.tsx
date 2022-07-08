@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Picker } from '@react-native-picker/picker';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { verticalScale } from 'react-native-size-matters';
-import { range } from '../../../utils/calculate';
+import { range } from '../../../utils';
 import { IMeasurepicker } from './index';
 
 export const styles = StyleSheet.create({

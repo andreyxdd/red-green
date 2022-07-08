@@ -11,6 +11,9 @@ import { useNavigation } from '@react-navigation/native';
 import { subYears } from 'date-fns';
 import produce from 'immer';
 
+import {
+  CMandMMtoFTandIN, FTandINtoCMandMM, KGtoLBS, LBStoKG,
+} from '../../utils/conversions';
 import Datepicker from '../Pickers/Datepickers/Datepicker';
 import { IProfileData } from '../../types/data';
 // import parseStringNumbers from '../../utils/parseStringNumbers';
@@ -269,12 +272,9 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                   handleBlur={onBlur}
                   handleChange={(v) => {
                     setMetricHeight(produce((h) => {
-                      const cmANDmm = v * 30.48 + imperialHeight.in * 2.54;
-                      h.cm = Math.floor(cmANDmm);
-                      h.mm = Number(
-                        (`${Math.round(((cmANDmm - h.cm) + Number.EPSILON) * 10) / 10}`)
-                          .split('.')[1],
-                      );
+                      const { cm, mm } = FTandINtoCMandMM(v, imperialHeight.in);
+                      h.cm = cm;
+                      h.mm = mm;
                     }));
                     setImperialHeight(produce((h) => { h.ft = v; }));
                     onChange(v);
@@ -292,10 +292,9 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                     handleChange={(v) => {
                       setMetricHeight(produce((h) => { h.cm = v; }));
                       setImperialHeight(produce((h) => {
-                        const totalMM = v * 10 + metricHeight.mm;
-                        const totalIN = totalMM / 25.4;
-                        h.ft = Math.floor(totalIN / 12);
-                        h.in = Math.round(totalIN - h.ft * 12);
+                        const { feet, inches } = CMandMMtoFTandIN(v, metricHeight.mm);
+                        h.ft = feet;
+                        h.in = inches;
                       }));
                       onChange(v);
                     }}
@@ -324,12 +323,9 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                   handleBlur={onBlur}
                   handleChange={(v) => {
                     setMetricHeight(produce((h) => {
-                      const cmANDmm = imperialHeight.ft * 30.48 + v * 2.54;
-                      h.cm = Math.floor(cmANDmm);
-                      h.mm = Number(
-                        (`${Math.round(((cmANDmm - h.cm) + Number.EPSILON) * 10) / 10}`)
-                          .split('.')[1],
-                      );
+                      const { cm, mm } = FTandINtoCMandMM(imperialHeight.ft, v);
+                      h.cm = cm;
+                      h.mm = mm;
                     }));
                     setImperialHeight(produce((h) => { h.in = v; }));
                     onChange(v);
@@ -347,10 +343,9 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                     handleChange={(v) => {
                       setMetricHeight(produce((h) => { h.mm = v; }));
                       setImperialHeight(produce((h) => {
-                        const totalMM = metricHeight.cm * 10 + v;
-                        const totalIN = totalMM / 25.4;
-                        h.ft = Math.floor(totalIN / 12);
-                        h.in = Math.round(totalIN - h.ft * 12);
+                        const { feet, inches } = CMandMMtoFTandIN(metricHeight.cm, v);
+                        h.ft = feet;
+                        h.in = inches;
                       }));
                       onChange(v);
                     }}
@@ -381,12 +376,9 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                   handleBlur={onBlur}
                   handleChange={(v) => {
                     setMetricWeight(produce((h) => {
-                      const totalKG = (v + imperialWeight.fraction / 10) / 2.205;
-                      h.kg = Math.floor(totalKG);
-                      h.fraction = Number(
-                        (`${Math.round(((totalKG - h.kg) + Number.EPSILON) * 10) / 10}`)
-                          .split('.')[1],
-                      );
+                      const { kg, kgFraction } = LBStoKG(v, imperialWeight.fraction);
+                      h.kg = kg;
+                      h.fraction = kgFraction;
                     }));
                     setImperialWeight(produce((h) => { h.lbs = v; }));
                     onChange(v);
@@ -404,12 +396,9 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                     handleChange={(v) => {
                       setMetricWeight(produce((h) => { h.kg = v; }));
                       setImperialWeight(produce((h) => {
-                        const totalLBS = (v + metricWeight.fraction / 10) * 2.205;
-                        h.lbs = Math.floor(totalLBS);
-                        h.fraction = Number(
-                          (`${Math.round(((totalLBS - h.lbs) + Number.EPSILON) * 10) / 10}`)
-                            .split('.')[1],
-                        );
+                        const { lbs, lbsFraction } = KGtoLBS(v, metricWeight.fraction);
+                        h.lbs = lbs;
+                        h.fraction = lbsFraction;
                       }));
                       onChange(v);
                     }}
@@ -436,12 +425,9 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                   handleBlur={onBlur}
                   handleChange={(v) => {
                     setMetricWeight(produce((h) => {
-                      const totalKG = (v / 10 + imperialWeight.lbs) / 2.205;
-                      h.kg = Math.floor(totalKG);
-                      h.fraction = Number(
-                        (`${Math.round(((totalKG - h.kg) + Number.EPSILON) * 10) / 10}`)
-                          .split('.')[1],
-                      );
+                      const { kg, kgFraction } = LBStoKG(imperialWeight.lbs, v);
+                      h.kg = kg;
+                      h.fraction = kgFraction;
                     }));
                     setImperialWeight(produce((h) => { h.fraction = v; }));
                     onChange(v);
@@ -459,12 +445,9 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                     handleChange={(v) => {
                       setMetricWeight(produce((h) => { h.fraction = v; }));
                       setImperialWeight(produce((h) => {
-                        const totalLBS = (v / 10 + metricWeight.kg) * 2.205;
-                        h.lbs = Math.floor(totalLBS);
-                        h.fraction = Number(
-                          (`${Math.round(((totalLBS - h.lbs) + Number.EPSILON) * 10) / 10}`)
-                            .split('.')[1],
-                        );
+                        const { lbs, lbsFraction } = KGtoLBS(metricWeight.kg, v);
+                        h.lbs = lbs;
+                        h.fraction = lbsFraction;
                       }));
                       onChange(v);
                     }}

@@ -12,7 +12,7 @@ import { auth } from '../../firebase/firebase';
 import useAppleAuthentication from '../../hooks/useAppleAuthentification';
 import useGoogleAuthentication from '../../hooks/useGoogleAuthentification';
 import Divider from '../../components/Divider';
-import SignInForm from '../../components/Forms/SignInForm';
+import { SignInForm } from '../../components/Forms';
 import { NonAuthStackScreenProps } from '../../types/navigation';
 import colors from '../../styles/colors';
 

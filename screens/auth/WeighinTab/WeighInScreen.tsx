@@ -7,11 +7,8 @@ import NoWeighInView from '../../../components/WeighInTab/NoWeighInView';
 import WeighInView from '../../../components/WeighInTab/WeighInView';
 
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
-import useInterfaceStore, { IInterfaceStore } from '../../../hooks/useInterfaceStore';
-import { IHistoryItem } from '../../../types/data';
 
-import { SIGNS, UNITS } from '../../../types/enums';
-import { getRelativeChange } from '../../../utils/calculate';
+import { UNITS } from '../../../types/enums';
 
 const styles = StyleSheet.create({
   container: {
@@ -23,68 +20,40 @@ const styles = StyleSheet.create({
 });
 
 function WeighInScreen() {
-  const [user, profileData, history, plan] = useDataStore(
-    (state: IDataStore) => [state.user, state.profileData, state.history, state.plan],
+  const [user, profile, history, plan, todayHistoryItem] = useDataStore(
+    (state: IDataStore) => [
+      state.user, state.profile, state.history, state.plan, state.todayHistoryItem,
+    ],
     shallow,
   );
-  const [sign, setSign] = useInterfaceStore(
-    (state: IInterfaceStore) => [state.sign, state.setSign],
-    shallow,
-  );
 
-  const todaysHistoryItem = React.useMemo(() => history.find(
-    (item: IHistoryItem) => item.date.setHours(0, 0, 0, 0) === (new Date()).setHours(0, 0, 0, 0),
-  ), [history]);
-
-  React.useEffect(() => {
-    if (
-      history.length > 0 && todaysHistoryItem && todaysHistoryItem.weighIn
-      && plan && plan.active
-    ) {
-      const relativeChange = getRelativeChange(
-        todaysHistoryItem.dailyGoal,
-        todaysHistoryItem.weighIn,
-      ); // in %
-
-      if (relativeChange > 2.0) {
-        setSign(SIGNS.RED);
-      } else if (relativeChange < 0.0) {
-        setSign(SIGNS.GREEN);
-      } else {
-        setSign(SIGNS.YELLOW);
-      }
-    } else {
-      setSign(undefined);
-    }
-  }, [history, plan, setSign, todaysHistoryItem]);
-
-  if ((!plan || !plan.active) && profileData) {
+  if ((!plan || !plan.active) && profile) {
     return (
-      <CreatNewPlanView name={profileData.name} />
+      <CreatNewPlanView name={profile.name} />
     );
   }
 
-  if (user && plan && profileData && todaysHistoryItem) {
+  if (user && plan && profile && todayHistoryItem) {
     return (
       <View style={[styles.container, { flex: 1 }]}>
-        {profileData ? <Greeting name={profileData.name} /> : null}
+        {profile ? <Greeting name={profile.name} /> : null}
         {(
-          history.length > 0 && todaysHistoryItem.weighIn && sign
+          history.length > 0 && todayHistoryItem && todayHistoryItem.weighIn
         ) ? (
           <WeighInView
-            currentWeighIn={todaysHistoryItem.weighIn}
-            sign={sign}
+            currentWeighIn={todayHistoryItem.weighIn}
+            sign={todayHistoryItem.sign}
             uid={user.uid}
             planId={plan.id}
-            historyId={todaysHistoryItem.id}
-            isImperialUnits={profileData.units === UNITS.IMPERIAL}
+            historyId={todayHistoryItem.id}
+            isImperialUnits={profile.units === UNITS.IMPERIAL}
           />
           ) : (
             <NoWeighInView
               uid={user.uid}
               planId={plan.id}
-              historyId={todaysHistoryItem.id}
-              isImperialUnits={profileData.units === UNITS.IMPERIAL}
+              historyId={todayHistoryItem.id}
+              isImperialUnits={profile.units === UNITS.IMPERIAL}
             />
           )}
       </View>

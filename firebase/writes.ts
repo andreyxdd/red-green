@@ -4,7 +4,7 @@ import {
 import { eachDayOfInterval } from 'date-fns';
 import { getDailyGoal } from '../utils/calculate';
 import { db, batch } from './firebase';
-import { IProfileData } from '../types/data';
+import { IProfile } from '../types/data';
 import { PLANS } from '../types/enums';
 
 export const writeUserWeight = (uid: string, newWeight: number) => {
@@ -32,19 +32,19 @@ export const writeUserHistoryItem = (
 
 export const writeProfileData = (
   uid: string,
-  profileData: IProfileData,
+  profile: IProfile,
 ) => {
   const userRef = doc(db, 'users', uid);
-  const dob = new Date(new Date(profileData.dob).setHours(0, 0, 0, 0));
+  const dob = new Date(new Date(profile.dob).setHours(0, 0, 0, 0));
 
   setDoc(
     userRef,
     {
-      name: profileData.name,
+      name: profile.name,
       dob: Timestamp.fromDate(dob),
-      units: profileData.units,
-      height: profileData.height,
-      weight: profileData.weight,
+      units: profile.units,
+      height: profile.height,
+      weight: profile.weight,
     },
     { merge: true },
   );
@@ -52,7 +52,7 @@ export const writeProfileData = (
 
 export const writeMaintenancePlan = async (
   uid: string,
-  goalWeight: number,
+  goalWeight: { kg: number; kgFraction: number; },
   goalDate: Date,
 ) => {
   const planRef = collection(db, 'users', uid, 'plans');
@@ -70,7 +70,7 @@ export const writeMaintenancePlan = async (
       type: PLANS.MAINTENANCE,
       startDate: Timestamp.fromDate(startDate),
       goalDate: Timestamp.fromDate(endDate),
-      goalWeight: Number(goalWeight),
+      goalWeight: goalWeight.kg + goalWeight.kgFraction / 10,
     },
   );
 
@@ -89,9 +89,9 @@ export const writeMaintenancePlan = async (
 
 export const writeLosingPlan = async (
   uid: string,
-  goalWeight: number,
+  goalWeight: { kg: number; kgFraction: number; },
   goalDate: Date,
-  startWeight: number,
+  startWeight: { kg: number; kgFraction: number; },
 ) => {
   const planRef = collection(db, 'users', uid, 'plans');
   const startDate = new Date(new Date().setHours(0, 0, 0, 0));
@@ -109,19 +109,19 @@ export const writeLosingPlan = async (
       type: PLANS.LOSING,
       startDate: Timestamp.fromDate(startDate),
       goalDate: Timestamp.fromDate(endDate),
-      goalWeight: Number(goalWeight),
+      goalWeight: goalWeight.kg + goalWeight.kgFraction / 10,
     },
   );
 
   const historyRef = collection(db, 'users', uid, 'plans', res.id, 'history');
 
-  let prevDailyGoal = startWeight;
+  let prevDailyGoal = startWeight.kg + startWeight.kgFraction / 10;
   planDates.forEach((date) => {
     const newDocRef = doc(historyRef);
     const dailyGoal = getDailyGoal(
       Number(prevDailyGoal),
-      Number(startWeight),
-      Number(goalWeight),
+      Number(startWeight.kg + startWeight.kgFraction / 10),
+      Number(goalWeight.kg + goalWeight.kgFraction / 10),
       duration,
     );
     batch.set(newDocRef, { dailyGoal, date });

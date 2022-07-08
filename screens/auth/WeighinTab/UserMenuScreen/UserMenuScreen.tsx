@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
 
 function UserMenuScreen({ navigation: { navigate } }: AuthStackScreenProps<'UserMenu'>) {
   const [user, profileData] = useDataStore(
-    (state: IDataStore) => [state.user, state.profileData],
+    (state: IDataStore) => [state.user, state.profile],
     shallow,
   );
 

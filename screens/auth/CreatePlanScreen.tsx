@@ -14,7 +14,10 @@ const styles = StyleSheet.create({
 });
 
 function CreatePlanScreen() {
-  const [user, plan] = useDataStore((state: IDataStore) => [state.user, state.plan], shallow);
+  const [user, plan, profile] = useDataStore(
+    (state: IDataStore) => [state.user, state.plan, state.profile],
+    shallow,
+  );
 
   return (
     <KeyboardAwareScrollView
@@ -22,8 +25,8 @@ function CreatePlanScreen() {
       keyboardDismissMode="on-drag"
       keyboardShouldPersistTaps="handled"
     >
-      {user && (!plan || !plan.active) ? (
-        <PlanForm uid={user.uid} />
+      {user && (!plan || !plan.active) && profile ? (
+        <PlanForm uid={user.uid} profile={profile} />
       ) : null}
     </KeyboardAwareScrollView>
   );

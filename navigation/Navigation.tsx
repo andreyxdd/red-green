@@ -11,7 +11,7 @@ import useDataStore, { IDataStore } from '../hooks/useDataStore';
 
 function Navigation() {
   const [user, profileData] = useDataStore(
-    (state: IDataStore) => [state.user, state.profileData],
+    (state: IDataStore) => [state.user, state.profile],
     shallow,
   );
 

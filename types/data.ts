@@ -1,10 +1,11 @@
-import { PLANS, UNITS } from './enums';
+import { PLANS, SIGNS, UNITS } from './enums';
 
 export type IHistoryItem = {
   id: string;
   date: Date;
   weighIn: number | undefined;
   dailyGoal: number;
+  sign: SIGNS;
 }
 
 export type IPlan = {
@@ -22,4 +23,12 @@ export type IProfileData = {
   units: UNITS;
   height: number;
   weight: number;
+}
+
+export type IProfile = {
+  name: string;
+  dob: Date;
+  units: UNITS;
+  height: {cm: number, mm: number};
+  weight: {kg: number, fraction: number};
 }

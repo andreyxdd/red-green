@@ -6,7 +6,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase/firebase';
-import { ERROR_MESSAGES } from './index';
+import { ERROR_MESSAGES } from './settings';
 
 const styles = StyleSheet.create({
   container: { justifyContent: 'center', width: '100%' },

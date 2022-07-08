@@ -8,8 +8,8 @@ import { db } from '../firebase/firebase';
 import { IHistoryItem } from '../types/data';
 
 const useHistory = () => {
-  const [user, plan, setHistory] = useDataStore(
-    (state: IDataStore) => [state.user, state.plan, state.setHistory],
+  const [user, plan, setHistory, setTodayHistoryItem] = useDataStore(
+    (state: IDataStore) => [state.user, state.plan, state.setHistory, state.setTodayHistoryItem],
     shallow,
   );
 
@@ -23,18 +23,35 @@ const useHistory = () => {
   React.useEffect(() => {
     const result = value?.docs;
     if (result) {
-      const planHistory: Array<IHistoryItem> = result.map((doc) => ({
-        id: doc.id,
-        date: doc.data().date.toDate(),
-        weighIn: doc.data().weighIn,
-        dailyGoal: doc.data().dailyGoal,
-      }));
+      const planHistory: Array<IHistoryItem> = result.map((doc) => {
+        const {
+          date, weighIn, dailyGoal, sign,
+        } = doc.data();
 
+        return ({
+          id: doc.id,
+          date: date.toDate(),
+          weighIn,
+          dailyGoal,
+          sign,
+        });
+      });
       setHistory(planHistory);
+
+      const todayHistoryItem = planHistory.find(
+        (item: IHistoryItem) => item.date.setHours(0, 0, 0, 0)
+          === (new Date()).setHours(0, 0, 0, 0),
+      );
+      if (todayHistoryItem) {
+        setTodayHistoryItem(todayHistoryItem);
+      } else {
+        setTodayHistoryItem(null);
+      }
     } else {
       setHistory([]);
+      setTodayHistoryItem(null);
     }
-  }, [setHistory, value]);
+  }, [setHistory, setTodayHistoryItem, value]);
 
   return { loading, error };
 };

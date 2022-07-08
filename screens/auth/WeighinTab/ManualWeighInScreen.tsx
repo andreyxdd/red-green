@@ -5,7 +5,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import { AuthStackScreenProps } from '../../../types/navigation';
 import { MANUAL_WEIGHIN } from '../../../types/enums';
-import ManualWeighInForm from '../../../components/Forms/ManualWeighInForm';
+import { ManualWeighInForm } from '../../../components/Forms';
 
 const styles = StyleSheet.create({
   container: {

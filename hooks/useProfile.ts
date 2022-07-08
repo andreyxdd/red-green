@@ -7,8 +7,8 @@ import useDataStore, { IDataStore } from './useDataStore';
 import { db } from '../firebase/firebase';
 
 const useProfile = () => {
-  const [user, setProfileData] = useDataStore(
-    (state: IDataStore) => [state.user, state.setProfileData],
+  const [user, setProfile] = useDataStore(
+    (state: IDataStore) => [state.user, state.setProfile],
     shallow,
   );
   const [snapshot, loading, error] = useDocument(
@@ -22,7 +22,7 @@ const useProfile = () => {
         name, dob, units, height, weight,
       } = result;
 
-      setProfileData({
+      setProfile({
         name,
         dob: dob.toDate(),
         units,
@@ -30,9 +30,9 @@ const useProfile = () => {
         weight,
       });
     } else {
-      setProfileData(null);
+      setProfile(null);
     }
-  }, [snapshot, setProfileData]);
+  }, [snapshot, setProfile]);
 
   return { loading, error };
 };

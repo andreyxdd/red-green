@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { writeUserHistoryItem, writeUserWeight } from '../../firebase/writes';
 import parseStringNumbers from '../../utils/parseStringNumbers';
 import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
-import { ERROR_MESSAGES, CONSTANTS } from './index';
+import { ERROR_MESSAGES, CONSTANTS } from './settings';
 import { KGtoLBS, LBStoKG } from '../../utils/calculate';
 
 interface FormData {

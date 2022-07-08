@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
-import PlanForm from '../../../components/Forms/PlanForm';
+import { PlanForm } from '../../../components/Forms';
 import { AuthStackScreenProps } from '../../../types/navigation';
 
 const styles = StyleSheet.create({

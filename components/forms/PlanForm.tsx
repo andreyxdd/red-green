@@ -1,23 +1,24 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from 'react';
-import { StyleSheet, View, Alert } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { Button, HelperText } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
-import { useNavigation } from '@react-navigation/native';
-
-import shallow from 'zustand/shallow';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import { addDays } from 'date-fns';
+
+import { useNavigation } from '@react-navigation/native';
 import Datepicker from '../Pickers/Datepickers/Datepicker';
 import { PLANS, UNITS } from '../../types/enums';
 import Toggle from '../Toggle';
 import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
-import useDataStore, { IDataStore } from '../../hooks/useDataStore';
-import { ERROR_MESSAGES, CONSTANTS } from './index';
-import { getRelativeChange, KGtoLBS, LBStoKG } from '../../utils/calculate';
+import { ERROR_MESSAGES, CONSTANTS } from './settings';
+import { getRelativeChange } from '../../utils/calculate';
+import { KGtoLBS, LBStoKG } from '../../utils/conversions';
+import { IProfile } from '../../types/data';
 import { writeLosingPlan, writeMaintenancePlan } from '../../firebase/writes';
-import { updateLosingPlan, updateMaintenancePlan } from '../../firebase/updates';
-import parseStringNumbers from '../../utils/parseStringNumbers';
 
-const SUB_LOSING_WEIGHT = 5;
+// const SUB_LOSING_WEIGHT = 5;
 
 const styles = StyleSheet.create({
   container: {
@@ -26,138 +27,169 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.0)',
     width: '100%',
   },
-  input: {
-    marginVertical: 2, width: '90%', alignSelf: 'center',
+  rowContainer: {
+    flexDirection: 'row', width: '90%', alignSelf: 'center', marginVertical: 2,
   },
+  input: { marginVertical: 2, width: '90%', alignSelf: 'center' },
+  rowInput: { flex: 1 },
   button: {
     width: '80%', paddingVertical: 4, marginBottom: 14, alignSelf: 'center',
   },
   toggle: { marginBottom: 14, width: '90%', alignSelf: 'center' },
-  row: {
-    alignItems: 'center',
-    alignSelf: 'center',
-    flexDirection: 'row',
-    marginVertical: 10,
-  },
   helperText: { width: '90%', alignSelf: 'center' },
 });
 
-export interface FormData{
-  planType: PLANS;
-  goalWeight: number;
-  goalDate: Date;
-  // startWeight?: number;
-}
+const YUPschema = (currentWeight: IWeight) => yup.object().shape({
+  plan: yup
+    .mixed<PLANS>()
+    .oneOf(Object.values(PLANS))
+    .default(PLANS.MAINTENANCE),
+  goalWeightOne: yup
+    .number()
+    .typeError(ERROR_MESSAGES.NONNUMBER)
+    .required(ERROR_MESSAGES.REQUIRED)
+    .when('plan', {
+      is: (p: PLANS) => p === PLANS.MAINTENANCE,
+      then: (s) => s
+        .test({
+          name: 'within-range',
+          message: ERROR_MESSAGES.MAINTENANCE_GOAL_WEIGHT,
+          test: (v, ctx) => Math.abs(getRelativeChange(
+            currentWeight.whole + currentWeight.fraction / 10,
+            ctx.parent.goalWeightTwo / 10 + v!,
+          )) < 2.0,
+        })
+        .default(currentWeight.whole),
+      otherwise: (s) => s
+        .test({
+          name: 'too-high',
+          message: ERROR_MESSAGES.LOSING_GOAL_WEIGHT,
+          test: (v, ctx) => getRelativeChange(
+            currentWeight.whole + currentWeight.fraction / 10,
+            ctx.parent.goalWeightTwo / 10 + v!,
+          ) < 0.0,
+        })
+        .default(currentWeight.whole),
+    }),
+  goalWeightTwo: yup
+    .number()
+    .typeError(ERROR_MESSAGES.NONNUMBER)
+    .required(ERROR_MESSAGES.REQUIRED)
+    .when('plan', {
+      is: (p: PLANS) => p === PLANS.MAINTENANCE,
+      then: (s) => s
+        .test({
+          name: 'within-range',
+          message: ERROR_MESSAGES.MAINTENANCE_GOAL_WEIGHT,
+          test: (v, ctx) => Math.abs(getRelativeChange(
+            currentWeight.whole + currentWeight.fraction / 10,
+            ctx.parent.goalWeightOne + v! / 10,
+          )) < 2.0,
+        }),
+      otherwise: (s) => s
+        .test({
+          name: 'too-high',
+          message: ERROR_MESSAGES.LOSING_GOAL_WEIGHT,
+          test: (v, ctx) => getRelativeChange(
+            currentWeight.whole + currentWeight.fraction / 10,
+            ctx.parent.goalWeightOne + v! / 10,
+          ) < 0.0,
+        }),
+    })
+    .default(currentWeight.fraction),
+  goalDate: yup
+    .date()
+    .default(addDays(new Date(), CONSTANTS.PLAN.MIN_LENGTH))
+    .required(ERROR_MESSAGES.REQUIRED),
+}, [
+  ['goalWeightOne', 'plan'],
+  ['goalWeightTwo', 'plan'],
+  ['goalWeightTwo', 'goalWeightOne'],
+]);
 
 export interface IPlanForm {
   initialValues?: FormData;
+  profile: IProfile;
   uid: string;
 }
 
-function PlanForm({ initialValues, uid }: IPlanForm) {
-  const [isImperialUnits, profileWeight, plan, history] = useDataStore(
-    (state: IDataStore) => [
-      state.profileData?.units === UNITS.IMPERIAL,
-      // eslint-disable-next-line no-nested-ternary
-      state.profileData
-        ? (state.profileData?.units === UNITS.IMPERIAL
-          ? KGtoLBS(state.profileData.weight)
-          : state.profileData.weight)
-        : 0.0,
-      state.plan,
-      state.history,
-    ],
-    shallow,
-  );
+interface IWeight {
+  whole: number;
+  fraction: number;
+}
 
+interface FormData {
+  plan: PLANS;
+  goalWeightOne: number;
+  goalWeightTwo: number;
+  goalDate: Date;
+}
+
+function PlanForm({ initialValues, profile, uid }: IPlanForm) {
   const navigation = useNavigation();
 
+  const data = React.useMemo(() => {
+    if (profile.units === UNITS.IMPERIAL) {
+      const { lbs, lbsFraction } = KGtoLBS(profile.weight.kg, profile.weight.fraction);
+      const profileWeight = { whole: lbs, fraction: lbsFraction };
+      return {
+        isImperialUnits: true,
+        profileWeight,
+        schema: YUPschema(profileWeight),
+      };
+    }
+
+    const profileWeight = { whole: profile.weight.kg, fraction: profile.weight.fraction };
+    return {
+      isImperialUnits: false,
+      profileWeight,
+      schema: YUPschema(profileWeight),
+    };
+  }, [profile]);
+
   const {
-    control, handleSubmit, formState: { errors, isValid, isDirty }, watch, setValue,
+    control, handleSubmit, formState: { errors, isValid, isDirty },
   } = useForm<FormData>({
-    mode: 'onChange',
-    defaultValues: initialValues && initialValues,
+    mode: 'all',
+    resolver: yupResolver(data.schema),
+    defaultValues: data.schema.getDefault(),
   });
 
-  const isLosingPlanWatcher = watch('planType') === PLANS.LOSING;
-
-  const onSubmit = async ({ planType, goalWeight, goalDate }: FormData) => {
+  const onSubmit = async ({
+    plan, goalWeightOne, goalWeightTwo, goalDate,
+  }: FormData) => {
     if (isValid) {
-      const newGoalWeight = parseStringNumbers(goalWeight);
-      const goalWeighValue = isImperialUnits ? LBStoKG(newGoalWeight) : newGoalWeight;
-      const startWeight = isImperialUnits ? LBStoKG(profileWeight) : profileWeight;
+      const goalWeight = data.isImperialUnits
+        ? LBStoKG(goalWeightOne, goalWeightTwo)
+        : { kg: goalWeightTwo, kgFraction: goalWeightTwo };
+
+      const startWeight = data.isImperialUnits
+        ? LBStoKG(data.profileWeight.whole, data.profileWeight.fraction)
+        : { kg: data.profileWeight.whole, kgFraction: data.profileWeight.fraction };
+
       try {
         if (!initialValues) {
-          if (planType === PLANS.LOSING) {
-            console.log('goalWeighValue', goalWeighValue);
-            console.log('startWeight', startWeight);
-            await writeLosingPlan(uid, goalWeighValue, goalDate, startWeight);
+          if (plan === PLANS.MAINTENANCE) {
+            await writeMaintenancePlan(uid, goalWeight, goalDate);
           }
-          if (planType === PLANS.MAINTENANCE) {
-            await writeMaintenancePlan(uid, goalWeighValue, goalDate);
-          }
-        } else {
-          if (plan?.type === PLANS.LOSING) {
-            await updateLosingPlan(
-              uid,
-              plan.id,
-              history,
-              plan.startDate,
-              goalWeighValue,
-              plan.goalDate,
-              startWeight,
-            );
-          }
-          if (plan?.type === PLANS.MAINTENANCE) {
-            await updateMaintenancePlan(
-              uid,
-              plan.id,
-              history,
-              goalWeighValue,
-              plan.goalDate,
-            );
+          if (plan === PLANS.LOSING) {
+            await writeLosingPlan(uid, goalWeight, goalDate, startWeight);
           }
         }
+
         navigation.goBack();
       } catch (error) {
-        Alert.alert('Error', 'Something went wrong');
+        Alert.alert('Error', 'New plan was not created, something went wrong');
       }
     }
   };
-
-  React.useEffect(() => {
-    setValue('goalWeight', isLosingPlanWatcher ? profileWeight - SUB_LOSING_WEIGHT : profileWeight);
-  }, [isLosingPlanWatcher, profileWeight, setValue]);
-
-  const goalWeightFieldRules = React.useMemo(
-    () => ({
-      required: { message: ERROR_MESSAGES.REQUIRED, value: true },
-      /* pattern: {
-        message: isImperialUnits
-          ? ERROR_MESSAGES.INVALID_WEIGHT.LBS
-          : ERROR_MESSAGES.INVALID_WEIGHT.KG,
-        value: isImperialUnits
-          ? REGEX.WEIGHT.LBS
-          : REGEX.WEIGHT.KG,
-      }, */
-      validate: (v: any) => {
-        const relativeChange = getRelativeChange(profileWeight, Number(v));
-        if (!isLosingPlanWatcher) { // MAINTENANCE
-          return Math.abs(relativeChange) < 2.0 || ERROR_MESSAGES.MAINTENANCE_GOAL_WEIGHT;
-        }
-        return relativeChange < 0.0 || ERROR_MESSAGES.LOSING_GOAL_WEIGHT;
-      },
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isLosingPlanWatcher, isImperialUnits, profileWeight],
-  );
 
   return (
     <View style={styles.container}>
       {initialValues ? null : (
         <Controller
           control={control}
-          name="planType"
+          name="plan"
           defaultValue={PLANS.MAINTENANCE}
           render={({ field: { onChange, value } }) => (
             <Toggle
@@ -172,51 +204,63 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
           )}
         />
       )}
+
+      {/* Weight Pickers */}
+      <View style={styles.rowContainer}>
+        <Controller
+          control={control}
+          name="goalWeightOne"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View style={[styles.rowInput, { marginRight: 6 }]}>
+              <Measurepicker
+                value={value}
+                label={`Goal weight, ${data.isImperialUnits ? 'lbs' : 'kg'}`}
+                error={!!errors.goalWeightOne}
+                handleBlur={onBlur}
+                handleChange={onChange}
+                min={data.isImperialUnits ? CONSTANTS.WEIGHT.LBS.MIN : CONSTANTS.WEIGHT.KG.MIN}
+                max={data.isImperialUnits ? CONSTANTS.WEIGHT.LBS.MAX : CONSTANTS.WEIGHT.KG.MAX}
+              />
+            </View>
+          )}
+        />
+        <Controller
+          control={control}
+          name="goalWeightTwo"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View style={[styles.rowInput, { marginLeft: 6 }]}>
+              <Measurepicker
+                value={value}
+                label="Goal weight, decimal"
+                error={!!errors.goalWeightTwo}
+                handleBlur={onBlur}
+                handleChange={onChange}
+                min={CONSTANTS.WEIGHT.FRACTION.MIN}
+                max={CONSTANTS.WEIGHT.FRACTION.MAX}
+              />
+            </View>
+          )}
+        />
+      </View>
+      <HelperText type="error" style={styles.helperText}>
+        {errors.goalWeightTwo?.message || errors.goalWeightOne?.message}
+      </HelperText>
+
       <Controller
         control={control}
-        defaultValue={initialValues ? initialValues.goalWeight : profileWeight}
-        name="goalWeight"
-        rules={goalWeightFieldRules}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <>
-            <Measurepicker
-              value={value}
-              label={`Goal weight, ${isImperialUnits ? 'lbs' : 'kg'}`}
-              style={styles.input}
-              error={!!errors.goalWeight}
-              handleBlur={onBlur}
-              handleChange={onChange}
-              min={0}
-              max={100}
-            />
-            <HelperText
-              type="error"
-              style={styles.helperText}
-            >
-              {errors.goalWeight?.message}
-            </HelperText>
-          </>
-        )}
-      />
-      <Controller
-        control={control}
-        defaultValue={addDays(new Date(), CONSTANTS.MIN_PLAN_LENGTH)}
         name="goalDate"
-        rules={{
-          required: { value: true, message: ERROR_MESSAGES.REQUIRED },
-        }}
         render={({ field: { onChange, value } }) => (
           <>
             <Datepicker
               id="profile-form-datepicker"
-              label="Gaol Date"
+              label="Goal Date"
               style={styles.input}
               value={value}
               onChange={onChange}
               error={!!errors.goalDate}
               dateFormat="yyyy-MM-dd"
-              maxDate={addDays(new Date(), CONSTANTS.MAX_PLAN_LENGTH)}
-              minDate={addDays(new Date(), CONSTANTS.MIN_PLAN_LENGTH)}
+              maxDate={addDays(new Date(), CONSTANTS.PLAN.MAX_LENGTH)}
+              minDate={addDays(new Date(), CONSTANTS.PLAN.MIN_LENGTH)}
             />
             <HelperText
               type="error"
@@ -227,43 +271,11 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
           </>
         )}
       />
-      {/* isLosingPlanWatcher && !initialValues
-        ? (
-          <Controller
-            control={control}
-            name="startWeight"
-            defaultValue={profileWeight && profileWeight}
-            rules={{
-              required: { message: ERROR_MESSAGES.REQUIRED, value: true },
-              pattern: {
-                message: ERROR_MESSAGES.INVALID_VALUE,
-                value: REGEX.measureValue,
-              },
-            }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <>
-                <Measurepicker
-                  value={value || 0.0}
-                  label={`Start weight, ${isImperialUnits ? 'lbs' : 'kg'}`}
-                  style={styles.input}
-                  error={!!errors.startWeight}
-                  handleBlur={onBlur}
-                  handleChange={onChange}
-                  numOfWholePartOptions={isImperialUnits ? 320 : 100}
-                  wholeMinValue={isImperialUnits ? 85 : 40}
-                  numOfDecimalOptions={isImperialUnits ? undefined : 10}
-                />
-                <HelperText type="error">{errors.startWeight?.message}</HelperText>
-              </>
-            )}
-          />
-        )
-            : null */}
       <Button
         mode="contained"
         onPress={handleSubmit(onSubmit)}
         style={styles.button}
-        disabled={!isValid || !isDirty}
+        disabled={!(isValid && isDirty)}
       >
         Submit
       </Button>

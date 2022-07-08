@@ -3,7 +3,7 @@ export enum UNITS {
   IMPERIAL = 'IMPERIAL',
 }
 
-export const enum PLANS {
+export enum PLANS {
   MAINTENANCE = 'MAINTENANCE',
   LOSING = 'LOSING',
 }

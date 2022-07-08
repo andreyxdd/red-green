@@ -1,8 +1,9 @@
 function getFirstDigitAfterComma(num: number) {
-  return Number(
+  const res = Number(
     (`${Math.round((num + Number.EPSILON) * 10) / 10}`)
       .split('.')[1],
   );
+  return Number.isNaN(res) ? 0 : res;
 }
 
 export function FTandINtoCMandMM(feet: number, inches: number) {
@@ -30,7 +31,7 @@ export function KGtoLBS(kg: number, kgFraction: number) {
 }
 
 export function LBStoKG(lbs: number, lbsFraction: number) {
-  const totalKG = (lbs / 10 + lbsFraction) / 2.205;
+  const totalKG = (lbs + lbsFraction / 10) / 2.205;
   const kg = Math.floor(totalKG);
   const kgFraction = getFirstDigitAfterComma(totalKG - kg);
 

@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
 
 function EditProfileScreen() {
   const [profileData, user] = useDataStore(
-    (state: IDataStore) => [state.profileData, state.user],
+    (state: IDataStore) => [state.profile, state.user],
     shallow,
   );
 

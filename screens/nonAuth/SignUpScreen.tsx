@@ -11,7 +11,7 @@ import { auth } from '../../firebase/firebase';
 import useAppleAuthentication from '../../hooks/useAppleAuthentification';
 import useGoogleAuthentication from '../../hooks/useGoogleAuthentification';
 import Divider from '../../components/Divider';
-import SignUpForm from '../../components/Forms/SignUpForm';
+import { SignUpForm } from '../../components/Forms';
 import colors from '../../styles/colors';
 
 const styles = StyleSheet.create({

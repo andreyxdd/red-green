@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import {
   TextInput, Button, HelperText, Switch, Text,
 } from 'react-native-paper';
@@ -15,16 +15,12 @@ import {
   CMandMMtoFTandIN, FTandINtoCMandMM, KGtoLBS, LBStoKG,
 } from '../../utils/conversions';
 import Datepicker from '../Pickers/Datepickers/Datepicker';
-import { IProfileData } from '../../types/data';
-// import parseStringNumbers from '../../utils/parseStringNumbers';
-// import { writeProfileData } from '../../firebase/writes';
+import { IProfile } from '../../types/data';
+import { writeProfileData } from '../../firebase/writes';
 import { UNITS } from '../../types/enums';
 import Toggle from '../Toggle';
-// import {
-//  CMtoFT, FTtoCM, KGtoLBS, LBStoKG,
-// } from '../../utils/calculate';
 import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
-import { REGEX, ERROR_MESSAGES, CONSTANTS } from './index';
+import { REGEX, ERROR_MESSAGES, CONSTANTS } from './settings';
 
 const styles = StyleSheet.create({
   container: {
@@ -50,7 +46,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const schema = yup.object().shape({
+const YUPschema = yup.object().shape({
   name: yup
     .string()
     .min(CONSTANTS.NAME.MIN_LENGTH, ERROR_MESSAGES.NAME_LENGTH)
@@ -65,50 +61,52 @@ const schema = yup.object().shape({
   units: yup
     .mixed<UNITS>()
     .oneOf(Object.values(UNITS))
-    .default(UNITS.METRIC)
-    .required(ERROR_MESSAGES.REQUIRED),
+    .default(UNITS.METRIC),
   heightOne: yup
     .number()
     .typeError(ERROR_MESSAGES.NONNUMBER)
     .required(ERROR_MESSAGES.REQUIRED)
     .when('units', {
-      is: (val: UNITS) => val === UNITS.METRIC,
+      is: (val: UNITS) => val === UNITS.IMPERIAL,
       then: (s) => s
-        .min(CONSTANTS.HEIGHT.METRIC.CM.MIN, ERROR_MESSAGES.INVALID_HEIGHT_RANGE.METRIC.CM)
-        .max(CONSTANTS.HEIGHT.METRIC.CM.MAX, ERROR_MESSAGES.INVALID_HEIGHT_RANGE.METRIC.CM),
-      otherwise: (s) => s
         .min(CONSTANTS.HEIGHT.IMPERIAL.FT.MIN, ERROR_MESSAGES.INVALID_HEIGHT_RANGE.IMPERIAL.FT)
-        .max(CONSTANTS.HEIGHT.IMPERIAL.FT.MAX, ERROR_MESSAGES.INVALID_HEIGHT_RANGE.IMPERIAL.FT),
-    })
-    .default(CONSTANTS.HEIGHT.METRIC.CM.DEF),
+        .max(CONSTANTS.HEIGHT.IMPERIAL.FT.MAX, ERROR_MESSAGES.INVALID_HEIGHT_RANGE.IMPERIAL.FT)
+        .default(CONSTANTS.HEIGHT.IMPERIAL.FT.DEF),
+      otherwise: (s) => s
+        .min(CONSTANTS.HEIGHT.METRIC.CM.MIN, ERROR_MESSAGES.INVALID_HEIGHT_RANGE.METRIC.CM)
+        .max(CONSTANTS.HEIGHT.METRIC.CM.MAX, ERROR_MESSAGES.INVALID_HEIGHT_RANGE.METRIC.CM)
+        .default(CONSTANTS.HEIGHT.METRIC.CM.DEF),
+    }),
   heightTwo: yup
     .number()
     .typeError(ERROR_MESSAGES.NONNUMBER)
     .required(ERROR_MESSAGES.REQUIRED)
     .when('units', {
-      is: (val: UNITS) => val === UNITS.METRIC,
+      is: (val: UNITS) => val === UNITS.IMPERIAL,
       then: (s) => s
-        .min(CONSTANTS.HEIGHT.METRIC.MM.MIN, ERROR_MESSAGES.INVALID_HEIGHT_RANGE.METRIC.MM)
-        .max(CONSTANTS.HEIGHT.METRIC.MM.MAX, ERROR_MESSAGES.INVALID_HEIGHT_RANGE.METRIC.MM),
-      otherwise: (s) => s
         .min(CONSTANTS.HEIGHT.IMPERIAL.IN.MIN, ERROR_MESSAGES.INVALID_HEIGHT_RANGE.IMPERIAL.IN)
-        .max(CONSTANTS.HEIGHT.IMPERIAL.IN.MAX, ERROR_MESSAGES.INVALID_HEIGHT_RANGE.IMPERIAL.IN),
-    })
-    .default(CONSTANTS.HEIGHT.METRIC.MM.DEF),
+        .max(CONSTANTS.HEIGHT.IMPERIAL.IN.MAX, ERROR_MESSAGES.INVALID_HEIGHT_RANGE.IMPERIAL.IN)
+        .default(CONSTANTS.HEIGHT.IMPERIAL.IN.DEF),
+      otherwise: (s) => s
+        .min(CONSTANTS.HEIGHT.METRIC.MM.MIN, ERROR_MESSAGES.INVALID_HEIGHT_RANGE.METRIC.MM)
+        .max(CONSTANTS.HEIGHT.METRIC.MM.MAX, ERROR_MESSAGES.INVALID_HEIGHT_RANGE.METRIC.MM)
+        .default(CONSTANTS.HEIGHT.METRIC.MM.DEF),
+    }),
   weightOne: yup
     .number()
     .typeError(ERROR_MESSAGES.NONNUMBER)
     .required(ERROR_MESSAGES.REQUIRED)
     .when('units', {
-      is: (val: UNITS) => val === UNITS.METRIC,
+      is: (val: UNITS) => val === UNITS.IMPERIAL,
       then: (s) => s
-        .min(CONSTANTS.WEIGHT.KG.MIN, ERROR_MESSAGES.INVALID_WEIGHT_RANGE.KG)
-        .max(CONSTANTS.WEIGHT.KG.MAX, ERROR_MESSAGES.INVALID_WEIGHT_RANGE.KG),
-      otherwise: (s) => s
         .min(CONSTANTS.WEIGHT.LBS.MIN, ERROR_MESSAGES.INVALID_WEIGHT_RANGE.LBS)
-        .max(CONSTANTS.WEIGHT.LBS.MAX, ERROR_MESSAGES.INVALID_WEIGHT_RANGE.LBS),
-    })
-    .default(CONSTANTS.WEIGHT.KG.DEF),
+        .max(CONSTANTS.WEIGHT.LBS.MAX, ERROR_MESSAGES.INVALID_WEIGHT_RANGE.LBS)
+        .default(CONSTANTS.WEIGHT.LBS.DEF),
+      otherwise: (s) => s
+        .min(CONSTANTS.WEIGHT.KG.MIN, ERROR_MESSAGES.INVALID_WEIGHT_RANGE.KG)
+        .max(CONSTANTS.WEIGHT.KG.MAX, ERROR_MESSAGES.INVALID_WEIGHT_RANGE.KG)
+        .default(CONSTANTS.WEIGHT.KG.DEF),
+    }),
   weightTwo: yup
     .number()
     .typeError(ERROR_MESSAGES.NONNUMBER)
@@ -116,41 +114,69 @@ const schema = yup.object().shape({
     .min(CONSTANTS.WEIGHT.FRACTION.MIN, ERROR_MESSAGES.INVALID_WEIGHT_RANGE.FRACTION)
     .max(CONSTANTS.WEIGHT.FRACTION.MAX, ERROR_MESSAGES.INVALID_WEIGHT_RANGE.FRACTION)
     .when('units', {
-      is: (val: UNITS) => val === UNITS.METRIC,
-      then: (s) => s.default(CONSTANTS.WEIGHT.FRACTION.DEF.LBS),
-      otherwise: (s) => s.default(CONSTANTS.WEIGHT.FRACTION.DEF.KG),
+      is: (val: UNITS) => val === UNITS.IMPERIAL,
+      then: (s) => s.default(CONSTANTS.WEIGHT.FRACTION.DEF.KG),
+      otherwise: (s) => s.default(CONSTANTS.WEIGHT.FRACTION.DEF.LBS),
     }),
+  termsAccepted: yup
+    .boolean()
+    .oneOf([true], ERROR_MESSAGES.TERMS),
 });
 
 export type IProfileForm = {
-  initialValues?: IProfileData;
+  initialValues?: IProfile;
   uid: string;
 }
 
-interface FormData extends IProfileData {
-  name: string;
-  dob: Date;
-  units: UNITS;
+interface FormData extends IProfile {
+  termsAccepted: boolean;
   heightOne: number;
   heightTwo: number;
   weightOne: number;
   weightTwo: number;
-  termsAccepted: boolean;
+}
+
+function initToDefault(init: IProfile, initialUnits: UNITS): FormData {
+  if (initialUnits === UNITS.IMPERIAL) {
+    const { feet, inches } = CMandMMtoFTandIN(init.height.cm, init.height.mm);
+    const { lbs, lbsFraction } = KGtoLBS(init.weight.kg, init.weight.fraction);
+    return {
+      ...init,
+      termsAccepted: true,
+      heightOne: feet,
+      heightTwo: inches,
+      weightOne: lbs,
+      weightTwo: lbsFraction,
+    };
+  }
+  return {
+    ...init,
+    termsAccepted: true,
+    heightOne: init.height.cm,
+    heightTwo: init.height.mm,
+    weightOne: init.weight.kg,
+    weightTwo: init.weight.fraction,
+  };
 }
 
 function ProfileForm({ initialValues, uid }: IProfileForm) {
   const navigation = useNavigation();
+
+  const defaultFromInitial = React.useMemo(
+    () => (initialValues && initToDefault(initialValues, initialValues.units)),
+    [initialValues],
+  );
+
   const {
     control,
-    handleSubmit, formState: { errors, isValid, isDirty }, watch,
+    handleSubmit, formState: { errors, isValid, isDirty }, watch, setValue,
   } = useForm<FormData>({
-    mode: 'onChange',
-    reValidateMode: 'onBlur',
-    resolver: yupResolver(schema),
-    defaultValues: schema.getDefault(),
-    // defaultValues: { ...initialValues, termsAccepted: false } || {},
+    mode: 'all',
+    resolver: yupResolver(YUPschema),
+    defaultValues: defaultFromInitial || YUPschema.getDefault(),
   });
   const imperialUnitsWatcher = watch('units') === UNITS.IMPERIAL;
+  const termAcceptedWatcher = watch('termsAccepted');
 
   // -- handling height units conversion
   const [imperialHeight, setImperialHeight] = React.useState({
@@ -172,11 +198,82 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
     kg: CONSTANTS.WEIGHT.KG.DEF,
     fraction: CONSTANTS.WEIGHT.FRACTION.DEF.KG,
   });
+
+  // change initial values if they are passed
+  React.useEffect(() => {
+    if (initialValues) {
+      const imperialValues = initToDefault(initialValues, UNITS.IMPERIAL);
+      setImperialWeight(produce((w) => {
+        w.lbs = imperialValues.weightOne;
+        w.fraction = imperialValues.weightTwo;
+      }));
+      setImperialHeight(produce((h) => {
+        h.ft = imperialValues.heightOne;
+        h.in = imperialValues.heightTwo;
+      }));
+
+      const metricValues = initToDefault(initialValues, UNITS.METRIC);
+      setMetricWeight(produce((w) => {
+        w.kg = metricValues.weightOne;
+        w.fraction = metricValues.weightTwo;
+      }));
+      setMetricHeight(produce((h) => {
+        h.cm = metricValues.heightOne;
+        h.mm = metricValues.heightTwo;
+      }));
+    }
+  }, [initialValues]);
   // --
 
-  const onSubmit = (data: FormData) => {
+  // -- Adjusting value of the form
+  React.useEffect(() => {
+    if (imperialUnitsWatcher) {
+      setValue('heightOne', imperialHeight.ft, { shouldValidate: true });
+      setValue('heightTwo', imperialHeight.in, { shouldValidate: true });
+      setValue('weightOne', imperialWeight.lbs, { shouldValidate: true });
+      setValue('weightTwo', imperialWeight.fraction, { shouldValidate: true });
+    } else {
+      setValue('heightOne', metricHeight.cm, { shouldValidate: true });
+      setValue('heightTwo', metricHeight.mm, { shouldValidate: true });
+      setValue('weightOne', metricWeight.kg, { shouldValidate: true });
+      setValue('weightTwo', metricWeight.fraction, { shouldValidate: true });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imperialUnitsWatcher]);
+  // --
+
+  // useLog(termAcceptedWatcher);
+  // useLog(isDirty);
+  // useLog(`${isValid},${isDirty},${termAcceptedWatcher}`);
+  // useuseLog(errors);
+
+  const onSubmit = ({
+    name, dob, units, heightOne, heightTwo, weightOne, weightTwo,
+  }: FormData) => {
+    console.log(errors);
     if (isValid) {
-      console.log(data, uid);
+      try {
+        const { cm, mm } = imperialUnitsWatcher
+          ? FTandINtoCMandMM(heightOne, heightTwo)
+          : { cm: heightOne, mm: heightTwo };
+        const { kg, kgFraction } = imperialUnitsWatcher
+          ? LBStoKG(weightOne, weightTwo)
+          : { kg: weightOne, kgFraction: weightTwo };
+
+        const newProfile = {
+          name,
+          dob,
+          units,
+          height: { cm, mm },
+          weight: { kg, fraction: kgFraction },
+        };
+
+        writeProfileData(uid, newProfile as IProfile);
+
+        if (initialValues) navigation.navigate('UserMenu');
+      } catch (error) {
+        Alert.alert('Error', 'Form was not submitted, something went wrong');
+      }
     }
   };
 
@@ -302,9 +399,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                     max={CONSTANTS.HEIGHT.METRIC.CM.MAX}
                   />
                 )}
-              <HelperText
-                type="error"
-              >
+              <HelperText type="error">
                 {errors.heightOne?.message}
               </HelperText>
             </View>
@@ -375,12 +470,12 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                   error={!!errors.weightOne}
                   handleBlur={onBlur}
                   handleChange={(v) => {
-                    setMetricWeight(produce((h) => {
+                    setMetricWeight(produce((w) => {
                       const { kg, kgFraction } = LBStoKG(v, imperialWeight.fraction);
-                      h.kg = kg;
-                      h.fraction = kgFraction;
+                      w.kg = kg;
+                      w.fraction = kgFraction;
                     }));
-                    setImperialWeight(produce((h) => { h.lbs = v; }));
+                    setImperialWeight(produce((w) => { w.lbs = v; }));
                     onChange(v);
                   }}
                   min={CONSTANTS.WEIGHT.LBS.MIN}
@@ -394,11 +489,11 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                     error={!!errors.weightOne}
                     handleBlur={onBlur}
                     handleChange={(v) => {
-                      setMetricWeight(produce((h) => { h.kg = v; }));
-                      setImperialWeight(produce((h) => {
+                      setMetricWeight(produce((w) => { w.kg = v; }));
+                      setImperialWeight(produce((w) => {
                         const { lbs, lbsFraction } = KGtoLBS(v, metricWeight.fraction);
-                        h.lbs = lbs;
-                        h.fraction = lbsFraction;
+                        w.lbs = lbs;
+                        w.fraction = lbsFraction;
                       }));
                       onChange(v);
                     }}
@@ -424,12 +519,12 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                   error={!!errors.weightTwo}
                   handleBlur={onBlur}
                   handleChange={(v) => {
-                    setMetricWeight(produce((h) => {
+                    setMetricWeight(produce((w) => {
                       const { kg, kgFraction } = LBStoKG(imperialWeight.lbs, v);
-                      h.kg = kg;
-                      h.fraction = kgFraction;
+                      w.kg = kg;
+                      w.fraction = kgFraction;
                     }));
-                    setImperialWeight(produce((h) => { h.fraction = v; }));
+                    setImperialWeight(produce((w) => { w.fraction = v; }));
                     onChange(v);
                   }}
                   min={CONSTANTS.WEIGHT.FRACTION.MIN}
@@ -443,11 +538,11 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                     error={!!errors.weightTwo}
                     handleBlur={onBlur}
                     handleChange={(v) => {
-                      setMetricWeight(produce((h) => { h.fraction = v; }));
-                      setImperialWeight(produce((h) => {
+                      setMetricWeight(produce((w) => { w.fraction = v; }));
+                      setImperialWeight(produce((w) => {
                         const { lbs, lbsFraction } = KGtoLBS(metricWeight.kg, v);
-                        h.lbs = lbs;
-                        h.fraction = lbsFraction;
+                        w.lbs = lbs;
+                        w.fraction = lbsFraction;
                       }));
                       onChange(v);
                     }}
@@ -476,9 +571,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
             </Text>
             <Controller
               control={control}
-              defaultValue={false}
               name="termsAccepted"
-              rules={{ required: { value: true, message: ERROR_MESSAGES.TERMS } }}
               render={({ field: { onChange, value } }) => (
                 <Switch
                   style={{ marginLeft: 10 }}
@@ -497,7 +590,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
         mode="contained"
         onPress={handleSubmit(onSubmit)}
         style={styles.button}
-        disabled={!isValid || !isDirty}
+        disabled={!(isValid && isDirty && termAcceptedWatcher)}
       >
         Submit
       </Button>

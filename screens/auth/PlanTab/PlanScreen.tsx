@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
 
 function PlanScreen() {
   const [plan, history, profileData] = useDataStore(
-    (state: IDataStore) => [state.plan, state.history, state.profileData],
+    (state: IDataStore) => [state.plan, state.history, state.profile],
     shallow,
   );
   const [planView, setPlanView] = React.useState<PLAN_VIEWS>(PLAN_VIEWS.HISTORY);

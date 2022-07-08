@@ -1,17 +1,21 @@
 export const CONSTANTS = {
-  PASSWORD_MIN_LENGTH: 6,
-  NAME_MIN_LENGTH: 50,
-  MAX_AGE: 100,
-  MIN_AGE: 18,
+  PASSWORD: { MIN_LENGTH: 6, MAX_LENGTH: 32 },
+  NAME: { MIN_LENGTH: 3, MAX_LENGTH: 50 },
+  AGE: { MAX: 100, MIN: 18 },
   HEIGHT: {
-    FT: { MIN: 2, MAX: 7, IN: 12 },
-    CM: { MIN: 80, MAX: 230, AVG: 165 },
+    METRIC: {
+      CM: { MIN: 100, MAX: 230, DEF: 165 },
+      MM: { MIN: 0, MAX: 9, DEF: 5 },
+    },
+    IMPERIAL: {
+      FT: { MIN: 3, MAX: 7, DEF: 5 },
+      IN: { MIN: 0, MAX: 11, DEF: 5 },
+    },
   },
   WEIGHT: {
-    LBS: { MIN: 85, MAX: 320 },
-    KG: {
-      MIN: 40, MAX: 150, DECIMAL: 10, AVG: 61.7,
-    },
+    LBS: { MIN: 88, MAX: 330, DEF: 132 },
+    KG: { MIN: 40, MAX: 150, DEF: 60 },
+    FRACTION: { MIN: 0, MAX: 9, DEF: { KG: 5, LBS: 4 } },
   },
   MAX_PLAN_LENGTH: 70,
   MIN_PLAN_LENGTH: 14,
@@ -20,35 +24,31 @@ export const CONSTANTS = {
 export const REGEX = {
   EMAIL: /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i,
   NAME: /^[a-z ,.'-]+$/i,
-  HEIGHT: { FT: /^\d*\.?\d{2}$/, CM: /^[1-9]\d+$/ },
-  WEIGHT: { LBS: /^\d+$/, KG: /^\d*\.?\d{1}$/ },
-  // HEIGHT: { FT: /^\d+(\.\d+)?$/, CM: /^\d+(\.\d+)?$/ },
-  // WEIGHT: { LBS: /^\d+(\.\d+)?$/, KG: /^\d+(\.\d+)?$/ },
 };
 
 export const ERROR_MESSAGES = {
   UNEQUAL_EMAILS: 'Invalid value: emails are not the same',
   REQUIRED: 'This field is required',
   TERMS: 'Terms must be accepted to continue',
-  EMAIL: 'Invalid value: provided email does not follow conventions - example@mail.com',
-  NAME: 'Invalid name: "@", "!", "$", and other special charachters are not allowed',
-  PASSWORD: 'Password must have at least 6 characters',
-  NAME_LENGTH: `Maximum allowed length is ${CONSTANTS.NAME_MIN_LENGTH}`,
-  INVALID_HEIGHT: {
-    FT: 'Invalid value: number before dot is FT, after - IN. The letter characters are not allowed',
-    CM: 'Invalid value: decimal part and letter characters are not allowed.',
-  },
-  INVALID_WEIGHT: {
-    KG: 'Invalid value: letter characters are not allowed and only one decimal after dot can be input',
-    LBS: 'Invalid value: decimal part and letter characters are not allowed',
-  },
+  EMAIL: 'Invalid value: provided email does not follow conventions - example@sample.eg',
+  NAME: 'Invalid name: numbers, "@", "!", "$", and other special charachters are not allowed',
+  PASSWORD_LENGTH: 'Password must have at least 6 characters and maximum 32',
+  NAME_LENGTH: `Minimum allowed length is ${CONSTANTS.NAME.MIN_LENGTH} and maximum ${CONSTANTS.NAME.MAX_LENGTH}`,
+  NONNUMBER: 'Invalid value: this field may only contain numbers',
   INVALID_HEIGHT_RANGE: {
-    FT: `Invalid value: height should be between ${CONSTANTS.HEIGHT.FT.MIN} and ${CONSTANTS.HEIGHT.FT.MAX} ft`,
-    CM: `Invalid value: height should be between ${CONSTANTS.HEIGHT.CM.MIN} and ${CONSTANTS.HEIGHT.CM.MAX} cm`,
+    IMPERIAL: {
+      FT: `Invalid value: it should be between ${CONSTANTS.HEIGHT.IMPERIAL.FT.MIN} and ${CONSTANTS.HEIGHT.IMPERIAL.FT.MAX} feet`,
+      IN: `Invalid value: it should be between ${CONSTANTS.HEIGHT.IMPERIAL.IN.MIN} and ${CONSTANTS.HEIGHT.IMPERIAL.IN.MAX} inches`,
+    },
+    METRIC: {
+      CM: `Invalid value: it should be between ${CONSTANTS.HEIGHT.METRIC.CM.MIN} and ${CONSTANTS.HEIGHT.METRIC.CM.MAX} cm`,
+      MM: `Invalid value: it should be between ${CONSTANTS.HEIGHT.METRIC.MM.MIN} and ${CONSTANTS.HEIGHT.METRIC.MM.MAX} cm`,
+    },
   },
   INVALID_WEIGHT_RANGE: {
-    LBS: `Invalid value: weight should be between ${CONSTANTS.WEIGHT.LBS.MIN} and ${CONSTANTS.WEIGHT.LBS.MAX} lbs`,
-    KG: `Invalid value: weight should be between ${CONSTANTS.WEIGHT.KG.MIN} and ${CONSTANTS.WEIGHT.KG.MAX} kg`,
+    LBS: `Invalid value: it should be between ${CONSTANTS.WEIGHT.LBS.MIN} and ${CONSTANTS.WEIGHT.LBS.MAX} lbs`,
+    KG: `Invalid value: it should be between ${CONSTANTS.WEIGHT.KG.MIN} and ${CONSTANTS.WEIGHT.KG.MAX} kg`,
+    FRACTION: `Invalid value: it should be between ${CONSTANTS.WEIGHT.FRACTION.MIN} and ${CONSTANTS.WEIGHT.FRACTION.MAX} kg`,
   },
   MAINTENANCE_GOAL_WEIGHT: "The goal weight can not be more than 2% different the current user's weight",
   LOSING_GOAL_WEIGHT: "The goal weight can not be more or equal than the current user's weight",

@@ -5,6 +5,7 @@ import { ActivityIndicator, Provider as PaperProvider } from 'react-native-paper
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { MenuProvider } from 'react-native-popup-menu';
+import { enableES5 } from 'immer';
 import usePlans from './hooks/usePlans';
 import useHistory from './hooks/useHistory';
 
@@ -14,6 +15,8 @@ import Navigation from './navigation/Navigation';
 
 import theme from './styles/theme';
 import useProfile from './hooks/useProfile';
+
+enableES5();
 
 LogBox.ignoreLogs(['Setting a timer']);
 

@@ -1,4 +1,4 @@
-export const enum UNITS {
+export enum UNITS {
   METRIC = 'METRIC',
   IMPERIAL = 'IMPERIAL',
 }

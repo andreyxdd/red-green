@@ -11,7 +11,7 @@ import { PLANS, UNITS } from '../../types/enums';
 import Toggle from '../Toggle';
 import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
 import useDataStore, { IDataStore } from '../../hooks/useDataStore';
-import { REGEX, ERROR_MESSAGES, CONSTANTS } from './index';
+import { ERROR_MESSAGES, CONSTANTS } from './index';
 import { getRelativeChange, KGtoLBS, LBStoKG } from '../../utils/calculate';
 import { writeLosingPlan, writeMaintenancePlan } from '../../firebase/writes';
 import { updateLosingPlan, updateMaintenancePlan } from '../../firebase/updates';
@@ -132,14 +132,14 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
   const goalWeightFieldRules = React.useMemo(
     () => ({
       required: { message: ERROR_MESSAGES.REQUIRED, value: true },
-      pattern: {
+      /* pattern: {
         message: isImperialUnits
           ? ERROR_MESSAGES.INVALID_WEIGHT.LBS
           : ERROR_MESSAGES.INVALID_WEIGHT.KG,
         value: isImperialUnits
           ? REGEX.WEIGHT.LBS
           : REGEX.WEIGHT.KG,
-      },
+      }, */
       validate: (v: any) => {
         const relativeChange = getRelativeChange(profileWeight, Number(v));
         if (!isLosingPlanWatcher) { // MAINTENANCE
@@ -148,6 +148,7 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
         return relativeChange < 0.0 || ERROR_MESSAGES.LOSING_GOAL_WEIGHT;
       },
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isLosingPlanWatcher, isImperialUnits, profileWeight],
   );
 
@@ -185,15 +186,8 @@ function PlanForm({ initialValues, uid }: IPlanForm) {
               error={!!errors.goalWeight}
               handleBlur={onBlur}
               handleChange={onChange}
-              numOfWholePartOptions={isImperialUnits
-                ? CONSTANTS.WEIGHT.LBS.MAX - CONSTANTS.WEIGHT.LBS.MIN
-                : CONSTANTS.WEIGHT.KG.MAX - CONSTANTS.WEIGHT.KG.MIN}
-              wholeMinValue={isImperialUnits
-                ? CONSTANTS.WEIGHT.LBS.MIN
-                : CONSTANTS.WEIGHT.KG.MIN}
-              numOfDecimalOptions={isImperialUnits
-                ? undefined
-                : CONSTANTS.WEIGHT.KG.DECIMAL}
+              min={0}
+              max={100}
             />
             <HelperText
               type="error"

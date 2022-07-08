@@ -35,6 +35,6 @@ export function KGtoLBS(input: number) {
   return Math.round(out);
 }
 
-export function range(size:number, startAt = 0):ReadonlyArray<number> {
-  return [...Array(size).keys()].map((i) => i + startAt);
+export function range({ from = 0, to }:{from: number, to: number}):ReadonlyArray<number> {
+  return [...Array(to).keys()].map((i) => i + from);
 }

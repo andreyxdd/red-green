@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { writeUserHistoryItem, writeUserWeight } from '../../firebase/writes';
 import parseStringNumbers from '../../utils/parseStringNumbers';
 import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
-import { REGEX, ERROR_MESSAGES, CONSTANTS } from './index';
+import { ERROR_MESSAGES, CONSTANTS } from './index';
 import { KGtoLBS, LBStoKG } from '../../utils/calculate';
 
 interface FormData {
@@ -85,14 +85,14 @@ function ManualWeighInForm({
 
   const weighInFieldRules = React.useMemo(() => ({
     required: { message: ERROR_MESSAGES.REQUIRED, value: true },
-    pattern: {
+    /* pattern: {
       message: isImperialUnits
         ? ERROR_MESSAGES.INVALID_WEIGHT.LBS
         : ERROR_MESSAGES.INVALID_WEIGHT.KG,
       value: isImperialUnits
         ? REGEX.WEIGHT.LBS
         : REGEX.WEIGHT.KG,
-    },
+    }, */
     validate: (v: any) => {
       if (isImperialUnits) {
         return (Number(v) > CONSTANTS.WEIGHT.LBS.MIN && Number(v) < CONSTANTS.WEIGHT.LBS.MAX)
@@ -120,13 +120,8 @@ function ManualWeighInForm({
               error={!!errors.weighIn}
               handleBlur={onBlur}
               handleChange={onChange}
-              numOfWholePartOptions={isImperialUnits
-                ? CONSTANTS.WEIGHT.LBS.MAX - CONSTANTS.WEIGHT.LBS.MIN
-                : CONSTANTS.WEIGHT.KG.MAX - CONSTANTS.WEIGHT.KG.MIN}
-              wholeMinValue={isImperialUnits ? CONSTANTS.WEIGHT.LBS.MIN
-                : CONSTANTS.WEIGHT.KG.MIN}
-              numOfDecimalOptions={isImperialUnits ? undefined
-                : CONSTANTS.WEIGHT.KG.DECIMAL}
+              min={1}
+              max={102}
             />
             <HelperText
               style={styles.helperText}

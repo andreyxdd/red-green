@@ -25,14 +25,12 @@ export const styles = StyleSheet.create({
 });
 
 export interface IMeasurepickerMobile extends IMeasurepicker{
-  wholeMinValue: number;
-  numOfWholePartOptions: number;
-  numOfDecimalOptions?: number;
+  min: number;
+  max: number;
 }
 
 function MeasurepickerMobile({
-  handleChange, value, label, style, error,
-  wholeMinValue, numOfWholePartOptions, numOfDecimalOptions,
+  handleChange, value, label, style, error, min, max,
 }: IMeasurepickerMobile) {
   const pickerRef = React.useRef<RBSheet>(null);
   const handleToggle = () => {
@@ -40,20 +38,6 @@ function MeasurepickerMobile({
     if (pickerRef.current) {
       pickerRef.current.open();
     }
-  };
-
-  const wholePart = React.useMemo(() => Math.trunc(value), [value]);
-  const decimalPart = React.useMemo(() => {
-    const decimal = Number((`${value}`).split('.')[1]);
-    return Number.isNaN(decimal) ? 0 : decimal;
-  }, [value]);
-
-  const handleWholePartChange = (v: number) => {
-    handleChange(`${v}.${decimalPart}`);
-  };
-
-  const handleDecimalPartChange = (v: number) => {
-    handleChange(`${wholePart}.${v}`);
   };
 
   return (
@@ -80,13 +64,12 @@ function MeasurepickerMobile({
         }}
       >
         <View style={styles.BSRowContainer}>
-          {/* numOfWholePartOptions && wholeMinValue ? ( */}
           <Picker
-            selectedValue={wholePart}
+            selectedValue={value}
             style={styles.picker}
-            onValueChange={handleWholePartChange}
+            onValueChange={handleChange}
           >
-            {range(numOfWholePartOptions, wholeMinValue).map((v: number) => (
+            {range({ from: min, to: max }).map((v: number) => (
               <Picker.Item
                 key={uuidv4()}
                 label={v.toString()}
@@ -94,22 +77,6 @@ function MeasurepickerMobile({
               />
             ))}
           </Picker>
-          {/* ) : null */}
-          {numOfDecimalOptions ? (
-            <Picker
-              selectedValue={decimalPart}
-              style={styles.picker}
-              onValueChange={handleDecimalPartChange}
-            >
-              {range(numOfDecimalOptions).map((v: number) => (
-                <Picker.Item
-                  key={uuidv4()}
-                  label={v.toString()}
-                  value={v}
-                />
-              ))}
-            </Picker>
-          ) : null}
         </View>
       </RBSheet>
     </>

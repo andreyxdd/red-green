@@ -10,10 +10,8 @@ function MeasureWebInput({
       label={label}
       style={style}
       onBlur={handleBlur}
-      onChangeText={(v) => handleChange(v)}
+      onChangeText={(v) => handleChange(Number(v))}
       error={error}
-      keyboardType="decimal-pad"
-      returnKeyType="done"
       selectTextOnFocus
     />
   );

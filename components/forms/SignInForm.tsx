@@ -2,14 +2,11 @@ import React from 'react';
 import { StyleSheet, View, Alert } from 'react-native';
 import { TextInput, Button, HelperText } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase/firebase';
-import { ERROR_MESSAGES, REGEX } from './index';
-
-interface FormData {
-  email: string;
-  password: string;
-}
+import { ERROR_MESSAGES } from './index';
 
 const styles = StyleSheet.create({
   container: { justifyContent: 'center', width: '100%' },
@@ -20,6 +17,16 @@ const styles = StyleSheet.create({
   helperText: { width: '90%', alignSelf: 'center' },
 });
 
+const schema = yup.object().shape({
+  email: yup.string().email(ERROR_MESSAGES.EMAIL).required(ERROR_MESSAGES.REQUIRED),
+  password: yup.string().required(ERROR_MESSAGES.REQUIRED),
+});
+
+interface FormData {
+  email: string;
+  password: string;
+}
+
 function SignInForm() {
   // show/hide password charachters
   const [secureTextEntry, setSecureTextEntry] = React.useState(true);
@@ -28,7 +35,8 @@ function SignInForm() {
   const {
     control, handleSubmit, formState: { errors, isValid }, getValues,
   } = useForm<FormData>({
-    mode: 'onChange',
+    mode: 'onBlur',
+    resolver: yupResolver(schema),
   });
 
   // submit form
@@ -48,15 +56,12 @@ function SignInForm() {
         control={control}
         name="email"
         defaultValue=""
-        rules={{
-          required: { message: ERROR_MESSAGES.REQUIRED, value: true },
-          pattern: { value: REGEX.EMAIL, message: ERROR_MESSAGES.EMAIL },
-        }}
         render={({ field: { onBlur, onChange, value } }) => (
           <>
             <TextInput
               value={value}
               label="Email"
+              placeholder="example@sample.eg"
               style={styles.input}
               onBlur={onBlur}
               textContentType="emailAddress"
@@ -77,9 +82,6 @@ function SignInForm() {
         control={control}
         name="password"
         defaultValue=""
-        rules={{
-          required: { message: ERROR_MESSAGES.REQUIRED, value: true },
-        }}
         render={({ field: { onBlur, onChange, value } }) => (
           <>
             <TextInput
@@ -100,6 +102,7 @@ function SignInForm() {
               right={(
                 <TextInput.Icon
                   name={secureTextEntry ? 'eye' : 'eye-off'}
+                  style={{ zIndex: 10, paddingLeft: 12 }}
                   onPress={() => {
                     setSecureTextEntry(!secureTextEntry);
                     return false;

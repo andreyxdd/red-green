@@ -67,7 +67,7 @@ function PlanInfo({
         </View>
         <View style={{ flex: 2 }}>
           <Text style={styles.text}>
-            {differenceInDays(endDate, new Date(new Date('July 21,2022').setHours(0, 0, 0, 0)))}
+            {differenceInDays(endDate, new Date(new Date().setHours(0, 0, 0, 0)))}
             {' '}
             days
           </Text>

@@ -5,7 +5,6 @@ import { View } from 'react-native';
 import UserMenuScreen from '../screens/auth/WeighinTab/UserMenuScreen/UserMenuScreen';
 import ManualWeighInScreen from '../screens/auth/WeighinTab/ManualWeighInScreen';
 import EditProfileScreen from '../screens/auth/WeighinTab/UserMenuScreen/EditProfileScreen';
-import EditPlanScreen from '../screens/auth/PlanTab/EditPlanScreen';
 import CreatePlanScreen from '../screens/auth/CreatePlanScreen';
 
 import BottomTabStack from './AuthBottomTabStack';
@@ -69,17 +68,6 @@ function AuthStack() {
         component={EditProfileScreen}
         options={({ navigation }) => ({
           title: 'Edit Profile',
-          headerTitleAlign: 'center',
-          headerLeft: () => (
-            <GoBack onPress={() => navigation.goBack()} />
-          ),
-        })}
-      />
-      <Stack.Screen
-        name="EditPlan"
-        component={EditPlanScreen}
-        options={({ navigation }) => ({
-          title: 'Edit Plan',
           headerTitleAlign: 'center',
           headerLeft: () => (
             <GoBack onPress={() => navigation.goBack()} />

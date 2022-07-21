@@ -7,7 +7,7 @@ import { Subheading } from 'react-native-paper';
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
 import PopupPlanMenu from '../../../components/PlanTab/PopupPlanMenu';
 import HistoryPlot from '../../../components/PlanTab/HistoryPlot';
-import { PLANS, PLAN_VIEWS, UNITS } from '../../../types/enums';
+import { PLANS, PLAN_VIEWS } from '../../../types/enums';
 import Toggle from '../../../components/Toggle';
 import BreakdownCard from '../../../components/PlanTab/BreakdownCard';
 import PlanInfo from '../../../components/PlanTab/PlanInfo';
@@ -67,14 +67,14 @@ function PlanScreen() {
                 <FlatList
                   data={history}
                   renderItem={({ item }) => {
-                    if (item.weighIn && item.sign) {
+                    if (item.weighIn && item.sign && profileData) {
                       return (
                         <BreakdownCard
                           date={item.date}
                           sign={item.sign}
                           weighIn={item.weighIn}
                           goalWeight={item.dailyGoal}
-                          isImperialUnits={profileData?.units === UNITS.IMPERIAL}
+                          units={profileData.units}
                         />
                       );
                     }

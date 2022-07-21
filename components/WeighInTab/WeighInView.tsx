@@ -4,9 +4,8 @@ import { View, StyleSheet } from 'react-native';
 import { Button, Subheading, Headline } from 'react-native-paper';
 import colors from '../../styles/colors';
 import { fullHeight } from '../../styles/theme';
-import { IWeight } from '../../types/data';
-import { MANUAL_WEIGHIN, SIGNS } from '../../types/enums';
-import { KGtoLBS } from '../../utils/conversions';
+import { IBodyMeasure } from '../../types/data';
+import { MANUAL_WEIGHIN, SIGNS, UNITS } from '../../types/enums';
 
 const styles = StyleSheet.create({
   container: {
@@ -19,25 +18,22 @@ const styles = StyleSheet.create({
 
 interface IWeighInView{
   sign: SIGNS;
-  currentWeighIn: IWeight;
+  currentWeighIn: IBodyMeasure;
   uid: string;
   planId: string;
   historyId: string;
-  isImperialUnits: boolean;
-  profileWeight: IWeight;
+  units: UNITS;
+  profileWeight: IBodyMeasure;
 }
 
 function WeighInView({
-  sign, currentWeighIn, uid, planId, historyId, isImperialUnits, profileWeight,
+  sign, currentWeighIn, uid, planId, historyId, units, profileWeight,
 }: IWeighInView) {
   const { navigate } = useNavigation();
-  const currentWeighInValue = React.useMemo(() => {
-    if (isImperialUnits) {
-      const weight = KGtoLBS(currentWeighIn.kg, currentWeighIn.kgFraction);
-      return weight.lbs + weight.lbsFraction / 10;
-    }
-    return currentWeighIn.kg + currentWeighIn.kgFraction;
-  }, [isImperialUnits, currentWeighIn]);
+  const currentWeighInValue = React.useMemo(
+    () => currentWeighIn[units].integer + currentWeighIn[units].fraction / 10,
+    [units, currentWeighIn],
+  );
 
   return (
     <View style={[styles.container, { width: '80%', alignSelf: 'center' }]}>
@@ -59,7 +55,7 @@ function WeighInView({
         <Headline style={{ textAlign: 'center', fontWeight: '300' }}>
           {currentWeighInValue}
           {' '}
-          {isImperialUnits ? 'lbs' : 'kg'}
+          {units === UNITS.IMPERIAL ? 'lbs' : 'kg'}
         </Headline>
       </View>
       <Button
@@ -72,7 +68,7 @@ function WeighInView({
             uid,
             planId,
             historyId,
-            isImperialUnits,
+            isImperialUnits: (units === UNITS.IMPERIAL),
             profileWeight,
           });
         }}

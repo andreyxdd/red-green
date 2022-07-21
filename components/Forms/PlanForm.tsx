@@ -15,10 +15,10 @@ import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
 import { ERROR_MESSAGES, CONSTANTS } from './settings';
 import { getRelativeChange } from '../../utils/calculate';
 import { KGtoLBS, LBStoKG } from '../../utils/conversions';
-import { IProfile, IGeneralWeight } from '../../types/data';
-import { writeLosingPlan, writeMaintenancePlan } from '../../firebase/writes';
+import { IProfile, INumber, IBodyMeasure } from '../../types/data';
+import { writeMaintenancePlan, writeLosingWeightPlan } from '../../firebase/writes';
 
-// const SUB_LOSING_WEIGHT = 5;
+const SUB_LOSING_WEIGHT = 5;
 
 const styles = StyleSheet.create({
   container: {
@@ -39,12 +39,12 @@ const styles = StyleSheet.create({
   helperText: { width: '90%', alignSelf: 'center' },
 });
 
-const YUPschema = (currentWeight: IGeneralWeight) => yup.object().shape({
+const YUPschema = (currentWeight: INumber) => yup.object().shape({
   plan: yup
     .mixed<PLANS>()
     .oneOf(Object.values(PLANS))
     .default(PLANS.MAINTENANCE),
-  goalWeightOne: yup
+  goalWeightInteger: yup
     .number()
     .typeError(ERROR_MESSAGES.NONNUMBER)
     .required(ERROR_MESSAGES.REQUIRED)
@@ -55,23 +55,23 @@ const YUPschema = (currentWeight: IGeneralWeight) => yup.object().shape({
           name: 'within-range',
           message: ERROR_MESSAGES.MAINTENANCE_GOAL_WEIGHT,
           test: (v, ctx) => Math.abs(getRelativeChange(
-            currentWeight.whole + currentWeight.fraction / 10,
-            ctx.parent.goalWeightTwo / 10 + v!,
+            currentWeight.integer + currentWeight.fraction / 10,
+            ctx.parent.goalWeightFraction / 10 + v!,
           )) < 2.0,
         })
-        .default(currentWeight.whole),
+        .default(currentWeight.integer),
       otherwise: (s) => s
         .test({
           name: 'too-high',
           message: ERROR_MESSAGES.LOSING_GOAL_WEIGHT,
           test: (v, ctx) => getRelativeChange(
-            currentWeight.whole + currentWeight.fraction / 10,
-            ctx.parent.goalWeightTwo / 10 + v!,
+            currentWeight.integer + currentWeight.fraction / 10,
+            ctx.parent.goalWeightFraction / 10 + v!,
           ) < 0.0,
         })
-        .default(currentWeight.whole),
+        .default(currentWeight.integer),
     }),
-  goalWeightTwo: yup
+  goalWeightFraction: yup
     .number()
     .typeError(ERROR_MESSAGES.NONNUMBER)
     .required(ERROR_MESSAGES.REQUIRED)
@@ -82,8 +82,8 @@ const YUPschema = (currentWeight: IGeneralWeight) => yup.object().shape({
           name: 'within-range',
           message: ERROR_MESSAGES.MAINTENANCE_GOAL_WEIGHT,
           test: (v, ctx) => Math.abs(getRelativeChange(
-            currentWeight.whole + currentWeight.fraction / 10,
-            ctx.parent.goalWeightOne + v! / 10,
+            currentWeight.integer + currentWeight.fraction / 10,
+            ctx.parent.goalWeightInteger + v! / 10,
           )) < 2.0,
         }),
       otherwise: (s) => s
@@ -91,8 +91,8 @@ const YUPschema = (currentWeight: IGeneralWeight) => yup.object().shape({
           name: 'too-high',
           message: ERROR_MESSAGES.LOSING_GOAL_WEIGHT,
           test: (v, ctx) => getRelativeChange(
-            currentWeight.whole + currentWeight.fraction / 10,
-            ctx.parent.goalWeightOne + v! / 10,
+            currentWeight.integer + currentWeight.fraction / 10,
+            ctx.parent.goalWeightInteger + v! / 10,
           ) < 0.0,
         }),
     })
@@ -102,9 +102,9 @@ const YUPschema = (currentWeight: IGeneralWeight) => yup.object().shape({
     .default(addDays(new Date(), CONSTANTS.PLAN.MIN_LENGTH))
     .required(ERROR_MESSAGES.REQUIRED),
 }, [
-  ['goalWeightOne', 'plan'],
-  ['goalWeightTwo', 'plan'],
-  ['goalWeightTwo', 'goalWeightOne'],
+  ['goalWeightIntger', 'plan'],
+  ['goalWeightFraction', 'plan'],
+  ['goalWeightFraction', 'goalWeightIntger'],
 ]);
 
 export interface IPlanForm {
@@ -115,8 +115,8 @@ export interface IPlanForm {
 
 interface FormData {
   plan: PLANS;
-  goalWeightOne: number;
-  goalWeightTwo: number;
+  goalWeightInteger: number;
+  goalWeightFraction: number;
   goalDate: Date;
 }
 
@@ -124,43 +124,54 @@ function PlanForm({ initialValues, profile, uid }: IPlanForm) {
   const navigation = useNavigation();
 
   const data = React.useMemo(() => {
-    if (profile.units === UNITS.IMPERIAL) {
-      const { lbs, lbsFraction } = KGtoLBS(profile.weight.kg, profile.weight.kgFraction);
-      const profileWeight = { whole: lbs, fraction: lbsFraction };
-      return {
-        isImperialUnits: true,
-        profileWeight,
-        schema: YUPschema(profileWeight),
-      };
-    }
-
-    const profileWeight = { whole: profile.weight.kg, fraction: profile.weight.kgFraction };
+    const profileWeight = profile.weight[profile.units];
     return {
-      isImperialUnits: false,
+      isImperialUnits: profile.units === UNITS.IMPERIAL,
       profileWeight,
       schema: YUPschema(profileWeight),
     };
   }, [profile]);
 
   const {
-    control, handleSubmit, formState: { errors, isValid, isDirty },
+    control, handleSubmit, formState: { errors, isValid, isDirty }, watch, setValue,
   } = useForm<FormData>({
     mode: 'all',
     resolver: yupResolver(data.schema),
     defaultValues: initialValues || data.schema.getDefault(),
   });
 
+  const planType = watch('plan');
+
+  React.useEffect(() => {
+    if (planType === PLANS.LOSING) {
+      setValue('goalWeightInteger', profile.weight[profile.units].integer - SUB_LOSING_WEIGHT, { shouldValidate: true });
+      return;
+    }
+    setValue('goalWeightInteger', profile.weight[profile.units].integer, { shouldValidate: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [planType]);
+
   const onSubmit = async ({
-    plan, goalWeightOne, goalWeightTwo, goalDate,
+    plan, goalWeightInteger, goalWeightFraction, goalDate,
   }: FormData) => {
     if (isValid) {
-      const goalWeight = data.isImperialUnits
-        ? LBStoKG(goalWeightOne, goalWeightTwo)
-        : { kg: goalWeightOne, kgFraction: goalWeightTwo };
+      const goalWeight: IBodyMeasure = {
+        METRIC: data.isImperialUnits
+          ? LBStoKG(goalWeightInteger + goalWeightFraction / 10)
+          : { integer: goalWeightInteger, fraction: goalWeightFraction },
+        IMPERIAL: !data.isImperialUnits
+          ? KGtoLBS(goalWeightInteger + goalWeightFraction / 10)
+          : { integer: goalWeightInteger, fraction: goalWeightFraction },
+      };
 
-      const startWeight = data.isImperialUnits
-        ? LBStoKG(data.profileWeight.whole, data.profileWeight.fraction)
-        : { kg: data.profileWeight.whole, kgFraction: data.profileWeight.fraction };
+      const startWeight: IBodyMeasure = {
+        METRIC: data.isImperialUnits
+          ? LBStoKG(data.profileWeight.integer + data.profileWeight.fraction / 10)
+          : { integer: data.profileWeight.integer, fraction: data.profileWeight.fraction },
+        IMPERIAL: !data.isImperialUnits
+          ? KGtoLBS(data.profileWeight.integer + data.profileWeight.fraction / 10)
+          : { integer: data.profileWeight.integer, fraction: data.profileWeight.fraction },
+      };
 
       try {
         if (!initialValues) {
@@ -168,7 +179,7 @@ function PlanForm({ initialValues, profile, uid }: IPlanForm) {
             await writeMaintenancePlan(uid, goalWeight, goalDate);
           }
           if (plan === PLANS.LOSING) {
-            await writeLosingPlan(uid, goalWeight, goalDate, startWeight);
+            await writeLosingWeightPlan(uid, goalWeight, goalDate, startWeight);
           }
         }
 
@@ -204,13 +215,13 @@ function PlanForm({ initialValues, profile, uid }: IPlanForm) {
       <View style={styles.rowContainer}>
         <Controller
           control={control}
-          name="goalWeightOne"
+          name="goalWeightInteger"
           render={({ field: { onChange, onBlur, value } }) => (
             <View style={[styles.rowInput, { marginRight: 6 }]}>
               <Measurepicker
                 value={value}
                 label={`Goal weight, ${data.isImperialUnits ? 'lbs' : 'kg'}`}
-                error={!!errors.goalWeightOne}
+                error={!!errors.goalWeightInteger}
                 handleBlur={onBlur}
                 handleChange={onChange}
                 min={data.isImperialUnits ? CONSTANTS.WEIGHT.LBS.MIN : CONSTANTS.WEIGHT.KG.MIN}
@@ -221,13 +232,13 @@ function PlanForm({ initialValues, profile, uid }: IPlanForm) {
         />
         <Controller
           control={control}
-          name="goalWeightTwo"
+          name="goalWeightFraction"
           render={({ field: { onChange, onBlur, value } }) => (
             <View style={[styles.rowInput, { marginLeft: 6 }]}>
               <Measurepicker
                 value={value}
                 label="Goal weight, decimal"
-                error={!!errors.goalWeightTwo}
+                error={!!errors.goalWeightFraction}
                 handleBlur={onBlur}
                 handleChange={onChange}
                 min={CONSTANTS.WEIGHT.FRACTION.MIN}
@@ -238,7 +249,7 @@ function PlanForm({ initialValues, profile, uid }: IPlanForm) {
         />
       </View>
       <HelperText type="error" style={styles.helperText}>
-        {errors.goalWeightTwo?.message || errors.goalWeightOne?.message}
+        {errors.goalWeightInteger?.message || errors.goalWeightFraction?.message}
       </HelperText>
 
       <Controller

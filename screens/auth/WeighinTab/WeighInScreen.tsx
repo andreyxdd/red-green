@@ -47,7 +47,7 @@ function WeighInScreen() {
             uid={user.uid}
             planId={plan.id}
             historyId={todayHistoryItem.id}
-            isImperialUnits={profile.units === UNITS.IMPERIAL}
+            units={profile.units}
             profileWeight={profile.weight}
           />
           ) : (

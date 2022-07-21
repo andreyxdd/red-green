@@ -1,30 +1,30 @@
 Arguments: 
-  D:\Program Files\nodejs\node.exe D:\Program Files\nodejs\node_modules\yarn\bin\yarn.js add @hookform/resolvers/yup
+  /snap/node/6331/bin/node /snap/node/6331/bin/yarn.js install
 
 PATH: 
-  C:\Users\andre\AppData\Local\Programs\Python\Python39\Scripts\;C:\Users\andre\AppData\Local\Programs\Python\Python39\;C:\Users\andre\AppData\Local\Programs\Python\Python310\Scripts\;C:\Users\andre\AppData\Local\Programs\Python\Python310\;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\WiFi\bin\;C:\Program Files\Common Files\Intel\WirelessCommon\;C:\Program Files\Microsoft DNX\Dnvm\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Users\andre\AppData;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\ProgramData\chocolatey\bin;D:\Git\cmd;D:\Program Files\MATLAB\R2020b\bin;D:\Program Files\nvm;D:\Program Files\nodejs;D:\Program Files\PostgreSQL\14\bin;D:\Program Files\PostgreSQL\14\lib;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Users\andre\AppData\Local\Android\Sdk\platform-tools;D:\Program Files\geckodriver\geckodriver.exe;C:\Users\andre\AppData\Local\Programs\Python\Python39\Scripts\;C:\Users\andre\AppData\Local\Programs\Python\Python39\;C:\Users\andre\AppData\Local\Programs\Python\Python310\Scripts\;C:\Users\andre\AppData\Local\Programs\Python\Python310\;C:\texlive\2019\bin\win32;C:\Users\andre\AppData\Local\Microsoft\WindowsApps;D:\Microsoft VS Code\bin;D:\mingw-w64\mingw32\i686-w64-mingw32\bin;D:\mingw-w64\mingw32\bin;C:\Users\andre\AppData\Roaming\npm;D:\Program Files\nvm;D:\Program Files\nodejs;D:\Program Files\heroku\bin;C:\Users\andre\.deta\bin;C:\Users\andre\AppData\Local\Android\Sdk\platform-tools;D:\Program Files\geckodriver\geckodriver.exe;
+  /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/volkov/Android/Sdk/emulator:/home/volkov/Android/Sdk/platform-tools:/home/volkov/.pub-cache/bin:/home/volkov/Android/Sdk/emulator:/home/volkov/Android/Sdk/platform-tools:/home/volkov/.pub-cache/bin
 
 Yarn version: 
-  1.22.18
+  1.22.19
 
 Node version: 
-  14.17.0
+  14.19.3
 
 Platform: 
-  win32 x64
+  linux x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@hookform%2fresolvers/yup: Request "https://registry.yarnpkg.com/@hookform%2fresolvers/yup" returned a 405
-      at Request.params.callback [as _callback] (D:\Program Files\nvm\v14.17.0\node_modules\yarn\lib\cli.js:66147:18)
-      at Request.self.callback (D:\Program Files\nvm\v14.17.0\node_modules\yarn\lib\cli.js:140883:22)
-      at Request.emit (events.js:376:20)
-      at Request.<anonymous> (D:\Program Files\nvm\v14.17.0\node_modules\yarn\lib\cli.js:141855:10)
-      at Request.emit (events.js:376:20)
-      at IncomingMessage.<anonymous> (D:\Program Files\nvm\v14.17.0\node_modules\yarn\lib\cli.js:141777:12)
-      at Object.onceWrapper (events.js:482:28)
-      at IncomingMessage.emit (events.js:388:22)
-      at endReadableNT (internal/streams/readable.js:1336:12)
-      at processTicksAndRejections (internal/process/task_queues.js:82:21)
+  Error: EACCES: permission denied, write
+      at writeSync (fs.js:737:3)
+      at SyncWriteStream._write (internal/fs/sync_write_stream.js:24:3)
+      at writeOrBuffer (internal/streams/writable.js:358:12)
+      at SyncWriteStream.Writable.write (internal/streams/writable.js:303:10)
+      at Object.cursorTo (readline.js:1328:17)
+      at writeOnNthLine (/snap/node/6331/lib/cli.js:49482:14)
+      at Spinner.render (/snap/node/6331/lib/cli.js:93489:48)
+      at Spinner.start (/snap/node/6331/lib/cli.js:93476:10)
+      at ConsoleReporter.activity (/snap/node/6331/lib/cli.js:93022:13)
+      at PackageResolver.<anonymous> (/snap/node/6331/lib/cli.js:64697:52)
 
 npm manifest: 
   {
@@ -51,6 +51,7 @@ npm manifest:
     },
     "dependencies": {
       "@expo/vector-icons": "^12.0.0",
+      "@hookform/resolvers": "^2.9.4",
       "@react-native-community/datetimepicker": "4.0.0",
       "@react-native-picker/picker": "2.2.1",
       "@react-navigation/bottom-tabs": "^6.0.5",
@@ -72,6 +73,7 @@ npm manifest:
       "expo-status-bar": "~1.2.0",
       "expo-web-browser": "~10.1.0",
       "firebase": "^9.6.10",
+      "immer": "^9.0.15",
       "react": "17.0.1",
       "react-datepicker": "^4.8.0",
       "react-dom": "17.0.1",
@@ -1844,6 +1846,11 @@ Lockfile:
     integrity sha512-foQZKJig7Ob0BMAYBfcJk8d77QtOe7Wo4ox7ff1lQYoNNAb6jwcY1ncdoy2e9wQZzvNy7ODZCYJkK8kzmcAnAg==
     dependencies:
       "@hapi/hoek" "^9.0.0"
+  
+  "@hookform/resolvers@^2.9.4":
+    version "2.9.4"
+    resolved "https://registry.yarnpkg.com/@hookform/resolvers/-/resolvers-2.9.4.tgz#e06d15649c5b8d7ec5fb9cd53ede1ac7b117aaff"
+    integrity sha512-rVqwNB5Z5J67QGsJWp9a46z4+MJq8YDUXX8mMIr6hEsGD4bs6c7Jtel+ZNvk0aFfywGRwIEMfmQUrpxjWQck3w==
   
   "@humanwhocodes/config-array@^0.6.0":
     version "0.6.0"
@@ -5424,6 +5431,11 @@ Lockfile:
     version "3.0.6"
     resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.0.6.tgz#9db1dbd0faf8de6fbe0f5dd5e56bb606280de69b"
     integrity sha1-nbHb0Pr43m++D13V5Wu2BigN5ps=
+  
+  immer@^9.0.15:
+    version "9.0.15"
+    resolved "https://registry.yarnpkg.com/immer/-/immer-9.0.15.tgz#0b9169e5b1d22137aba7d43f8a81a495dd1b62dc"
+    integrity sha512-2eB/sswms9AEUSkOm4SbV5Y7Vmt/bKRwByd52jfLkW4OLYeaTP3EEiJ9agqU0O/tq6Dk62Zfj+TJSqfm1rLVGQ==
   
   import-fresh@^2.0.0:
     version "2.0.0"

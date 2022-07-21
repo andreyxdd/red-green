@@ -61,7 +61,7 @@ const YUPschema = yup.object().shape({
   units: yup
     .mixed<UNITS>()
     .oneOf(Object.values(UNITS))
-    .default(UNITS.METRIC),
+    .default(UNITS.IMPERIAL),
   heightOne: yup
     .number()
     .typeError(ERROR_MESSAGES.NONNUMBER)
@@ -136,26 +136,14 @@ interface FormData extends IProfile {
   weightTwo: number;
 }
 
-function initToDefault(init: IProfile, initialUnits: UNITS): FormData {
-  if (initialUnits === UNITS.IMPERIAL) {
-    const { feet, inches } = CMandMMtoFTandIN(init.height.cm, init.height.mm);
-    const { lbs, lbsFraction } = KGtoLBS(init.weight.kg, init.weight.kgFraction);
-    return {
-      ...init,
-      termsAccepted: true,
-      heightOne: feet,
-      heightTwo: inches,
-      weightOne: lbs,
-      weightTwo: lbsFraction,
-    };
-  }
+function initialValuesToSchema(init: IProfile, units: UNITS): FormData {
   return {
     ...init,
     termsAccepted: true,
-    heightOne: init.height.cm,
-    heightTwo: init.height.mm,
-    weightOne: init.weight.kg,
-    weightTwo: init.weight.kgFraction,
+    heightOne: init.height[units].integer,
+    heightTwo: init.height[units].fraction,
+    weightOne: init.weight[units].integer,
+    weightTwo: init.weight[units].fraction,
   };
 }
 
@@ -163,7 +151,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
   const navigation = useNavigation();
 
   const defaultFromInitial = React.useMemo(
-    () => (initialValues && initToDefault(initialValues, initialValues.units)),
+    () => (initialValues && initialValuesToSchema(initialValues, initialValues.units)),
     [initialValues],
   );
 
@@ -202,7 +190,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
   // change initial values if they are passed
   React.useEffect(() => {
     if (initialValues) {
-      const imperialValues = initToDefault(initialValues, UNITS.IMPERIAL);
+      const imperialValues = initialValuesToSchema(initialValues, UNITS.IMPERIAL);
       setImperialWeight(produce((w) => {
         w.lbs = imperialValues.weightOne;
         w.fraction = imperialValues.weightTwo;
@@ -212,7 +200,7 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
         h.in = imperialValues.heightTwo;
       }));
 
-      const metricValues = initToDefault(initialValues, UNITS.METRIC);
+      const metricValues = initialValuesToSchema(initialValues, UNITS.METRIC);
       setMetricWeight(produce((w) => {
         w.kg = metricValues.weightOne;
         w.fraction = metricValues.weightTwo;
@@ -238,33 +226,25 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
       setValue('weightOne', metricWeight.kg, { shouldValidate: true });
       setValue('weightTwo', metricWeight.fraction, { shouldValidate: true });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imperialUnitsWatcher]);
   // --
 
-  // useLog(termAcceptedWatcher);
-  // useLog(isDirty);
-  // useLog(`${isValid},${isDirty},${termAcceptedWatcher}`);
-  // useuseLog(errors);
-
-  const onSubmit = ({
-    name, dob, units, heightOne, heightTwo, weightOne, weightTwo,
-  }: FormData) => {
+  const onSubmit = ({ name, dob, units }: FormData) => {
     if (isValid) {
       try {
-        const { cm, mm } = imperialUnitsWatcher
-          ? FTandINtoCMandMM(heightOne, heightTwo)
-          : { cm: heightOne, mm: heightTwo };
-        const { kg, kgFraction } = imperialUnitsWatcher
-          ? LBStoKG(weightOne, weightTwo)
-          : { kg: weightOne, kgFraction: weightTwo };
-
         const newProfile = {
           name,
           dob,
           units,
-          height: { cm, mm },
-          weight: { kg, kgFraction },
+          height: {
+            METRIC: { integer: metricHeight.cm, fraction: metricHeight.mm },
+            IMPERIAL: { integer: imperialHeight.ft, fraction: imperialHeight.in },
+          },
+          weight: {
+            METRIC: { integer: metricWeight.kg, fraction: metricWeight.fraction },
+            IMPERIAL: { integer: imperialWeight.lbs, fraction: imperialWeight.fraction },
+          },
         };
 
         writeProfileData(uid, newProfile as IProfile);
@@ -343,8 +323,8 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
           <Toggle
             selection={value}
             options={{
-              first: { field: UNITS.METRIC, text: 'Metric (cm/mm, kg)' },
-              second: { field: UNITS.IMPERIAL, text: 'Imperial (ft/in, lbs)' },
+              first: { field: UNITS.IMPERIAL, text: 'Imperial (ft/in, lbs)' },
+              second: { field: UNITS.METRIC, text: 'Metric (cm/mm, kg)' },
             }}
             setSelection={onChange}
             style={{ marginBottom: 14, width: '90%', alignSelf: 'center' }}
@@ -470,7 +450,10 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                   handleBlur={onBlur}
                   handleChange={(v) => {
                     setMetricWeight(produce((w) => {
-                      const { kg, kgFraction } = LBStoKG(v, imperialWeight.fraction);
+                      const {
+                        integer: kg,
+                        fraction: kgFraction,
+                      } = LBStoKG(v + imperialWeight.fraction / 10);
                       w.kg = kg;
                       w.fraction = kgFraction;
                     }));
@@ -490,7 +473,10 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                     handleChange={(v) => {
                       setMetricWeight(produce((w) => { w.kg = v; }));
                       setImperialWeight(produce((w) => {
-                        const { lbs, lbsFraction } = KGtoLBS(v, metricWeight.fraction);
+                        const {
+                          integer: lbs,
+                          fraction: lbsFraction,
+                        } = KGtoLBS(v + metricWeight.fraction / 10);
                         w.lbs = lbs;
                         w.fraction = lbsFraction;
                       }));
@@ -519,7 +505,10 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                   handleBlur={onBlur}
                   handleChange={(v) => {
                     setMetricWeight(produce((w) => {
-                      const { kg, kgFraction } = LBStoKG(imperialWeight.lbs, v);
+                      const {
+                        integer: kg,
+                        fraction: kgFraction,
+                      } = LBStoKG(imperialWeight.lbs + v / 10);
                       w.kg = kg;
                       w.fraction = kgFraction;
                     }));
@@ -539,7 +528,10 @@ function ProfileForm({ initialValues, uid }: IProfileForm) {
                     handleChange={(v) => {
                       setMetricWeight(produce((w) => { w.fraction = v; }));
                       setImperialWeight(produce((w) => {
-                        const { lbs, lbsFraction } = KGtoLBS(metricWeight.kg, v);
+                        const {
+                          integer: lbs,
+                          fraction: lbsFraction,
+                        } = KGtoLBS(metricWeight.kg + v / 10);
                         w.lbs = lbs;
                         w.fraction = lbsFraction;
                       }));

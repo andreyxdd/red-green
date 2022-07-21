@@ -10,7 +10,7 @@ import { writeUserHistoryItem, writeUserWeight } from '../../firebase/writes';
 import Measurepicker from '../Pickers/Measurepickers/Measurepicker';
 import { ERROR_MESSAGES, CONSTANTS } from './settings';
 import { KGtoLBS, LBStoKG } from '../../utils/conversions';
-import { IWeight, IGeneralWeight } from '../../types/data';
+import { IBodyMeasure, INumber } from '../../types/data';
 
 const styles = StyleSheet.create({
   container: {
@@ -29,8 +29,8 @@ const styles = StyleSheet.create({
   helperText: { width: '90%', alignSelf: 'center' },
 });
 
-const YUPschema = (defaultWeighIn: IGeneralWeight, isImperialUnits: boolean) => yup.object().shape({
-  weighInOne: yup
+const YUPschema = (defaultWeighIn: INumber, isImperialUnits: boolean) => yup.object().shape({
+  weighInInteger: yup
     .number()
     .typeError(ERROR_MESSAGES.NONNUMBER)
     .required(ERROR_MESSAGES.REQUIRED)
@@ -46,8 +46,8 @@ const YUPschema = (defaultWeighIn: IGeneralWeight, isImperialUnits: boolean) => 
       isImperialUnits
         ? ERROR_MESSAGES.INVALID_WEIGHT_RANGE.LBS : ERROR_MESSAGES.INVALID_WEIGHT_RANGE.KG,
     )
-    .default(defaultWeighIn.whole),
-  weighInTwo: yup
+    .default(defaultWeighIn.integer),
+  weighInFraction: yup
     .number()
     .typeError(ERROR_MESSAGES.NONNUMBER)
     .required(ERROR_MESSAGES.REQUIRED)
@@ -57,8 +57,8 @@ const YUPschema = (defaultWeighIn: IGeneralWeight, isImperialUnits: boolean) => 
 });
 
 interface FormData {
-  weighInOne: number;
-  weighInTwo: number;
+  weighInInteger: number;
+  weighInFraction: number;
 }
 
 export type IManualWeighInForm = {
@@ -67,61 +67,44 @@ export type IManualWeighInForm = {
   planId: string;
   historyId: string;
   isImperialUnits: boolean;
-  profileWeight: IWeight;
+  profileWeight: IBodyMeasure;
 }
 
 function ManualWeighInForm({
   initialValues, uid, planId, historyId, isImperialUnits, profileWeight,
 }: IManualWeighInForm) {
-  const data = React.useMemo(() => {
-    if (isImperialUnits) {
-      const { lbs, lbsFraction } = KGtoLBS(profileWeight.kg, profileWeight.kgFraction);
-      const defaultWeighIn = { whole: lbs, fraction: lbsFraction };
-      return { defaultWeighIn, isImperialUnits: true };
-    }
-
-    const defaultWeighIn = { whole: profileWeight.kg, fraction: profileWeight.kgFraction };
-    return { defaultWeighIn, isImperialUnits: false };
-  }, [profileWeight, isImperialUnits]);
+  const defaultWeight: INumber = React.useMemo(() => {
+    if (isImperialUnits) return profileWeight.IMPERIAL;
+    return profileWeight.METRIC;
+  }, [isImperialUnits, profileWeight]);
 
   // screen nav object
   const navigation = useNavigation();
 
   // handle form
   const {
-    control, handleSubmit, formState: { errors, isValid }, setValue,
+    control, handleSubmit, formState: { errors, isValid },
   } = useForm<FormData>({
     mode: 'all',
-    resolver: yupResolver(YUPschema(data.defaultWeighIn, data.isImperialUnits)),
-    defaultValues: initialValues
-      || YUPschema(data.defaultWeighIn, data.isImperialUnits).getDefault(),
+    resolver: yupResolver(YUPschema(defaultWeight, isImperialUnits)),
+    defaultValues: initialValues || YUPschema(defaultWeight, isImperialUnits).getDefault(),
   });
 
-  React.useEffect(() => {
-    if (isImperialUnits) {
-      const { lbs, lbsFraction } = KGtoLBS(profileWeight.kg, profileWeight.kgFraction);
-      const defaultWeighIn = { whole: lbs, fraction: lbsFraction };
-      setValue('weighInOne', defaultWeighIn.whole, { shouldValidate: true });
-      setValue('weighInTwo', defaultWeighIn.fraction, { shouldValidate: true });
-      return;
-    }
-
-    const defaultWeighIn = { whole: profileWeight.kg, fraction: profileWeight.kgFraction };
-    setValue('weighInOne', defaultWeighIn.whole, { shouldValidate: true });
-    setValue('weighInTwo', defaultWeighIn.fraction, { shouldValidate: true });
-  }, [profileWeight, isImperialUnits, setValue]);
-
   // submit form
-  const onSubmit = async ({ weighInOne, weighInTwo }: FormData) => {
+  const onSubmit = async ({ weighInInteger, weighInFraction }: FormData) => {
     if (isValid) {
       try {
-        const newWeighInKG = isImperialUnits
-          ? LBStoKG(weighInOne, weighInTwo)
-          : { kg: weighInOne, kgFraction: weighInTwo };
+        const newWeighIn: IBodyMeasure = {
+          METRIC: isImperialUnits
+            ? LBStoKG(weighInInteger + weighInFraction / 10)
+            : { integer: weighInInteger, fraction: weighInFraction },
+          IMPERIAL: !isImperialUnits
+            ? KGtoLBS(weighInInteger + weighInFraction / 10)
+            : { integer: weighInInteger, fraction: weighInFraction },
+        };
 
-        writeUserWeight(uid, newWeighInKG);
-
-        await writeUserHistoryItem(uid, planId, historyId, newWeighInKG);
+        writeUserWeight(uid, newWeighIn);
+        await writeUserHistoryItem(uid, planId, historyId, newWeighIn, isImperialUnits);
 
         navigation.goBack();
       } catch (error) {
@@ -135,13 +118,13 @@ function ManualWeighInForm({
       <View style={styles.rowContainer}>
         <Controller
           control={control}
-          name="weighInOne"
+          name="weighInInteger"
           render={({ field: { onBlur, onChange, value } }) => (
             <View style={[styles.rowInput, { marginRight: 6 }]}>
               <Measurepicker
                 value={value}
                 label={`Weigh-In, ${isImperialUnits ? 'lbs' : 'kg'}`}
-                error={!!errors.weighInOne}
+                error={!!errors.weighInInteger}
                 handleBlur={onBlur}
                 handleChange={onChange}
                 min={isImperialUnits ? CONSTANTS.WEIGHT.LBS.MIN : CONSTANTS.WEIGHT.KG.MIN}
@@ -152,13 +135,13 @@ function ManualWeighInForm({
         />
         <Controller
           control={control}
-          name="weighInTwo"
+          name="weighInFraction"
           render={({ field: { onBlur, onChange, value } }) => (
             <View style={[styles.rowInput, { marginRight: 6 }]}>
               <Measurepicker
                 value={value}
                 label="Weigh-In, decimal"
-                error={!!errors.weighInTwo}
+                error={!!errors.weighInFraction}
                 handleBlur={onBlur}
                 handleChange={onChange}
                 min={isImperialUnits ? CONSTANTS.WEIGHT.LBS.MIN : CONSTANTS.WEIGHT.KG.MIN}
@@ -169,7 +152,7 @@ function ManualWeighInForm({
         />
       </View>
       <HelperText type="error" style={styles.helperText}>
-        {errors.weighInOne?.message || errors.weighInTwo?.message}
+        {errors.weighInInteger?.message || errors.weighInFraction?.message}
       </HelperText>
       <Button
         mode="contained"

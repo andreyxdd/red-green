@@ -5,7 +5,6 @@ import { LineChart } from 'react-native-chart-kit';
 import { format } from 'date-fns';
 import { fullHeight, fullWidth } from '../../styles/theme';
 import { IHistoryItem, IPlan } from '../../types/data';
-import { KGtoLBS } from '../../utils/conversions';
 import colors from '../../styles/colors';
 import { UNITS } from '../../types/enums';
 
@@ -35,13 +34,7 @@ function HistoryPlot({ history, plan, units }: IHistoryPlot) {
   const plot = React.useMemo(() => {
     if (history.length > 0 && plan) {
       const dailyGoals = history.map(
-        (item: IHistoryItem) => {
-          if (units === UNITS.IMPERIAL) {
-            const weight = KGtoLBS(item.dailyGoal.kg, item.dailyGoal.kgFraction);
-            return weight.lbs + weight.lbsFraction / 10;
-          }
-          return item.dailyGoal.kg + item.dailyGoal.kgFraction / 10;
-        },
+        (item: IHistoryItem) => item.dailyGoal[units],
       );
       const maxDailyGoal = Math.max(...dailyGoals);
       const minDailyGoal = Math.min(...dailyGoals);
@@ -49,12 +42,7 @@ function HistoryPlot({ history, plan, units }: IHistoryPlot) {
       const weignIns: Array<number> = [];
       history.forEach((item: IHistoryItem) => {
         if (item.weighIn !== undefined) {
-          if (units === UNITS.IMPERIAL) {
-            const weight = KGtoLBS(item.weighIn.kg, item.weighIn.kgFraction);
-            weignIns.push(weight.lbs + weight.lbsFraction / 10);
-          } else {
-            weignIns.push(item.weighIn.kg + item.weighIn.kgFraction / 10);
-          }
+          weignIns.push(item.weighIn[units].integer + item.weighIn[units].fraction / 10);
         }
       });
 

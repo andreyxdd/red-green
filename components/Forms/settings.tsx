@@ -13,7 +13,7 @@ export const CONSTANTS = {
     },
   },
   WEIGHT: {
-    LBS: { MIN: 88, MAX: 330, DEF: 132 },
+    LBS: { MIN: 88, MAX: 330, DEF: 133 },
     KG: { MIN: 40, MAX: 150, DEF: 60 },
     FRACTION: { MIN: 0, MAX: 9, DEF: { KG: 5, LBS: 4 } },
   },

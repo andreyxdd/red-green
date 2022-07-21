@@ -32,7 +32,12 @@ export default function ManualWeighInScreen({ route }: AuthStackScreenProps<'Man
       <ManualWeighInForm
         initialValues={
           currentWeighIn
-            ? { weighInOne: currentWeighIn.kg, weighInTwo: currentWeighIn.kgFraction }
+            ? {
+              weighInInteger: isImperialUnits
+                ? currentWeighIn.IMPERIAL.integer : currentWeighIn.METRIC.integer,
+              weighInFraction: isImperialUnits
+                ? currentWeighIn.IMPERIAL.fraction : currentWeighIn.METRIC.fraction,
+            }
             : undefined
         }
         uid={uid}

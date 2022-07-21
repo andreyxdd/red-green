@@ -30,18 +30,18 @@ export function CMandMMtoFTandIN(cm: number, mm: number) {
   return { feet, inches };
 }
 
-export function KGtoLBS(kg: number, kgFraction: number) {
-  const totalLBS = (kg + kgFraction / 10) * 2.205;
+export function KGtoLBS(kgValue: number) {
+  const totalLBS = kgValue * 2.205;
   const lbs = Math.floor(totalLBS);
   const lbsFraction = getFirstDigitAfterComma(totalLBS - lbs);
 
-  return { lbs, lbsFraction };
+  return { integer: lbs, fraction: lbsFraction };
 }
 
-export function LBStoKG(lbs: number, lbsFraction: number) {
-  const totalKG = (lbs + lbsFraction / 10) / 2.205;
+export function LBStoKG(lbsValue: number) {
+  const totalKG = lbsValue / 2.205;
   const kg = Math.floor(totalKG);
   const kgFraction = getFirstDigitAfterComma(totalKG - kg);
 
-  return { kg, kgFraction };
+  return { integer: kg, fraction: kgFraction };
 }

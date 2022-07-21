@@ -2,11 +2,10 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { format } from 'date-fns';
 import { Card, Text } from 'react-native-paper';
-import { SIGNS } from '../../types/enums';
+import { SIGNS, UNITS } from '../../types/enums';
 import colors from '../../styles/colors';
 import TrafficLightIcon from '../TrafficLightIcon';
-import { KGtoLBS } from '../../utils/conversions';
-import { IWeight } from '../../types/data';
+import { IBodyMeasure } from '../../types/data';
 
 const styles = StyleSheet.create({
   column: {
@@ -22,32 +21,19 @@ const styles = StyleSheet.create({
 });
 
 interface IBreakdownCard{
-  goalWeight: IWeight;
-  weighIn: IWeight;
+  goalWeight: {
+    METRIC: number,
+    IMPERIAL: number,
+  };
+  weighIn: IBodyMeasure;
   date: Date;
   sign: SIGNS;
-  isImperialUnits: boolean;
+  units: UNITS;
 }
 
 function BreakdownCard({
-  goalWeight, weighIn, date, sign, isImperialUnits,
+  goalWeight, weighIn, date, sign, units,
 }: IBreakdownCard) {
-  const currenGoaltWeightValue = React.useMemo(() => {
-    if (isImperialUnits) {
-      const weight = KGtoLBS(goalWeight.kg, goalWeight.kgFraction);
-      return weight.lbs + weight.lbsFraction / 10;
-    }
-    return goalWeight.kg + goalWeight.kgFraction / 10;
-  }, [isImperialUnits, goalWeight]);
-
-  const currenWeighInValue = React.useMemo(() => {
-    if (isImperialUnits) {
-      const weight = KGtoLBS(weighIn.kg, weighIn.kgFraction);
-      return weight.lbs + weight.lbsFraction / 10;
-    }
-    return weighIn.kg + weighIn.kgFraction / 10;
-  }, [isImperialUnits, weighIn]);
-
   return (
     <Card style={{ marginVertical: 4 }}>
       <Card.Content>
@@ -63,24 +49,24 @@ function BreakdownCard({
               <Text style={{ fontWeight: '200', marginRight: 4 }}>
                 Daily Goal Weight,
                 {' '}
-                {isImperialUnits ? 'lbs' : 'kg'}
+                {units === UNITS.IMPERIAL ? 'lbs' : 'kg'}
                 :
               </Text>
               <Text style={{ fontWeight: '200', marginRight: 4 }}>
                 {' '}
-                {currenGoaltWeightValue}
+                {goalWeight[units]}
               </Text>
             </View>
             <View style={styles.row}>
               <Text style={{ marginRight: 4 }}>
                 Achieved Weight,
                 {' '}
-                {isImperialUnits ? 'lbs' : 'kg'}
+                {units === UNITS.IMPERIAL ? 'lbs' : 'kg'}
                 :
               </Text>
               <Text style={{ marginRight: 4 }}>
                 {' '}
-                {currenWeighInValue}
+                {weighIn[units].integer + weighIn[units].fraction / 10}
               </Text>
             </View>
           </View>

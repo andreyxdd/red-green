@@ -7,14 +7,13 @@ import {
   Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 import colors from '../../styles/colors';
-import { IBodyMeasure, IHistoryItem, IPlan } from '../../types/data';
+import { IHistoryItem, IPlan } from '../../types/data';
 import { SIGNS, UNITS } from '../../types/enums';
 
 interface IHistoryPlot{
   history: Array<IHistoryItem>
   plan: IPlan | null;
   units: UNITS;
-  profileWeight: IBodyMeasure;
 }
 
 export interface IData{
@@ -33,7 +32,7 @@ function CustomizedDot(props: any) {
   }
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   return ( // @ts-ignore
-    <svg fill={colors[payload.sign].primary} fillOpacity={0.6}>
+    <svg fill={colors[payload.sign].primary} fillOpacity={0.4}>
       <circle cx={cx} cy={cy} r={2.5 * r} />
     </svg>
   );
@@ -50,14 +49,14 @@ function CustomizedActiveDot(props: any) {
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   return ( // @ts-ignore
-    <svg fill={colors[payload.sign].primary}>
+    <svg fill={colors[payload.sign].primary} fillOpacity={0.8}>
       <circle cx={cx} cy={cy} r={r} />
     </svg>
   );
 }
 
 function Example({
-  history, plan, units, profileWeight,
+  history, plan, units,
 }: IHistoryPlot) {
   const data = React.useMemo(() => history.map((item: IHistoryItem) => {
     if (item.weighIn && item.sign) {
@@ -69,19 +68,33 @@ function Example({
       };
     }
 
-    if (item.date <= new Date()) {
+    /*
+    if (item.date <= new Date('July 30, 2022')) {
+      const lastWeighIn = history.filter(
+        (it: IHistoryItem) => it.weighIn && it.date < item.date,
+      ).pop();
+
+      if (lastWeighIn && lastWeighIn.weighIn) {
+        return {
+          date: format(item.date, 'PP'),
+          'Daily Goal': item.dailyGoal[units],
+          'Weigh In': lastWeighIn.weighIn[units].integer + lastWeighIn.weighIn[units].fraction / 10,
+        };
+      }
+
       return {
         date: format(item.date, 'PP'),
         'Daily Goal': item.dailyGoal[units],
         'Weigh In': profileWeight[units].integer + profileWeight[units].fraction / 10,
       };
     }
+    */
 
     return {
       date: format(item.date, 'PP'),
       'Daily Goal': item.dailyGoal[units],
     };
-  }), [history, profileWeight, units]);
+  }), [history, units]);
 
   const { colors: paperColors } = useTheme();
 
@@ -115,13 +128,15 @@ function Example({
             fill="url(#colorDailyGoals)"
           />
           <Line
+            connectNulls
             type="monotone"
             dataKey="Weigh In"
-            strokeOpacity={0.4}
+            strokeOpacity={0.3}
             stroke={paperColors.primary}
             strokeWidth={4}
             dot={<CustomizedDot />}
             activeDot={<CustomizedActiveDot />}
+            strokeDasharray="14 14"
           />
         </ComposedChart>
       </ResponsiveContainer>

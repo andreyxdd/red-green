@@ -66,7 +66,6 @@ function PlanScreen() {
                         history={history}
                         plan={plan}
                         units={profileData.units}
-                        profileWeight={profileData.weight}
                       />
                     )
                     : null}

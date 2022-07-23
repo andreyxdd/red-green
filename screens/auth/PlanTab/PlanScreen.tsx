@@ -1,5 +1,5 @@
 import {
-  StyleSheet, ScrollView, FlatList, View,
+  StyleSheet, ScrollView, FlatList, View, Platform,
 } from 'react-native';
 import shallow from 'zustand/shallow';
 import React from 'react';
@@ -60,7 +60,16 @@ function PlanScreen() {
                   justifyContent: 'flex-start',
                 }}
                 >
-                  <HistoryPlot history={history} plan={plan} units={profileData.units} />
+                  {Platform.OS === 'web'
+                    ? (
+                      <HistoryPlot
+                        history={history}
+                        plan={plan}
+                        units={profileData.units}
+                        profileWeight={profileData.weight}
+                      />
+                    )
+                    : null}
                 </ScrollView>
               )
               : (

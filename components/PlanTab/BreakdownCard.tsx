@@ -59,7 +59,7 @@ function BreakdownCard({
             </View>
             <View style={styles.row}>
               <Text style={{ marginRight: 4 }}>
-                Achieved Weight,
+                Weigh-In,
                 {' '}
                 {units === UNITS.IMPERIAL ? 'lbs' : 'kg'}
                 :

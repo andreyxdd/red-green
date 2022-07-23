@@ -2,7 +2,6 @@ import { differenceInDays } from 'date-fns';
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
-import useLog from '../../hooks/useLog';
 import { IBodyMeasure } from '../../types/data';
 import { UNITS } from '../../types/enums';
 
@@ -37,8 +36,6 @@ interface IPlanInformation{
 function PlanInfo({
   type, endDate, startDate, units, goalWeight,
 }: IPlanInformation) {
-  useLog(endDate);
-  useLog(startDate);
   return (
     <>
       <View style={[styles.item, { paddingVertical: 0, paddingTop: 10, paddingBottom: 6 }]}>

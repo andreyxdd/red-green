@@ -1,5 +1,5 @@
 Arguments: 
-  /snap/node/6331/bin/node /snap/node/6331/bin/yarn.js install
+  /snap/node/6331/bin/node /snap/node/6331/bin/yarn.js add recharts
 
 PATH: 
   /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/volkov/Android/Sdk/emulator:/home/volkov/Android/Sdk/platform-tools:/home/volkov/.pub-cache/bin:/home/volkov/Android/Sdk/emulator:/home/volkov/Android/Sdk/platform-tools:/home/volkov/.pub-cache/bin

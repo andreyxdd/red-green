@@ -1,114 +1,134 @@
+import format from 'date-fns/format';
 import React from 'react';
-import { Platform, View } from 'react-native';
-import { Subheading } from 'react-native-paper';
-import { LineChart } from 'react-native-chart-kit';
-import { format } from 'date-fns';
-import { fullHeight, fullWidth } from '../../styles/theme';
-import { IHistoryItem, IPlan } from '../../types/data';
+import { View } from 'react-native';
+import { Subheading, useTheme } from 'react-native-paper';
+import {
+  ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer,
+} from 'recharts';
 import colors from '../../styles/colors';
-import { UNITS } from '../../types/enums';
-
-const chartConfig = {
-  backgroundGradientFrom: '#ffffff',
-  backgroundGradientTo: '#fff',
-  color: (opacity = 1) => `rgba(63, 143, 244, ${opacity})`,
-  strokeWidth: 2, // optional, default 3
-  barPercentage: 0.5,
-  propsForVerticalLabels: {
-    fontSize: '8',
-  },
-  propsForDots: {
-    r: Platform.OS === 'web' ? '12' : '6',
-    strokeWidth: '2',
-    stroke: '#fff',
-  },
-};
+import { IBodyMeasure, IHistoryItem, IPlan } from '../../types/data';
+import { SIGNS, UNITS } from '../../types/enums';
 
 interface IHistoryPlot{
   history: Array<IHistoryItem>
   plan: IPlan | null;
-  units:UNITS
+  units: UNITS;
+  profileWeight: IBodyMeasure;
 }
 
-function HistoryPlot({ history, plan, units }: IHistoryPlot) {
-  const plot = React.useMemo(() => {
-    if (history.length > 0 && plan) {
-      const dailyGoals = history.map(
-        (item: IHistoryItem) => item.dailyGoal[units],
-      );
-      const maxDailyGoal = Math.max(...dailyGoals);
-      const minDailyGoal = Math.min(...dailyGoals);
+export interface IData{
+  date: string;
+  dailyGoal: number;
+  weighIn: number;
+  sign: SIGNS,
+}
 
-      const weignIns: Array<number> = [];
-      history.forEach((item: IHistoryItem) => {
-        if (item.weighIn !== undefined) {
-          weignIns.push(item.weighIn[units].integer + item.weighIn[units].fraction / 10);
-        }
-      });
+function CustomizedDot(props: any) {
+  const {
+    cx, cy, r, payload,
+  } = props;
+  if (!payload.sign) {
+    return <svg />;
+  }
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  return ( // @ts-ignore
+    <svg fill={colors[payload.sign].primary} fillOpacity={0.6}>
+      <circle cx={cx} cy={cy} r={2.5 * r} />
+    </svg>
+  );
+}
 
-      const datasets = [
-        {
-          data: dailyGoals,
-          color: (opacity = 1) => `rgb(190, 190, 190, ${opacity})`, // optional
-          strokeWidth: 6, // optional
-          withDots: false,
-        },
-        {
-          data: [maxDailyGoal + maxDailyGoal / 30], // max
-          withDots: false,
-          color: (opacity = 1) => `rgb(98, 0, 238, ${opacity})`,
-        },
-        {
-          data: [minDailyGoal - minDailyGoal / 10], // min
-          withDots: false,
-          color: (opacity = 1) => `rgb(98, 0, 238, ${opacity})`,
-        },
-      ];
-      const legend = ['Goal Weight'];
+function CustomizedActiveDot(props: any) {
+  const {
+    cx, cy, r, payload,
+  } = props;
 
-      if (weignIns.length > 0) {
-        datasets.push(
-          {
-            data: weignIns,
-            color: (opacity = 1) => `rgb(98, 0, 238, ${opacity})`,
-            strokeWidth: 3,
-            withDots: true,
-          },
-        );
-        legend.push('Weigh-ins');
-      }
+  if (!payload.sign) {
+    return <svg />;
+  }
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  return ( // @ts-ignore
+    <svg fill={colors[payload.sign].primary}>
+      <circle cx={cx} cy={cy} r={r} />
+    </svg>
+  );
+}
+
+function Example({
+  history, plan, units, profileWeight,
+}: IHistoryPlot) {
+  const data = React.useMemo(() => history.map((item: IHistoryItem) => {
+    if (item.weighIn && item.sign) {
       return {
-        labels: history.map((item: IHistoryItem) => format(item.date, 'PP')),
-        datasets,
-        legend,
+        date: format(item.date, 'PP'),
+        'Daily Goal': item.dailyGoal[units],
+        'Weigh In': item.weighIn[units].integer + item.weighIn[units].fraction / 10,
+        sign: item.sign,
       };
     }
-    return null;
-  }, [history, plan, units]);
 
-  if (plot && plan) {
+    if (item.date <= new Date()) {
+      return {
+        date: format(item.date, 'PP'),
+        'Daily Goal': item.dailyGoal[units],
+        'Weigh In': profileWeight[units].integer + profileWeight[units].fraction / 10,
+      };
+    }
+
+    return {
+      date: format(item.date, 'PP'),
+      'Daily Goal': item.dailyGoal[units],
+    };
+  }), [history, profileWeight, units]);
+
+  const { colors: paperColors } = useTheme();
+
+  if (data && plan) {
     return (
-      <LineChart
-        data={plot}
-        width={fullWidth}
-        height={fullHeight / 1.5}
-        chartConfig={chartConfig}
-        bezier
-        verticalLabelRotation={Platform.OS === 'web' ? 0 : -75}
-        xLabelsOffset={Platform.OS === 'web' ? 0 : 35}
-        getDotColor={(dataPoint, dataPointIndex) => {
-          const historyItem = history[dataPointIndex];
-
-          if (historyItem.sign) return colors[historyItem.sign].secondary;
-
-          return '#D3D3D3';
-        }}
-      />
+      <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart
+          data={data}
+          margin={{
+            top: 10, right: 30, left: 0, bottom: 0,
+          }}
+        >
+          <defs>
+            <linearGradient id="colorDailyGoals" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="3%" stopColor={paperColors.primary} stopOpacity={0.1} />
+              <stop offset="97%" stopColor={paperColors.primary} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <XAxis dataKey="date" interval={2} />
+          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Legend verticalAlign="top" height={36} iconType="plainline" />
+          <Area
+            type="linear"
+            dataKey="Daily Goal"
+            strokeOpacity={0.15}
+            stroke={paperColors.backdrop}
+            fillOpacity={1}
+            strokeWidth={4}
+            fill="url(#colorDailyGoals)"
+          />
+          <Line
+            type="monotone"
+            dataKey="Weigh In"
+            strokeOpacity={0.4}
+            stroke={paperColors.primary}
+            strokeWidth={4}
+            dot={<CustomizedDot />}
+            activeDot={<CustomizedActiveDot />}
+          />
+        </ComposedChart>
+      </ResponsiveContainer>
     );
   }
 
   return <View><Subheading>No Availble Data</Subheading></View>;
 }
 
-export default HistoryPlot;
+export default Example;

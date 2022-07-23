@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import { Subheading } from 'react-native-paper';
 import useDataStore, { IDataStore } from '../../../hooks/useDataStore';
 import TodaysRecommendations from '../../../components/TodayTab/TodaysRecommendations';
+import useLog from '../../../hooks/useLog';
 
 const styles = StyleSheet.create({
   container: {
@@ -12,6 +13,8 @@ const styles = StyleSheet.create({
 
 function TodayScreen() {
   const sign = useDataStore((state:IDataStore) => state.todayHistoryItem?.sign);
+
+  useLog(`TODAY TAB ${sign}`);
 
   return (
     <View style={[styles.container, { flex: 1 }]}>

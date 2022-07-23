@@ -1,9 +1,9 @@
 import {
-  Timestamp, setDoc, doc, collection, addDoc, getDoc,
+  Timestamp, setDoc, doc, collection, addDoc, getDoc, writeBatch,
 } from 'firebase/firestore';
 import { eachDayOfInterval } from 'date-fns';
 import { getDailyGoal, getRelativeChange } from '../utils/calculate';
-import { db, batch } from './firebase';
+import { db } from './firebase';
 import { IProfile, IBodyMeasure, IHistoryItem } from '../types/data';
 import { PLANS, SIGNS } from '../types/enums';
 
@@ -32,38 +32,45 @@ export const writeMaintenancePlan = async (
   goalWeight: IBodyMeasure,
   goalDate: Date,
 ) => {
-  const plansCollectionRef = collection(db, 'users', uid, 'plans');
-  const startDate = new Date(new Date().setHours(0, 0, 0, 0));
-  const endDate = new Date(goalDate.setHours(0, 0, 0, 0));
+  try {
+    // Initialize new batch write object
+    const batch = writeBatch(db);
 
-  const planDates = eachDayOfInterval(
-    { start: startDate, end: endDate },
-  );
+    const plansCollectionRef = collection(db, 'users', uid, 'plans');
+    const startDate = new Date(new Date().setHours(0, 0, 0, 0));
+    const endDate = new Date(goalDate.setHours(0, 0, 0, 0));
 
-  const res = await addDoc(
-    plansCollectionRef,
-    {
-      active: true,
-      type: PLANS.MAINTENANCE,
-      startDate: Timestamp.fromDate(startDate),
-      goalDate: Timestamp.fromDate(endDate),
-      goalWeight,
-    },
-  );
+    const planDates = eachDayOfInterval(
+      { start: startDate, end: endDate },
+    );
 
-  const historyRef = collection(db, 'users', uid, 'plans', res.id, 'history');
-
-  planDates.forEach((date) => {
-    const newDocRef = doc(historyRef);
-    batch.set(newDocRef, {
-      dailyGoal: {
-        METRIC: goalWeight.METRIC.integer + goalWeight.METRIC.fraction,
-        IMPERIAL: goalWeight.IMPERIAL.integer + goalWeight.IMPERIAL.fraction,
+    const res = await addDoc(
+      plansCollectionRef,
+      {
+        active: true,
+        type: PLANS.MAINTENANCE,
+        startDate: Timestamp.fromDate(startDate),
+        goalDate: Timestamp.fromDate(endDate),
+        goalWeight,
       },
-      date,
+    );
+
+    const historyRef = collection(db, 'users', uid, 'plans', res.id, 'history');
+
+    planDates.forEach((date) => {
+      const newDocRef = doc(historyRef);
+      batch.set(newDocRef, {
+        dailyGoal: {
+          METRIC: goalWeight.METRIC.integer + goalWeight.METRIC.fraction / 10,
+          IMPERIAL: goalWeight.IMPERIAL.integer + goalWeight.IMPERIAL.fraction / 10,
+        },
+        date,
+      });
     });
-  });
-  await batch.commit();
+    await batch.commit();
+  } catch (e) {
+    console.log('Error', 'New plan was not created, something went wrong', e);
+  }
 };
 
 export const writeLosingWeightPlan = async (
@@ -72,6 +79,9 @@ export const writeLosingWeightPlan = async (
   goalDate: Date,
   startWeight: IBodyMeasure,
 ) => {
+  // Initialize new batch write object
+  const batch = writeBatch(db);
+
   const plansCollectionRef = collection(db, 'users', uid, 'plans');
   const startDate = new Date(new Date().setHours(0, 0, 0, 0));
   const endDate = new Date(goalDate.setHours(0, 0, 0, 0));
@@ -190,10 +200,14 @@ export const writeUserWeight = (uid: string, newWeight: IBodyMeasure) => {
 // to be updated is below
 
 export const writePlanStatus = (uid: string, planId: string) => {
-  const planRef = doc(db, 'users', uid, 'plans', planId);
-  setDoc(
-    planRef,
-    { active: false },
-    { merge: true },
-  );
+  try {
+    const planRef = doc(db, 'users', uid, 'plans', planId);
+    setDoc(
+      planRef,
+      { active: false },
+      { merge: true },
+    );
+  } catch (e) {
+    console.log('Error', 'New plan was not created, something went wrong', e);
+  }
 };

@@ -33,7 +33,7 @@ function CustomizedDot(props: any) {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   return ( // @ts-ignore
     <svg fill={colors[payload.sign].primary} fillOpacity={0.4}>
-      <circle cx={cx} cy={cy} r={2.5 * r} />
+      <circle cx={cx} cy={cy} r={4 * r} />
     </svg>
   );
 }
@@ -50,7 +50,7 @@ function CustomizedActiveDot(props: any) {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   return ( // @ts-ignore
     <svg fill={colors[payload.sign].primary} fillOpacity={0.8}>
-      <circle cx={cx} cy={cy} r={r} />
+      <circle cx={cx} cy={cy} r={2 * r} />
     </svg>
   );
 }
@@ -133,10 +133,10 @@ function Example({
             dataKey="Weigh In"
             strokeOpacity={0.3}
             stroke={paperColors.primary}
-            strokeWidth={4}
+            strokeWidth={3}
             dot={<CustomizedDot />}
             activeDot={<CustomizedActiveDot />}
-            strokeDasharray="14 14"
+            strokeDasharray="6 6"
           />
         </ComposedChart>
       </ResponsiveContainer>

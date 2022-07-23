@@ -10,12 +10,15 @@ import { MenuContextOpenner } from '../components/PlanTab/PopupPlanMenu';
 import useDataStore, { IDataStore } from '../hooks/useDataStore';
 import colors from '../styles/colors';
 import Profile from '../components/IconButtons/Profile';
+import useLog from '../hooks/useLog';
 
 const BottomTab = createBottomTabNavigator<AuthBottomTabList>();
 
 function BottomTabStack() {
   const sign = useDataStore((state:IDataStore) => state.todayHistoryItem?.sign);
   const { colors: paperColors } = useTheme();
+
+  useLog(`BottomTabStack ${sign}`);
 
   return (
     <BottomTab.Navigator initialRouteName="WeighInTab">

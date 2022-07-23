@@ -1,9 +1,7 @@
 import {
   Menu, MenuOptions, MenuOption, MenuTrigger, withMenuContext, renderers,
 } from 'react-native-popup-menu';
-import {
-  Alert, Platform, View, StyleSheet,
-} from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Text } from 'react-native-paper';
 import shallow from 'zustand/shallow';
@@ -11,7 +9,7 @@ import ThreeDots from '../IconButtons/ThreeDots';
 import Divider from '../Divider';
 import useDataStore, { IDataStore } from '../../hooks/useDataStore';
 import { writePlanStatus as deactivatePlan } from '../../firebase/writes';
-import { deleteHistoryByIds, deletePlan } from '../../firebase/deletes';
+// import { deleteHistoryByIds, deletePlan } from '../../firebase/deletes';
 
 const { SlideInMenu } = renderers;
 
@@ -21,8 +19,8 @@ const styles = StyleSheet.create({
 
 export default function PopupPlanMenu() {
   const navigation = useNavigation();
-  const [user, plan, history] = useDataStore(
-    (state: IDataStore) => [state.user, state.plan, state.history],
+  const [user, plan, setHistory, setTodayHistoryItem] = useDataStore(
+    (state: IDataStore) => [state.user, state.plan, state.setHistory, state.setTodayHistoryItem],
     shallow,
   );
 
@@ -32,20 +30,26 @@ export default function PopupPlanMenu() {
         <MenuTrigger />
         <MenuOptions>
           <MenuOption
-            onSelect={() => { if (plan) navigation.navigate('EditPlan', { plan }); }}
-            disabled={!plan}
+            onSelect={() => {
+              if (plan) navigation.navigate('EditPlan', { plan });
+            }}
+            disabled
           >
-            <Text style={styles.menuOption}>Edit Plan</Text>
+            <Text style={[styles.menuOption, { fontWeight: '200' }]}>Edit Plan</Text>
           </MenuOption>
           <Divider width={1} />
           <MenuOption
             onSelect={() => {
-              if (user && plan) deactivatePlan(user.uid, plan.id);
+              if (user && plan) {
+                setTodayHistoryItem(null);
+                setHistory([]);
+                deactivatePlan(user.uid, plan.id);
+              }
             }}
-            disabled
           >
-            <Text style={[styles.menuOption, { fontWeight: '200' }]}>Deactivate Plan</Text>
+            <Text style={[styles.menuOption, { color: 'red' }]}>Deactivate Plan</Text>
           </MenuOption>
+          {/*
           <Divider width={1} />
           <MenuOption
             onSelect={Platform.OS === 'web'
@@ -77,6 +81,7 @@ export default function PopupPlanMenu() {
           >
             <Text style={[styles.menuOption, { color: 'red' }]}>Delete Plan</Text>
           </MenuOption>
+          */}
         </MenuOptions>
       </Menu>
     </View>
